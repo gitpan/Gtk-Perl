@@ -30,8 +30,8 @@ MODULE = Gtk::Container		PACKAGE = Gtk::Container		PREFIX = gtk_container_
 #ifdef GTK_CONTAINER
 
 void
-set_border_width(self, width)
-	Gtk::Container	self
+set_border_width(container, width)
+	Gtk::Container	container
 	int	width
 	ALIAS:
 		Gtk::Container::set_border_width = 0
@@ -39,35 +39,38 @@ set_border_width(self, width)
 	CODE:
 #if GTK_HVER < 0x010106
 	/* DEPRECATED */
-	gtk_container_border_width(self, width);
+	gtk_container_border_width(container, width);
 #else
-	gtk_container_set_border_width(self, width);
+	gtk_container_set_border_width(container, width);
 #endif
 
+ #OUTPUT: Gtk::Widget
 SV *
-add(self, widget)
-	Gtk::Container	self
+add(container, widget)
+	Gtk::Container	container
 	Gtk::Widget	widget	
 	CODE:
-		gtk_container_add(self, widget);
+		gtk_container_add(container, widget);
 		RETVAL = newSVsv(ST(1));
 	OUTPUT:
 	RETVAL
 
 Gtk::Widget
-remove(self, widget)
-	Gtk::Container	self
+remove(container, widget)
+	Gtk::Container	container
 	Gtk::Widget	widget	
 	CODE:
-		gtk_container_remove(self, widget);
+		gtk_container_remove(container, widget);
 		RETVAL = widget;
 	OUTPUT:
 	RETVAL
 
+ #ARG: $handler subroutine (a subroutine that will get each children of the container)
+ #ARG: ... list (additional arguments for $handler)
 void
-foreach(self, code, ...)
-	Gtk::Container	self
-	SV *	code
+foreach(container, handler, ...)
+	Gtk::Container	container
+	SV *	handler
 	PPCODE:
 	{
 		AV * args;
@@ -79,17 +82,17 @@ foreach(self, code, ...)
 		av_push(args, newRV_inc(SvRV(ST(0))));
 		PackCallbackST(args, 1);
 
-		gtk_container_foreach(self, foreach_container_handler, args);
+		gtk_container_foreach(container, foreach_container_handler, args);
 		
 		SvREFCNT_dec(args);
 	}
 
 void
-children(self)
-	Gtk::Container	self
+children(container)
+	Gtk::Container	container
 	PPCODE:
 	{
-		GList * c = gtk_container_children(self);
+		GList * c = gtk_container_children(container);
 		GList * start = c;
 		while(c) {
 			EXTEND(sp, 1);
@@ -102,66 +105,66 @@ children(self)
 
 
 int
-gtk_container_focus(self, direction)
-	Gtk::Container	self
+gtk_container_focus(container, direction)
+	Gtk::Container	container
 	Gtk::DirectionType	direction
 
 
 #ifdef GTK_HAVE_CONTAINER_FOCUS_ADJUSTMENTS
 
 void
-gtk_container_set_focus_vadjustment(self, adjustment)
-	Gtk::Container	self
+gtk_container_set_focus_vadjustment(container, adjustment)
+	Gtk::Container	container
 	Gtk::Adjustment	adjustment
 
 void
-gtk_container_set_focus_hadjustment(self, adjustment)
-	Gtk::Container	self
+gtk_container_set_focus_hadjustment(container, adjustment)
+	Gtk::Container	container
 	Gtk::Adjustment	adjustment
 
 #endif
 
 void
-gtk_container_register_toplevel (self)
-	Gtk::Container  self
+gtk_container_register_toplevel (container)
+	Gtk::Container  container
 
 void
-gtk_container_unregister_toplevel (self)
-	Gtk::Container  self
+gtk_container_unregister_toplevel (container)
+	Gtk::Container  container
 
 #if GTK_HVER < 0x010105
 
 void
-gtk_container_disable_resize(self)
-	Gtk::Container	self
+gtk_container_disable_resize(container)
+	Gtk::Container	container
 
 void
-gtk_container_enable_resize(self)
-	Gtk::Container	self
+gtk_container_enable_resize(container)
+	Gtk::Container	container
 
 void
-gtk_container_block_resize(self)
-	Gtk::Container	self
+gtk_container_block_resize(container)
+	Gtk::Container	container
 
 void
-gtk_container_unblock_resize(self)
-	Gtk::Container	self
+gtk_container_unblock_resize(container)
+	Gtk::Container	container
 
 bool
-gtk_container_need_resize(self)
-	Gtk::Container	self
+gtk_container_need_resize(container)
+	Gtk::Container	container
 
 #endif
 
 #if GTK_HVER >= 0x010100
 
 void
-gtk_container_resize_children(self)
-	Gtk::Container self
+gtk_container_resize_children(container)
+	Gtk::Container container
 
 void
-gtk_container_set_focus_child(self, child)
-	Gtk::Container	self
+gtk_container_set_focus_child(container, child)
+	Gtk::Container	container
 	Gtk::Widget	child
 
 #endif
@@ -169,14 +172,16 @@ gtk_container_set_focus_child(self, child)
 #if GTK_HVER >= 0x010200
 
 char*
-gtk_container_child_type (self)
-	Gtk::Container	self
+gtk_container_child_type (container)
+	Gtk::Container	container
 	CODE:
-	RETVAL = ptname_for_gtnumber(gtk_container_child_type(self));
+	RETVAL = ptname_for_gtnumber(gtk_container_child_type(container));
+	OUTPUT:
+	RETVAL
 
 char *
-gtk_container_child_composite_name (self, child)
-	Gtk::Container	self
+gtk_container_child_composite_name (container, child)
+	Gtk::Container	container
 	Gtk::Widget	child
 
 

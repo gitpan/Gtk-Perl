@@ -57,16 +57,49 @@ SvGtkItemFactoryEntry(SV *data) {
 	return e;
 }
 
+/* The GtkItemFactoryEntry struct does not have a separate
+   callback_data member for each item.  Instead, the callback_data is
+   passed into gtk_item_factory_create_item(s), and, to make matters
+   even worse, gtk_item_factory_create_items() only has a single
+   callback_data argument. Therefore, we have to get the actual
+   callback data in a separate function from the one above. */
+
+static SV*
+ifactory_sv_get_handler(SV* data)
+{
+	SV* handler = NULL;
+
+	if (SvTYPE(SvRV(data)) == SVt_PVHV) {
+		HV *h = (HV*)SvRV(data);
+		SV **s;
+		if ((s = hv_fetch(h, "callback", 8, 0)) && SvOK(*s))
+			handler = *s;
+	} else if (SvTYPE(SvRV(data)) == SVt_PVAV) {
+		AV *a = (AV*)SvRV(data);
+		SV **s;
+		if ((s = av_fetch(a, 4, 0)) && SvOK(*s))
+			handler = *s;
+	}
+	return handler;
+}
 
 static void
-default_ifactory_callback (gpointer callback_data, guint callback_action, GtkWidget *widget) {
-	AV * args = (AV*)callback_data;
-	SV * handler = *av_fetch(args, 0, 0); 
-	SV * sv_widget = newSVGtkObjectRef(GTK_OBJECT(widget), 0);
+default_ifactory_callback (gpointer callback_data, guint callback_action, GtkWidget *widget)
+{
+	AV * args;
+	SV * handler;
+	SV * sv_widget;
 	int i;
 
 	dSP; 
+
+	if (callback_data == NULL)
+		return;
+
 	PUSHMARK(sp);
+	args = (AV*)callback_data;
+	handler = *av_fetch(args, 0, 0); 
+	sv_widget = newSVGtkObjectRef(GTK_OBJECT(widget), 0);
 
 	XPUSHs(sv_2mortal(sv_widget));
 	XPUSHs(sv_2mortal(newSViv(callback_action)));
@@ -75,8 +108,6 @@ default_ifactory_callback (gpointer callback_data, guint callback_action, GtkWid
 	PUTBACK;
 
 	perl_call_sv(handler, G_DISCARD);
-
-	/*SvREFCNT_dec(args);*/
 }
 
 MODULE = Gtk::ItemFactory	PACKAGE = Gtk::ItemFactory	PREFIX = gtk_item_factory_
@@ -101,8 +132,8 @@ gtk_item_factory_new(Class, container_type, path, accel_group)
 	RETVAL
 
 void
-gtk_item_factory_construct(self, container_type, path, accel_group)
-	Gtk::ItemFactory	self
+gtk_item_factory_construct(item_factory, container_type, path, accel_group)
+	Gtk::ItemFactory	item_factory
 	char*		container_type
 	char*		path
 	Gtk::AccelGroup	accel_group
@@ -112,7 +143,7 @@ gtk_item_factory_construct(self, container_type, path, accel_group)
 		wtype = gtnumber_for_gtname(container_type); 
 		if (!wtype)
 			wtype = gtnumber_for_ptname(container_type);
-		gtk_item_factory_construct(self, wtype, path, accel_group);
+		gtk_item_factory_construct(item_factory, wtype, path, accel_group);
 	}
 
 void
@@ -146,57 +177,85 @@ gtk_item_factory_add_foreign(Class, accel_widget, full_path, accel_group, keyval
 
 
 Gtk::Widget_Up
-gtk_item_factory_get_widget(self, path)
-	Gtk::ItemFactory	self
+gtk_item_factory_get_widget(item_factory, path)
+	Gtk::ItemFactory	item_factory
 	char*			path
 
 Gtk::Widget_Up
-gtk_item_factory_get_item(self, path)
-	Gtk::ItemFactory	self
+gtk_item_factory_get_item(item_factory, path)
+	Gtk::ItemFactory	item_factory
 	char*			path
 
 Gtk::Widget_Up
-gtk_item_factory_get_widget_by_action(self, action)
-	Gtk::ItemFactory	self
+gtk_item_factory_get_widget_by_action(item_factory, action)
+	Gtk::ItemFactory	item_factory
 	unsigned int		action
 
 Gtk::Widget_Up
-gtk_item_factory_get_item_by_action(self, action)
-	Gtk::ItemFactory	self
+gtk_item_factory_get_item_by_action(item_factory, action)
+	Gtk::ItemFactory	item_factory
 	unsigned int		action
 
 void
-gtk_item_factory_create_item(self, entry, handler, ...)
-	Gtk::ItemFactory	self
+gtk_item_factory_create_item(item_factory, entry, ...)
+	Gtk::ItemFactory	item_factory
 	Gtk::ItemFactory::Entry	entry
-	SV *	handler
 	CODE:
 	{
-		AV *args = newAV();
-		/*
-			Need to unref args when the item is destroyed.
-			Should be fixed at the Gtk+ level with a _full
-			version of the function.
-		*/
+		AV *args = NULL;
+		/* Need to unref args when the item is destroyed.
+		   Should be fixed at the Gtk+ level with a _full
+		   version of the function.  */
 
-		PackCallbackST(args, 2);
-		gtk_item_factory_create_item(self, entry, args, 1);
+		if (items > 2) {
+			/* If we have a handler and arg-list, use it */
+			args = newAV();
+			PackCallbackST(args, 2);
+		} else {
+			SV *handler = ifactory_sv_get_handler(ST(1)); /* entry */
+			if (handler) {
+				args = newAV();
+				PackCallback(args, handler);
+			} else
+				entry->callback = NULL;
+		}
+		gtk_item_factory_create_item(item_factory, entry, args, 1);
 	}
 
+void
+gtk_item_factory_create_items(item_factory, ...)
+	Gtk::ItemFactory	item_factory
+	CODE:
+	{
+		int i;
+		for (i = 1; i < items; i++) {
+			GtkItemFactoryEntry *entry = SvGtkItemFactoryEntry(ST(i));
+			SV *handler = ifactory_sv_get_handler(ST(i));
+			AV *args = NULL;
+
+			/* As above, args will leak memory :( */
+			if (handler) {
+				args = newAV();
+				PackCallback(args, handler);
+			} else
+				entry->callback = NULL;
+			gtk_item_factory_create_item(item_factory, entry, args, 1);
+		}
+	}
 
 void
-gtk_item_factory_delete_item(self, path)
-	Gtk::ItemFactory	self
+gtk_item_factory_delete_item(item_factory, path)
+	Gtk::ItemFactory	item_factory
 	char *	path
 
 void
-gtk_item_factory_delete_entry(self, entry)
-	Gtk::ItemFactory	self
+gtk_item_factory_delete_entry(item_factory, entry)
+	Gtk::ItemFactory	item_factory
 	Gtk::ItemFactory::Entry	entry
 
 void
-gtk_item_factory_popup(self, x, y, mouse_button, time)
-	Gtk::ItemFactory	self
+gtk_item_factory_popup(item_factory, x, y, mouse_button, time)
+	Gtk::ItemFactory	item_factory
 	unsigned int	x
 	unsigned int	y
 	unsigned int	mouse_button

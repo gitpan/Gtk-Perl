@@ -19,27 +19,27 @@ new(Class, title)
 	RETVAL
 
 void
-gtk_file_selection_set_filename(self, filename)
-	Gtk::FileSelection	self
+gtk_file_selection_set_filename(file_selection, filename)
+	Gtk::FileSelection	file_selection
 	char *	filename
 
 char *
-gtk_file_selection_get_filename(self)
-	Gtk::FileSelection	self
+gtk_file_selection_get_filename(file_selection)
+	Gtk::FileSelection	file_selection
 
 void
-gtk_file_selection_show_fileop_buttons (self)
-	Gtk::FileSelection	self
+gtk_file_selection_show_fileop_buttons (file_selection)
+	Gtk::FileSelection	file_selection
 
 void
-gtk_file_selection_hide_fileop_buttons (self)
-	Gtk::FileSelection	self
+gtk_file_selection_hide_fileop_buttons (file_selection)
+	Gtk::FileSelection	file_selection
 
 #if GTK_HVER >= 0x010200
 
 void
-gtk_file_selection_complete (self, pattern)
-	Gtk::FileSelection	self
+gtk_file_selection_complete (file_selection, pattern)
+	Gtk::FileSelection	file_selection
 	char *	pattern
 
 #endif

@@ -10,6 +10,7 @@ MODULE = Gtk::Window		PACKAGE = Gtk::Window		PREFIX = gtk_window_
 
 #ifdef GTK_WINDOW
 
+ #CONSTRUCTOR: yes
 Gtk::Window_Sink
 new(Class, type=0)
 	SV *	Class
@@ -20,11 +21,11 @@ new(Class, type=0)
 	RETVAL
 
 void
-set_title(self, title)
-	Gtk::Window	self
+set_title(window, title)
+	Gtk::Window	window
 	char *	title
 	CODE:
-	gtk_window_set_title(self, title);
+	gtk_window_set_title(window, title);
 
 void
 gtk_window_set_wmclass(window, wmclass_name, wmclass_class)

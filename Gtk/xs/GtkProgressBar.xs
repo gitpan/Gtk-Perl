@@ -17,20 +17,20 @@ new(Class)
 	RETVAL
 
 void
-gtk_progress_bar_update(self, percentage)
-	Gtk::ProgressBar	self
+gtk_progress_bar_update(progressbar, percentage)
+	Gtk::ProgressBar	progressbar
 	double	percentage
 
 # FIXME: DEPRECATED?
 
 double
-percentage(self)
-	Gtk::ProgressBar	self
+percentage(progressbar)
+	Gtk::ProgressBar	progressbar
 	CODE:
 #if GTK_HVER < 0x010100	
-	RETVAL = self->percentage;
+	RETVAL = progressbar->percentage;
 #else
-	RETVAL = gtk_progress_get_current_percentage(GTK_PROGRESS(self));
+	RETVAL = gtk_progress_get_current_percentage(GTK_PROGRESS(progressbar));
 #endif
 	OUTPUT:
 	RETVAL

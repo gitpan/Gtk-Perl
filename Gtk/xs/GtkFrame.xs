@@ -22,19 +22,19 @@ new(Class, label=&PL_sv_undef)
 	RETVAL
 
 void
-gtk_frame_set_label(self, label)
-	Gtk::Frame	self
+gtk_frame_set_label(frame, label)
+	Gtk::Frame	frame
 	char *	label
 
 void
-gtk_frame_set_label_align(self, xalign, yalign)
-	Gtk::Frame	self
+gtk_frame_set_label_align(frame, xalign, yalign)
+	Gtk::Frame	frame
 	double	xalign
 	double	yalign
 
 void
-gtk_frame_set_shadow_type(self, shadow)
-	Gtk::Frame	self
+gtk_frame_set_shadow_type(frame, shadow)
+	Gtk::Frame	frame
 	Gtk::ShadowType	shadow
 
 #endif

@@ -24,50 +24,50 @@ gtk_accel_group_get_default(Class)
 	RETVAL
 
 bool
-gtk_accel_group_activate(self, accel_key, accel_mods)
-	Gtk::AccelGroup		self
+gtk_accel_group_activate(accel_group, accel_key, accel_mods)
+	Gtk::AccelGroup		accel_group
 	unsigned int		accel_key
 	Gtk::Gdk::ModifierType	accel_mods
 
 void
-gtk_accel_group_attach(self, object)
-	Gtk::AccelGroup	self
+gtk_accel_group_attach(accel_group, object)
+	Gtk::AccelGroup	accel_group
 	Gtk::Object	object
 
 void
-gtk_accel_group_detach(self, object)
-	Gtk::AccelGroup	self
+gtk_accel_group_detach(accel_group, object)
+	Gtk::AccelGroup	accel_group
 	Gtk::Object	object
 
 void
-gtk_accel_group_lock(self)
-	Gtk::AccelGroup	self
+gtk_accel_group_lock(accel_group)
+	Gtk::AccelGroup	accel_group
 
 void
-gtk_accel_group_unlock(self)
-	Gtk::AccelGroup	self
+gtk_accel_group_unlock(accel_group)
+	Gtk::AccelGroup	accel_group
 
 #Gtk::AccelEntry
-#gtk_accel_group_get_entry(self, accel_key, accel_mods)
-#	Gtk::AccelGroup		self
+#gtk_accel_group_get_entry(accel_group, accel_key, accel_mods)
+#	Gtk::AccelGroup		accel_group
 #	unsigned int		accel_key
 #	Gtk::Gdk::ModifierType	accel_mods
 
 void
-gtk_accel_group_lock_entry(self, accel_key, accel_mods)
-	Gtk::AccelGroup		self
+gtk_accel_group_lock_entry(accel_group, accel_key, accel_mods)
+	Gtk::AccelGroup		accel_group
 	unsigned int		accel_key
 	Gtk::Gdk::ModifierType	accel_mods
 
 void
-gtk_accel_group_unlock_entry(self, accel_key, accel_mods)
-	Gtk::AccelGroup		self
+gtk_accel_group_unlock_entry(accel_group, accel_key, accel_mods)
+	Gtk::AccelGroup		accel_group
 	unsigned int		accel_key
 	Gtk::Gdk::ModifierType	accel_mods
 
 void
-gtk_accel_group_add(self, accel_key, accel_mods, accel_flags, object, accel_signal)
-	Gtk::AccelGroup		self
+gtk_accel_group_add(accel_group, accel_key, accel_mods, accel_flags, object, accel_signal)
+	Gtk::AccelGroup		accel_group
 	unsigned int		accel_key
 	Gtk::Gdk::ModifierType	accel_mods
 	Gtk::AccelFlags		accel_flags
@@ -75,8 +75,8 @@ gtk_accel_group_add(self, accel_key, accel_mods, accel_flags, object, accel_sign
 	char*			accel_signal
 
 void
-gtk_accel_group_remove(self, accel_key, accel_mods, object)
-	Gtk::AccelGroup		self
+gtk_accel_group_remove(accel_group, accel_key, accel_mods, object)
+	Gtk::AccelGroup		accel_group
 	unsigned int		accel_key
 	Gtk::Gdk::ModifierType	accel_mods
 	Gtk::Object		object
@@ -100,7 +100,7 @@ gtk_accelerator_parse(Class, accelerator)
 	PPCODE:
 	{
 		unsigned int accel_key;
-		GdkModifierType accel_mods;
+		GdkModifierType accel_mods=0;
 		gtk_accelerator_parse(accelerator, &accel_key, &accel_mods);
 		/* FIXME: GIMME */
 		EXTEND(sp, 2);

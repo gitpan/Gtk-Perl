@@ -25,27 +25,27 @@ new(Class, label=0)
 	RETVAL
 
 void
-gtk_toggle_button_set_active(self, state)
-	Gtk::ToggleButton	self
+gtk_toggle_button_set_active(toggle_button, state)
+	Gtk::ToggleButton	toggle_button
 	int	state
 	ALIAS:
 		Gtk::ToggleButton::set_state = 1
 	CODE:
 #if GTK_HVER < 0x010114
 	/* DEPRECATED */
-	gtk_toggle_button_set_state(self, state);
+	gtk_toggle_button_set_state(toggle_button, state);
 #else
-	gtk_toggle_button_set_active(self, state);
+	gtk_toggle_button_set_active(toggle_button, state);
 #endif
 
 void
-gtk_toggle_button_set_mode(self, draw_indicator)
-	Gtk::ToggleButton	self
+gtk_toggle_button_set_mode(toggle_button, draw_indicator)
+	Gtk::ToggleButton	toggle_button
 	int	draw_indicator
 
 void
-gtk_toggle_button_toggled(self)
-	Gtk::ToggleButton	self
+gtk_toggle_button_toggled(toggle_button)
+	Gtk::ToggleButton	toggle_button
 
 #if GTK_HVER >= 0x010200
 
@@ -56,21 +56,21 @@ gtk_toggle_button_get_active (toggle_botton)
 #endif
 
 int
-active(self, new_value=0)
-	Gtk::ToggleButton	self
+active(toggle_button, new_value=0)
+	Gtk::ToggleButton	toggle_button
 	int	new_value
 	CODE:
-		RETVAL = self->active;
+		RETVAL = toggle_button->active;
 		if (items>1)
-			self->active = new_value;
+			toggle_button->active = new_value;
 	OUTPUT:
 	RETVAL
 
 int
-draw_indicator(self)
-	Gtk::ToggleButton	self
+draw_indicator(toggle_button)
+	Gtk::ToggleButton	toggle_button
 	CODE:
-		RETVAL = self->draw_indicator;
+		RETVAL = toggle_button->draw_indicator;
 	OUTPUT:
 	RETVAL
 

@@ -132,7 +132,36 @@ zvt_term_set_scroll_on_output(term, state)
 	Gnome::ZvtTerm	term
 	int	state
 
-# FIXME: zvt_term_set_color_scheme
+void
+zvt_term_set_color_scheme (term, red, green, blue)
+	Gnome::ZvtTerm	term
+	SV *red
+	SV *green
+	SV *blue
+	CODE:
+	{
+		gushort r[18], g[18], b[18];
+		AV *ra, *ga, *ba;
+		int i;
+		SV **s;
+
+		if (!red || !SvOK(red) || !SvROK(red) || SvTYPE(SvRV(red)) != SVt_PVAV )
+			croak("need an array ref in set_color_scheme");
+		ra = (AV*)SvRV(red);
+		if (!green || !SvOK(green) || !SvROK(green) || SvTYPE(SvRV(green)) != SVt_PVAV )
+			croak("need an array ref in set_color_scheme");
+		ga = (AV*)SvRV(green);
+		if (!blue || !SvOK(blue) || !SvROK(blue) || SvTYPE(SvRV(blue)) != SVt_PVAV )
+			croak("need an array ref in set_color_scheme");
+		ba = (AV*)SvRV(blue);
+		for (i=0; i < 18; ++i) {
+			r[i] = (s=av_fetch(ra, i, 0)) && SvOK(*s)? SvIV(*s): 0;
+			g[i] = (s=av_fetch(ga, i, 0)) && SvOK(*s)? SvIV(*s): 0;
+			b[i] = (s=av_fetch(ba, i, 0)) && SvOK(*s)? SvIV(*s): 0;
+		}
+		zvt_term_set_color_scheme (term, r, g, b);
+	}
+
 
 void
 zvt_term_set_default_color_scheme(term)
@@ -147,6 +176,38 @@ void
 zvt_term_set_wordclass (term ,klass)
 	Gnome::ZvtTerm	term
 	char*	klass
+
+#if 0
+
+void
+zvt_term_set_auto_window_hint (term, state)
+	Gnome::ZvtTerm	term
+	int	state
+
+#endif
+
+int
+zvt_term_match_add (term, regexp, highlight_mask, data)
+	Gnome::ZvtTerm	term
+	char*	regexp
+	unsigned int highlight_mask
+	SV *data
+
+void
+zvt_term_match_clear (term, regexp)
+	Gnome::ZvtTerm	term
+	char*	regexp
+
+char*
+zvt_term_match_check (term, x, y)
+	Gnome::ZvtTerm	term
+	int	x
+	int	y
+	CODE:
+	{
+		gpointer data = NULL;
+		RETVAL = zvt_term_match_check (term, x, y, &data);
+	}
 
 void
 zvt_term_set_background (term, pixmap_file, transparent, shaded)
@@ -165,6 +226,19 @@ zvt_term_set_size (term, width, height)
 	Gnome::ZvtTerm	term
 	int	width
 	int	height
+
+int
+writechild (term, text)
+	Gnome::ZvtTerm	term
+	SV *text
+	CODE:
+	{
+		STRLEN len;
+		char *p = SvPV(text, len);
+		RETVAL = zvt_term_writechild(term, p, len);
+	}
+	OUTPUT:
+	RETVAL
 
 
 Gtk::Adjustment

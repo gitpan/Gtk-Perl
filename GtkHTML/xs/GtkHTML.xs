@@ -26,11 +26,46 @@ static int fixup_html(SV ** * _sp, int match, GtkObject * object, char * signame
 {
 	dTHR;
 	XPUSHs(sv_2mortal(newSVpv(GTK_VALUE_POINTER(args[0]), 0)));
-	XPUSHs(sv_2mortal(newSViv(GPOINTER_TO_UINT(GTK_VALUE_POINTER(args[1])))));
+	XPUSHs(sv_2mortal(newSViv((long)GTK_VALUE_POINTER(args[1]))));
 	return 1;
 }
 #undef sp
 
+static bool
+html_save (const HTMLEngine *engine, const char *data, guint len, gpointer user_data) {
+	AV *stuff;
+	SV *handler;
+	int i, result;
+	dSP;
+
+	stuff = (AV*) user_data;
+	handler = *av_fetch(stuff, 0, 0);
+
+	ENTER;
+	SAVETMPS;
+
+	PUSHMARK(sp);
+
+	XPUSHs(sv_2mortal(newSVpvn(data, len)));
+
+	for(i=1; i <= av_len(stuff); ++i)
+		XPUSHs(sv_2mortal(newSVsv(*av_fetch(stuff, i, 0))));
+	
+	PUTBACK;
+	i = perl_call_sv(handler, G_SCALAR);
+	
+	SPAGAIN;
+
+	if (i != 1)
+		croak("handler failed");
+	
+	result = POPi;
+
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+	return result;
+}
 
 MODULE = Gtk::HTML	PACKAGE = Gtk::HTML	PREFIX = gtk_html_
 
@@ -58,14 +93,9 @@ gtk_html_new (Class)
 	OUTPUT:
 	RETVAL
 
-void
-gtk_html_parse (html)
+gulong
+gtk_html_begin (html)
 	Gtk::HTML	html
-
-guint
-gtk_html_begin (html, url)
-	Gtk::HTML	html
-	char *	url
 
 void
 gtk_html_write (html, handle, chunk)
@@ -73,7 +103,11 @@ gtk_html_write (html, handle, chunk)
 	guint	handle
 	SV *	chunk
 	CODE:
-	gtk_html_write(html, handle, SvPV(chunk, PL_na), PL_na);
+	{
+		STRLEN blen;
+		char *buf = SvPV(chunk, blen);
+		gtk_html_write(html, handle, buf, blen);
+	}
 
 void
 gtk_html_end (html, handle, status)
@@ -82,8 +116,126 @@ gtk_html_end (html, handle, status)
 	Gtk::HTMLStreamStatus	status
 
 void
-gtk_html_calc_scrollbars (html)
+gtk_html_load_empty (html)
 	Gtk::HTML	html
+
+void
+gtk_html_set_editable (html, editable)
+	Gtk::HTML	html
+	bool	editable
+
+bool
+gtk_html_get_editable (html)
+	Gtk::HTML	html
+
+void
+gtk_html_allow_selection (html, allow)
+	Gtk::HTML	html
+	bool	allow
+
+void
+gtk_html_request_paste (html, time)
+	Gtk::HTML	html
+	int	time
+
+void
+gtk_html_set_paragraph_style (html, style)
+	Gtk::HTML	html
+	Gtk::HTMLParagraphStyle	style
+
+void
+gtk_html_indent (html, delta)
+	Gtk::HTML	html
+	int	delta
+
+void
+gtk_html_set_font_style (html, and_mask, or_mask)
+	Gtk::HTML	html
+	Gtk::HTMLFontStyle	and_mask
+	Gtk::HTMLFontStyle	or_mask
+
+void
+gtk_html_set_paragraph_alignment (html, alignment)
+	Gtk::HTML	html
+	Gtk::HTMLParagraphAlignment	alignment
+
+Gtk::HTMLParagraphAlignment
+gtk_html_get_paragraph_alignment (html)
+	Gtk::HTML	html
+
+void
+gtk_html_cut (html)
+	Gtk::HTML	html
+
+void
+gtk_html_paste (html)
+	Gtk::HTML	html
+
+void
+gtk_html_copy (html)
+	Gtk::HTML	html
+
+void
+gtk_html_undo (html)
+	Gtk::HTML	html
+
+void
+gtk_html_redo (html)
+	Gtk::HTML	html
+
+void
+gtk_html_set_default_background_color (html, color)
+	Gtk::HTML	html
+	Gtk::Gdk::Color color
+
+void
+gtk_html_enable_debug (html, debug)
+	Gtk::HTML	html
+	bool	debug
+
+char*
+gtk_html_get_title (html)
+	Gtk::HTML	html
+
+bool
+gtk_html_jump_to_anchor (html, anchor)
+	Gtk::HTML	html
+	char*	anchor
+
+bool
+gtk_html_save (html, handler, ...)
+	Gtk::HTML	html
+	SV	*handler
+	CODE:
+	{
+		AV *args;
+
+		args = newAV();
+
+		PackCallbackST(args, 1);
+		RETVAL = gtk_html_save(html, html_save, args);
+		SvREFCNT_dec(args);
+	}
+	OUTPUT:
+	RETVAL
+
+bool
+gtk_html_export (html, type, handler, ...)
+	Gtk::HTML	html
+	char *type
+	SV	*handler
+	CODE:
+	{
+		AV *args;
+
+		args = newAV();
+
+		PackCallbackST(args, 2);
+		RETVAL = gtk_html_export(html, type, html_save, args);
+		SvREFCNT_dec(args);
+	}
+	OUTPUT:
+	RETVAL
 
 #endif
 

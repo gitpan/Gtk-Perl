@@ -6,7 +6,7 @@ require AutoLoader;
 
 use Carp;
 
-$VERSION = '0.7000';
+$VERSION = '0.7003';
 
 @ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export
@@ -120,11 +120,13 @@ sub AUTOLOAD {
     $realname =~ s/^.*:://;
     eval {
             my ($argn, $classn, $flags) = $_[0]->_get_arg_info($realname);
+	    my $is_readable = $flags->{readable} || $flags->{readwrite};
+	    my $is_writable = $flags->{writable} || $flags->{readwrite};
             #print STDERR "GOT ARG: $AUTOLOAD -> $argn ($classn) ", join(' ', keys %{$flags}), " - ",  join(' ', values %{$flags}),"\n";
    
-	    if (@_ == 2 && ($flags->{writable} || $flags->{readwrite})) {
+	    if (@_ == 2 && $is_writable) {
 	    	$_[0]->set($argn, $_[1]);
-	    } elsif (@_ == 1 && ($flags->{readable} || $flags->{readwrite})) {
+	    } elsif (@_ == 1 && $is_readable) {
 	    	$result = $_[0]->get($argn);
 	    } else {
 	    	die;
@@ -134,9 +136,9 @@ sub AUTOLOAD {
 	    eval <<"EOT";
 	    
 	    sub ${classn}::$realname {
-	    	if (\@_ == 2 && ( $flags->{writable} || $flags->{readwrite})) {
+	    	if (\@_ == 2 && $is_writable) {
 	    		\$_[0]->set('$argn', \$_[1]);
-	    	} elsif (\@_ == 1 && ( $flags->{readable} || $flags->{readwrite})) {
+	    	} elsif (\@_ == 1 && $is_readable) {
 	    		\$_[0]->get('$argn');
 	    	} else {
 	    		die "Usage: ${classn}::$realname (Object [, new_value])";
@@ -163,7 +165,7 @@ sub signal_connect_object {
 	$obj->signal_connect($signal, sub {
 		# throw away the object
 		shift; 
-		$handler->($slot_object, @_);
+		$slot_object->$handler(@_);
 	}, @data);
 }
 
@@ -173,7 +175,7 @@ sub signal_connect_object_after {
 	$obj->signal_connect_after($signal, sub {
 		# throw away the object
 		shift; 
-		$handler->($slot_object, @_);
+		$slot_object->$handler(@_);
 	}, @data);
 }
 
@@ -187,6 +189,18 @@ sub new {
 }
 
 sub new_child {return new @_}
+
+package Gtk::CTree;
+
+sub insert_node_defaults {
+	my ($ctree, %values) = @_;
+
+	$values{spacing} = 5 unless defined $values{spacing};
+	$values{is_leaf} = 1 unless defined $values{is_leaf};
+	$values{expanded} = 0 unless defined $values{expanded};
+	
+	return $ctree->insert_node(@values{qw/parent sibling titles spacing pixmap_closed mask_closed pixmap_opened mask_opened is_leaf expanded/});
+}
 
 package Gtk;
 

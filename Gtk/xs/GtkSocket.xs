@@ -18,23 +18,23 @@ new(Class)
 	RETVAL
 
 void
-gtk_socket_steal(self, wid)
-	Gtk::Socket     self
+gtk_socket_steal(socket, wid)
+	Gtk::Socket     socket
 	int             wid
 
 Gtk::Gdk::Window
-plug_window(self)
-	Gtk::Socket     self
+plug_window(socket)
+	Gtk::Socket     socket
 	CODE:
-		RETVAL = self->plug_window;
+		RETVAL = socket->plug_window;
 	OUTPUT:
 	RETVAL
 
 int
-same_app(self)
-	Gtk::Socket     self
+same_app(socket)
+	Gtk::Socket     socket
 	CODE:
-		RETVAL = self->same_app;
+		RETVAL = socket->same_app;
 	OUTPUT:
 	RETVAL
 

@@ -27,6 +27,7 @@ MODULE = Gtk11		PACKAGE = Gtk::Gdk::Rgb::Cmap				PREFIX = gdk_rgb_cmap_
 
 Gtk::Gdk::Rgb::Cmap
 gdk_rgb_cmap_new(Class, ...)
+	SV *	Class
 	CODE:
 	{
 		guint32 n_colors = items-1;
@@ -41,8 +42,8 @@ gdk_rgb_cmap_new(Class, ...)
 	RETVAL
 
 void
-gdk_rgb_cmap_free(self)
-	Gtk::Gdk::Rgb::Cmap	self
+gdk_rgb_cmap_free(cmap)
+	Gtk::Gdk::Rgb::Cmap	cmap
 
 #endif
 

@@ -40,12 +40,12 @@ gtk_radio_button_set_group(radio_button, other_button)
 	gtk_radio_button_set_group(radio_button, gtk_radio_button_group(other_button));
 
 void
-group(self)
-	Gtk::RadioButton	self
+group(radiobutton)
+	Gtk::RadioButton	radiobutton
 	PPCODE:
 	{
 		GSList * group = 0;
-		group = gtk_radio_button_group(self);
+		group = gtk_radio_button_group(radiobutton);
 		while(group) {
 			EXTEND(sp, 1);
 			PUSHs(sv_2mortal(newSVGtkRadioButton(group->data)));

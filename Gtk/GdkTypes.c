@@ -326,7 +326,7 @@ SV * newSVGdkEvent(GdkEvent * e)
 	SvREFCNT_dec(h);
 
 	sv_bless(r, gv_stashpv("Gtk::Gdk::Event", FALSE));
- 	
+ 
 	e2 = gdk_event_copy(e);
 	
 	hv_store(h, "_ptr", 4, newSViv((long)e2), 0);
@@ -335,10 +335,14 @@ SV * newSVGdkEvent(GdkEvent * e)
 	
 	hv_store(h, "type", 4, newSVGdkEventType(e->type), 0);
 	hv_store(h, "window", 6, newSVGdkWindow(e->any.window), 0);
+	hv_store(h, "send_event", 10, newSViv(e->any.send_event), 0);
 	switch (e->type) {
 	case GDK_EXPOSE:
 		hv_store(h, "area", 4, newSVGdkRectangle(&e->expose.area), 0);
 		hv_store(h, "count", 5, newSViv(e->expose.count), 0);
+		break;
+	case GDK_VISIBILITY_NOTIFY:
+		hv_store(h, "state", 5, newSVGdkVisibilityState(e->visibility.state), 0);
 		break;
 	case GDK_MOTION_NOTIFY:
 		hv_store(h, "is_hint", 7, newSViv(e->motion.is_hint), 0);
@@ -351,6 +355,8 @@ SV * newSVGdkEvent(GdkEvent * e)
 		hv_store(h, "state", 5, newSViv(e->motion.state), 0);
 		hv_store(h, "source", 6, newSVGdkInputSource(e->motion.source), 0);
 		hv_store(h, "deviceid", 8, newSViv(e->motion.deviceid), 0);
+		hv_store(h, "x_root", 6, newSVnv(e->motion.x_root), 0);
+		hv_store(h, "y_root", 6, newSVnv(e->motion.y_root), 0);
 		break;
 	case GDK_BUTTON_PRESS:
 	case GDK_2BUTTON_PRESS:
@@ -359,19 +365,22 @@ SV * newSVGdkEvent(GdkEvent * e)
 		hv_store(h, "x", 1, newSViv(e->button.x), 0);
 		hv_store(h, "y", 1, newSViv(e->button.y), 0);
 		hv_store(h, "time", 4, newSViv(e->button.time), 0);
-		hv_store(h, "pressure", 8, newSVnv(e->motion.pressure), 0);
-		hv_store(h, "xtilt", 5, newSVnv(e->motion.xtilt), 0);
-		hv_store(h, "ytilt", 5, newSVnv(e->motion.ytilt), 0);
+		hv_store(h, "pressure", 8, newSVnv(e->button.pressure), 0);
+		hv_store(h, "xtilt", 5, newSVnv(e->button.xtilt), 0);
+		hv_store(h, "ytilt", 5, newSVnv(e->button.ytilt), 0);
 		hv_store(h, "state", 5, newSViv(e->button.state), 0);
 		hv_store(h, "button", 6, newSViv(e->button.button), 0);
-		hv_store(h, "source", 6, newSVGdkInputSource(e->motion.source), 0);
-		hv_store(h, "deviceid", 8, newSViv(e->motion.deviceid), 0);
+		hv_store(h, "source", 6, newSVGdkInputSource(e->button.source), 0);
+		hv_store(h, "deviceid", 8, newSViv(e->button.deviceid), 0);
+		hv_store(h, "x_root", 6, newSVnv(e->button.x_root), 0);
+		hv_store(h, "y_root", 6, newSVnv(e->button.y_root), 0);
 		break;
 	case GDK_KEY_PRESS:
 	case GDK_KEY_RELEASE:
 		hv_store(h, "time", 4, newSViv(e->key.time), 0);
-		hv_store(h, "state", 5, newSViv(e->key.state), 0);
+		hv_store(h, "state", 5, newSVnv(e->key.state), 0);
 		hv_store(h, "keyval", 6, newSViv(e->key.keyval), 0);
+		hv_store(h, "string", 6, newSVpvn(e->key.string, e->key.length), 0);
 		break;
 	case GDK_FOCUS_CHANGE:
 		hv_store(h, "in", 2, newSViv(e->focus_change.in), 0);
@@ -380,7 +389,15 @@ SV * newSVGdkEvent(GdkEvent * e)
 	case GDK_LEAVE_NOTIFY:
 		hv_store(h, "window", 6, newSVGdkWindow(e->crossing.window), 0);
 		hv_store(h, "subwindow", 9, newSVGdkWindow(e->crossing.subwindow), 0);
+		hv_store(h, "time", 4, newSViv(e->crossing.time), 0);
+		hv_store(h, "x", 1, newSVnv(e->crossing.x), 0);
+		hv_store(h, "y", 1, newSVnv(e->crossing.y), 0);
+		hv_store(h, "x_root", 6, newSVnv(e->crossing.x_root), 0);
+		hv_store(h, "y_root", 6, newSVnv(e->crossing.y_root), 0);
 		hv_store(h, "detail", 6, newSVGdkNotifyType(e->crossing.detail), 0);
+		hv_store(h, "mode", 4, newSVGdkCrossingMode(e->crossing.mode), 0);
+		hv_store(h, "focus", 5, newSVnv(e->crossing.focus), 0);
+		hv_store(h, "state", 5, newSVnv(e->crossing.state), 0);
 		break;
 	case GDK_CONFIGURE:
 		hv_store(h, "x", 1, newSViv(e->configure.x), 0);
@@ -390,7 +407,7 @@ SV * newSVGdkEvent(GdkEvent * e)
 		break;
 	case GDK_PROPERTY_NOTIFY:
 		hv_store(h, "time", 4, newSViv(e->property.time), 0);
-		hv_store(h, "state", 5, newSViv(e->property.state), 0);
+		hv_store(h, "state", 5, newSVnv(e->property.state), 0);
 		hv_store(h, "atom", 4, newSVGdkAtom(e->property.atom), 0);
 		break;
 	case GDK_SELECTION_CLEAR:
@@ -400,14 +417,32 @@ SV * newSVGdkEvent(GdkEvent * e)
 		hv_store(h, "time", 4, newSViv(e->selection.time), 0);
 		hv_store(h, "selection", 9, newSVGdkAtom(e->selection.selection), 0);
 		hv_store(h, "property", 8, newSVGdkAtom(e->selection.property), 0);
+		hv_store(h, "target", 6, newSVGdkAtom(e->selection.target), 0);
 		break;
 	case GDK_PROXIMITY_IN:
 	case GDK_PROXIMITY_OUT:
 		hv_store(h, "time", 4, newSViv(e->proximity.time), 0);
-		hv_store(h, "source", 6, newSVGdkInputSource(e->motion.source), 0);
-		hv_store(h, "deviceid", 8, newSViv(e->motion.deviceid), 0);
+		hv_store(h, "source", 6, newSVGdkInputSource(e->proximity.source), 0);
+		hv_store(h, "deviceid", 8, newSViv(e->proximity.deviceid), 0);
 		break;
-		
+	case GDK_CLIENT_EVENT:
+		hv_store(h, "message_type", 12, newSVGdkAtom(e->client.message_type), 0);
+		hv_store(h, "data_format", 11, newSViv(e->client.data_format), 0);
+		hv_store(h, "data", 4, newSVpvn(e->client.data.b, 20), 0);
+		break;
+	case GDK_DRAG_ENTER:
+	case GDK_DRAG_LEAVE:
+	case GDK_DRAG_MOTION:
+	case GDK_DRAG_STATUS:
+	case GDK_DROP_START:
+	case GDK_DROP_FINISHED:
+		hv_store(h, "time", 4, newSVnv(e->dnd.time), 0);
+		hv_store(h, "x_root", 6, newSViv(e->dnd.x_root), 0);
+		hv_store(h, "y_root", 6, newSViv(e->dnd.y_root), 0);
+		hv_store(h, "context", 7, newSVGdkDragContext(e->dnd.context), 0);
+		break;
+	default:
+		/*g_message("event type %d not handled", e->type);*/
 	}
 	
 	return r;
@@ -432,113 +467,120 @@ GdkEvent * SvSetGdkEvent(SV * data, GdkEvent * e)
 
         /*printf("Composing GdkEvent HV %d to pointer %d\n", h, e);*/
 	
-	if (s=hv_fetch(h, "type", 4, 0))
+	if ((s=hv_fetch(h, "type", 4, 0)))
 		e->type = SvGdkEventType(*s);
 	else
 		croak("event must contain type");
-	if (s=hv_fetch(h, "window", 6, 0))
+	if ((s=hv_fetch(h, "window", 6, 0)))
 		e->any.window = SvGdkWindow(*s);
 	else
 		croak("event must contain window");
+	if ((s=hv_fetch(h, "send_event", 10, 0)))
+		e->any.send_event = SvIV(*s);
 	
 	switch (e->type) {
 	case GDK_EXPOSE:
-		if (s=hv_fetch(h, "area", 4, 0))
+		if ((s=hv_fetch(h, "area", 4, 0)))
 			SvGdkRectangle(*s, &e->expose.area);
 		else
 			croak("event must contain area");
-		if (s=hv_fetch(h, "count", 5, 0))
+		if ((s=hv_fetch(h, "count", 5, 0)))
 			e->expose.count = SvIV(*s);
 		else
 			croak("event must contain count");
 		break;
+	case GDK_VISIBILITY_NOTIFY:
+		if ((s=hv_fetch(h, "state", 5, 0)))
+			e->visibility.state = SvGdkVisibilityState(*s);
+		else
+			croak("event must contain count");
 	case GDK_MOTION_NOTIFY:
-		if (s=hv_fetch(h, "x", 1, 0))
+		if ((s=hv_fetch(h, "x", 1, 0)))
 			e->motion.x = SvNV(*s);
 		else
 			croak("event must contain x ordinate");
-		if (s=hv_fetch(h, "y", 1, 0))
+		if ((s=hv_fetch(h, "y", 1, 0)))
 			e->motion.y = SvNV(*s);
 		else
 			croak("event must contain y ordinate");
-		if (s=hv_fetch(h, "pressure", 8, 0))
-			e->button.button = SvNV(*s);
+		if ((s=hv_fetch(h, "pressure", 8, 0)))
+			e->motion.pressure = SvNV(*s);
 		else
-			e->button.pressure = 0;
-		if (s=hv_fetch(h, "xtilt", 5, 0))
-			e->button.xtilt = SvNV(*s);
+			e->motion.pressure = 0;
+		if ((s=hv_fetch(h, "xtilt", 5, 0)))
+			e->motion.xtilt = SvNV(*s);
 		else
-			e->button.xtilt = 0;
-		if (s=hv_fetch(h, "ytilt", 5, 0))
-			e->button.ytilt = SvNV(*s);
+			e->motion.xtilt = 0;
+		if ((s=hv_fetch(h, "ytilt", 5, 0)))
+			e->motion.ytilt = SvNV(*s);
 		else
-			e->button.ytilt = 0;
-		if (s=hv_fetch(h, "ytilt", 5, 0))
-			e->button.ytilt = SvNV(*s);
-		else
-			e->button.ytilt = 0;
-		if (s=hv_fetch(h, "time", 4, 0))
+			e->motion.ytilt = 0;
+		if ((s=hv_fetch(h, "time", 4, 0)))
 			e->motion.time = SvIV(*s);
 		else
 			croak("event must contain time");
-		if (s=hv_fetch(h, "state", 5, 0))
+		if ((s=hv_fetch(h, "state", 5, 0)))
 			e->motion.state = SvIV(*s);
 		else
 			croak("event must contain state");
-		if (s=hv_fetch(h, "is_hint", 7, 0))
+		if ((s=hv_fetch(h, "is_hint", 7, 0)))
 			e->motion.is_hint = SvIV(*s);
 		else
 			croak("event must contain is_hint");
-		if (s=hv_fetch(h, "source", 6, 0))
-			e->button.source = SvGdkInputSource(*s);
+		if ((s=hv_fetch(h, "source", 6, 0)))
+			e->motion.source = SvGdkInputSource(*s);
 		else
-			e->button.source = 0;
+			e->motion.source = 0;
 		if ((s=hv_fetch(h, "deviceid", 8, 0)) && SvOK(*s))
-			e->button.deviceid = SvIV(*s);
+			e->motion.deviceid = SvIV(*s);
 		else
-			e->button.deviceid = GDK_CORE_POINTER;
+			e->motion.deviceid = GDK_CORE_POINTER;
+		if ((s=hv_fetch(h, "x_root", 6, 0)))
+			e->motion.x_root = SvIV(*s);
+		else
+			croak("event must contain x_root");
+		if ((s=hv_fetch(h, "y_root", 6, 0)))
+			e->motion.y_root = SvIV(*s);
+		else
+			croak("event must contain y_root");
 		break;
 	case GDK_BUTTON_PRESS:
 	case GDK_2BUTTON_PRESS:
 	case GDK_3BUTTON_PRESS:
 	case GDK_BUTTON_RELEASE:
-		if (s=hv_fetch(h, "x", 1, 0))
+		if ((s=hv_fetch(h, "x", 1, 0)))
 			e->button.x = SvNV(*s);
 		else
 			croak("event must contain x ordinate");
-		if (s=hv_fetch(h, "y", 1, 0))
+		if ((s=hv_fetch(h, "y", 1, 0)))
 			e->button.y = SvNV(*s);
 		else
 			croak("event must contain y ordinate");
-		if (s=hv_fetch(h, "pressure", 8, 0))
+		if ((s=hv_fetch(h, "pressure", 8, 0)))
 			e->button.button = SvNV(*s);
 		else
 			e->button.pressure = 0;
-		if (s=hv_fetch(h, "xtilt", 5, 0))
+		if ((s=hv_fetch(h, "xtilt", 5, 0)))
 			e->button.xtilt = SvNV(*s);
 		else
 			e->button.xtilt = 0;
-		if (s=hv_fetch(h, "ytilt", 5, 0))
+		if ((s=hv_fetch(h, "ytilt", 5, 0)))
 			e->button.ytilt = SvNV(*s);
 		else
 			e->button.ytilt = 0;
-		if (s=hv_fetch(h, "ytilt", 5, 0))
-			e->button.ytilt = SvNV(*s);
-		else
-			e->button.ytilt = 0;
-		if (s=hv_fetch(h, "time", 4, 0))
+		if ((s=hv_fetch(h, "time", 4, 0)))
 			e->button.time = SvIV(*s);
 		else
 			croak("event must contain time");
-		if (s=hv_fetch(h, "state", 5, 0))
+		if ((s=hv_fetch(h, "state", 5, 0)))
 			e->button.state = SvIV(*s);
 		else
 			croak("event must contain state");
-		if (s=hv_fetch(h, "button", 6, 0))
+		if ((s=hv_fetch(h, "button", 6, 0)))
 			e->button.button = SvIV(*s);
 		else
 			croak("event must contain state");
-		if (s=hv_fetch(h, "source", 6, 0))
+		if ((s=hv_fetch(h, "source", 6, 0)))
 			e->button.source = SvGdkInputSource(*s);
 		else
 			e->button.source = 0;
@@ -546,71 +588,118 @@ GdkEvent * SvSetGdkEvent(SV * data, GdkEvent * e)
 			e->button.deviceid = SvIV(*s);
 		else
 			e->button.deviceid = GDK_CORE_POINTER;
+		if ((s=hv_fetch(h, "x_root", 6, 0)))
+			e->button.x_root = SvIV(*s);
+		else
+			croak("event must contain x_root");
+		if ((s=hv_fetch(h, "y_root", 6, 0)))
+			e->button.y_root = SvIV(*s);
+		else
+			croak("event must contain y_root");
 		break;
 	case GDK_KEY_PRESS:
 	case GDK_KEY_RELEASE:
-		if (s=hv_fetch(h, "time", 4, 0))
+		if ((s=hv_fetch(h, "time", 4, 0)))
 			e->key.time = SvIV(*s);
 		else
 			croak("event must contain time");
-		if (s=hv_fetch(h, "state", 5, 0))
+		if ((s=hv_fetch(h, "state", 5, 0)))
 			e->key.state = SvIV(*s);
 		else
 			croak("event must contain state");
-		if (s=hv_fetch(h, "keyval", 6, 0))
+		if ((s=hv_fetch(h, "keyval", 6, 0)))
 			e->key.keyval = SvIV(*s);
 		else
 			croak("event must contain keyval");
+		if ((s=hv_fetch(h, "string", 6, 0))) {
+			STRLEN len;
+			/* FIXME: need to free e->key.string? */
+			e->key.string = g_strdup(SvPV(*s, len));
+			e->key.length = len;
+		} else
+			croak("event must contain string");
 		break;
 	case GDK_FOCUS_CHANGE:
-		if (s=hv_fetch(h, "in", 2, 0))
+		if ((s=hv_fetch(h, "in", 2, 0)))
 			e->focus_change.in = SvIV(*s);
 		else
 			croak("event must contain in");
 		break;
 	case GDK_ENTER_NOTIFY:
 	case GDK_LEAVE_NOTIFY:
-		if (s=hv_fetch(h, "window", 6, 0))
+		if ((s=hv_fetch(h, "window", 6, 0)))
 			e->crossing.window = SvGdkWindow(*s);
 		else
 			croak("event must contain window");
-		if (s=hv_fetch(h, "subwindow", 9, 0))
+		if ((s=hv_fetch(h, "subwindow", 9, 0)))
 			e->crossing.subwindow = SvGdkWindow(*s);
 		else
 			croak("event must contain subwindow");
-		if (s=hv_fetch(h, "detail", 6, 0))
+		if ((s=hv_fetch(h, "detail", 6, 0)))
 			e->crossing.detail = SvGdkNotifyType(*s);
 		else
 			croak("event must contain detail");
+		if ((s=hv_fetch(h, "x", 1, 0)))
+			e->crossing.x = SvIV(*s);
+		else
+			croak("event must contain x ordinate");
+		if ((s=hv_fetch(h, "y", 1, 0)))
+			e->crossing.y = SvIV(*s);
+		else
+			croak("event must contain y ordinate");
+		if ((s=hv_fetch(h, "x_root", 6, 0)))
+			e->crossing.x_root = SvIV(*s);
+		else
+			croak("event must contain x_root ordinate");
+		if ((s=hv_fetch(h, "y_root", 6, 0)))
+			e->crossing.y_root = SvIV(*s);
+		else
+			croak("event must contain y_root ordinate");
+		if ((s=hv_fetch(h, "time", 4, 0)))
+			e->crossing.time = SvIV(*s);
+		else
+			croak("event must contain time");
+		if ((s=hv_fetch(h, "state", 5, 0)))
+			e->crossing.state = SvIV(*s);
+		else
+			croak("event must contain state");
+		if ((s=hv_fetch(h, "mode", 4, 0)))
+			e->crossing.time = SvGdkCrossingMode(*s);
+		else
+			croak("event must contain time");
+		if ((s=hv_fetch(h, "focus", 5, 0)))
+			e->crossing.focus = SvIV(*s);
+		else
+			croak("event must contain focus");
 		break;
 	case GDK_CONFIGURE:
-		if (s=hv_fetch(h, "x", 1, 0))
+		if ((s=hv_fetch(h, "x", 1, 0)))
 			e->configure.x = SvIV(*s);
 		else
 			croak("event must contain x ordinate");
-		if (s=hv_fetch(h, "y", 1, 0))
+		if ((s=hv_fetch(h, "y", 1, 0)))
 			e->configure.y = SvIV(*s);
 		else
 			croak("event must contain y ordinate");
-		if (s=hv_fetch(h, "width", 5, 0))
+		if ((s=hv_fetch(h, "width", 5, 0)))
 			e->configure.width = SvIV(*s);
 		else
 			croak("event must contain width");
-		if (s=hv_fetch(h, "height", 6, 0))
+		if ((s=hv_fetch(h, "height", 6, 0)))
 			e->configure.height = SvIV(*s);
 		else
 			croak("event must contain height");
 		break;
 	case GDK_PROPERTY_NOTIFY:
-		if (s=hv_fetch(h, "time", 4, 0))
+		if ((s=hv_fetch(h, "time", 4, 0)))
 			e->property.time = SvIV(*s);
 		else
 			croak("event must contain time");
-		if (s=hv_fetch(h, "state", 5, 0))
+		if ((s=hv_fetch(h, "state", 5, 0)))
 			e->property.state = SvIV(*s);
 		else
 			croak("event must contain state");
-		if (s=hv_fetch(h, "atom", 4, 0))
+		if ((s=hv_fetch(h, "atom", 4, 0)))
 			e->property.atom = SvGdkAtom(*s);
 		else
 			croak("event must contain atom");
@@ -618,33 +707,80 @@ GdkEvent * SvSetGdkEvent(SV * data, GdkEvent * e)
 	case GDK_SELECTION_CLEAR:
 	case GDK_SELECTION_REQUEST:
 	case GDK_SELECTION_NOTIFY:
-		if (s=hv_fetch(h, "requestor", 9, 0))
+		if ((s=hv_fetch(h, "requestor", 9, 0)))
 			e->selection.requestor = SvIV(*s);
 		else
 			croak("event must contain requestor");
-		if (s=hv_fetch(h, "time", 4, 0))
+		if ((s=hv_fetch(h, "time", 4, 0)))
 			e->selection.time = SvIV(*s);
 		else
 			croak("event must contain time");
-		if (s=hv_fetch(h, "selection", 9, 0))
+		if ((s=hv_fetch(h, "selection", 9, 0)))
 			e->selection.selection = SvGdkAtom(*s);
 		else
 			croak("event must contain selection");
-		if (s=hv_fetch(h, "property", 8, 0))
+		if ((s=hv_fetch(h, "property", 8, 0)))
 			e->selection.property = SvGdkAtom(*s);
 		else
 			croak("event must contain property");
+		if ((s=hv_fetch(h, "target", 6, 0)))
+			e->selection.target = SvGdkAtom(*s);
+		else
+			croak("event must contain target");
 		break;
 	case GDK_PROXIMITY_IN:
 	case GDK_PROXIMITY_OUT:
-		if (s=hv_fetch(h, "time", 4, 0))
+		if ((s=hv_fetch(h, "time", 4, 0)))
 			e->proximity.time = SvIV(*s);
 		else
 			croak("event must contain time");
-		if (s=hv_fetch(h, "deviceid", 8, 0))
+		if ((s=hv_fetch(h, "deviceid", 8, 0)))
 			e->proximity.deviceid = SvIV(*s);
 		else
 			croak("event must contain deviceid");
+		if ((s=hv_fetch(h, "source", 6, 0)))
+			e->proximity.source = SvGdkInputSource(*s);
+		else
+			croak("event must contain source");
+		break;
+	case GDK_CLIENT_EVENT:
+		if ((s=hv_fetch(h, "message_type", 12, 0)))
+			e->client.message_type = SvGdkAtom(*s);
+		else
+			croak("event must contain message_type");
+		if ((s=hv_fetch(h, "data_format", 11, 0)))
+			e->client.data_format = SvIV(*s);
+		else
+			croak("event must contain data_format");
+		if ((s=hv_fetch(h, "data", 4, 0))) {
+			STRLEN len;
+			char *p = SvPV(*s, len);
+			memcpy(e->client.data.b, p, len>20?20:len);
+		} else
+			croak("event must contain data");
+		break;
+	case GDK_DRAG_ENTER:
+	case GDK_DRAG_LEAVE:
+	case GDK_DRAG_MOTION:
+	case GDK_DRAG_STATUS:
+	case GDK_DROP_START:
+	case GDK_DROP_FINISHED:
+		if ((s=hv_fetch(h, "time", 4, 0)))
+			e->dnd.time = SvIV(*s);
+		else
+			croak("event must contain time");
+		if ((s=hv_fetch(h, "x_root", 6, 0)))
+			e->dnd.x_root = SvIV(*s);
+		else
+			croak("event must contain x_root");
+		if ((s=hv_fetch(h, "y_root", 6, 0)))
+			e->dnd.y_root = SvIV(*s);
+		else
+			croak("event must contain y_root");
+		if ((s=hv_fetch(h, "context", 7, 0)))
+			e->dnd.context = SvGdkDragContext(*s);
+		else
+			croak("event must contain context");
 		break;
 	}
 	
@@ -670,53 +806,53 @@ GdkWindowAttr * SvGdkWindowAttr(SV * data, GdkWindowAttr * attr, gint * mask)
 
 	h = (HV*)SvRV(data);
 	
-	if (s=hv_fetch(h, "title", 5, 0)) {
+	if ((s=hv_fetch(h, "title", 5, 0))) {
 		attr->title = SvPV(*s,PL_na);
 		*mask |= GDK_WA_TITLE;
 	}
 	
-	if (s=hv_fetch(h, "x", 1, 0)) {
+	if ((s=hv_fetch(h, "x", 1, 0))) {
 		attr->x = SvIV(*s);
 		*mask |= GDK_WA_X;
 	}
 	
-	if (s=hv_fetch(h, "y", 1, 0)) {
+	if ((s=hv_fetch(h, "y", 1, 0))) {
 		attr->y = SvIV(*s);
 		*mask |= GDK_WA_Y;
 	}
 	
-	if (s=hv_fetch(h, "cursor", 6, 0)) {
+	if ((s=hv_fetch(h, "cursor", 6, 0))) {
 		attr->cursor = SvGdkCursorRef(*s);
 		*mask |= GDK_WA_CURSOR;
 	}
 	
-	if (s=hv_fetch(h, "colormap", 8, 0)) {
+	if ((s=hv_fetch(h, "colormap", 8, 0))) {
 		attr->colormap = SvGdkColormap(*s);
 		*mask |= GDK_WA_COLORMAP;
 	}
 	
-	if (s=hv_fetch(h, "visual", 6, 0)) {
+	if ((s=hv_fetch(h, "visual", 6, 0))) {
 		attr->visual = SvGdkVisual(*s);
 		*mask |= GDK_WA_VISUAL;
 	}
 
-	if (s=hv_fetch(h, "window_type",11, 0))
+	if ((s=hv_fetch(h, "window_type",11, 0)))
 		attr->window_type = SvGdkWindowType(*s);
 	else
 		croak("window attribute must have window_type");
-	if (s=hv_fetch(h, "event_mask",10, 0))
+	if ((s=hv_fetch(h, "event_mask",10, 0)))
 		attr->event_mask = SvGdkEventMask(*s);
 	else
 		croak("window attribute must have event_mask");
-	if (s=hv_fetch(h, "width",5, 0))
+	if ((s=hv_fetch(h, "width",5, 0)))
 		attr->width = SvIV(*s);
 	else
 		croak("window attribute must have width");
-	if (s=hv_fetch(h, "height",6, 0))
+	if ((s=hv_fetch(h, "height",6, 0)))
 		attr->height = SvIV(*s);
 	else
 		croak("window attribute must have height");
-	if (s=hv_fetch(h, "wclass",6, 0))
+	if ((s=hv_fetch(h, "wclass",6, 0)))
 		attr->wclass = SvGdkWindowClass(*s);
 	else
 		attr->wclass = GDK_INPUT_OUTPUT;

@@ -10,7 +10,7 @@ MODULE = Gtk::Arrow		PACKAGE = Gtk::Arrow		PREFIX = gtk_arrow_
 #ifdef GTK_ARROW
 
 Gtk::Arrow_Sink
-new(Class, arrow_type, shadow_type)
+new(Class, arrow_type=GTK_ARROW_RIGHT, shadow_type=GTK_SHADOW_OUT)
 	SV *	Class
 	Gtk::ArrowType	arrow_type
 	Gtk::ShadowType	shadow_type

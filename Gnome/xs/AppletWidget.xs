@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+#include <applet-widget.h>
 
 extern int did_we_init_gnome;
 int did_we_init_panel = 0;
@@ -64,9 +66,9 @@ void AppletInit_internal(char * app_id, AV * args)
 				
 			GtkInit_internal();
 
-			/*Gnome_InstallTypedefs();
+			Gnome_InstallTypedefs();
 
-			Gnome_InstallObjects();*/
+			Gnome_InstallObjects();
 
 
 		}
@@ -77,6 +79,7 @@ void AppletInit_internal(char * app_id, AV * args)
 MODULE = Gnome::Panel::AppletWidget		PACKAGE = Gnome::Panel::AppletWidget		PREFIX = applet_widget_
 
 #ifdef APPLET_WIDGET
+
 void
 init(Class, app_id, start_func=0, ...)
 	SV *    Class

@@ -17,34 +17,34 @@ new(Class)
 	RETVAL
 
 int
-gtk_statusbar_get_context_id(self, context_description)
-	Gtk::Statusbar self
+gtk_statusbar_get_context_id(statusbar, context_description)
+	Gtk::Statusbar statusbar
 	char* context_description
 
 int
-gtk_statusbar_push(self, context_id, text)
-	Gtk::Statusbar self
+gtk_statusbar_push(statusbar, context_id, text)
+	Gtk::Statusbar statusbar
 	int context_id
 	char* text
 
 void
-gtk_statusbar_pop(self, context_id)
-	Gtk::Statusbar self
+gtk_statusbar_pop(statusbar, context_id)
+	Gtk::Statusbar statusbar
 	int context_id
 
 void
-gtk_statusbar_remove(self, context_id, message_id)
-	Gtk::Statusbar self
+gtk_statusbar_remove(statusbar, context_id, message_id)
+	Gtk::Statusbar statusbar
 	int context_id
 	int message_id
 
 void
-gtk_statusbar_messages(self)
-	Gtk::Statusbar	self
+gtk_statusbar_messages(statusbar)
+	Gtk::Statusbar	statusbar
 	PPCODE:
 	{
 		GSList * list;
-		for (list = self->messages; list; list = list->next) {
+		for (list = statusbar->messages; list; list = list->next) {
 			HV * hv = newHV();
 			GtkStatusbarMsg * msg = (GtkStatusbarMsg*)list->data;
 			
@@ -60,18 +60,18 @@ gtk_statusbar_messages(self)
 	}
 
 Gtk::Widget_Up
-frame(self)
-	Gtk::Statusbar self
+frame(statusbar)
+	Gtk::Statusbar statusbar
 	CODE:
-	RETVAL = self->frame;
+	RETVAL = statusbar->frame;
 	OUTPUT:
 	RETVAL
 
 Gtk::Widget_Up
-label(self)
-	Gtk::Statusbar self
+label(statusbar)
+	Gtk::Statusbar statusbar
 	CODE:
-	RETVAL = self->label;
+	RETVAL = statusbar->label;
 	OUTPUT:
 	RETVAL
 

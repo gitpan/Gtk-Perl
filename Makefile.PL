@@ -3,6 +3,7 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 
 use Cwd;
+use Config;
 require 'Depends.pm';
 #import ExtUtils::Depends;
 
@@ -93,11 +94,18 @@ if ($Lazy) {
 	push @defines, "-DNEED_DERIVED";
 }
 
+if (exists($Config{usethreads}) && $Config{usethreads} eq 'define') {
+	print "Enabling threads support\n";
+	push(@defines, "-DPGTK_THREADS");
+	$threadl = " gthread ";
+} else {
+	$threadl = "";
+}
 
-$libs = `gtk-config --libs`;
+$libs = `gtk-config --libs $threadl`;
 $libs = "-L/usr/X11R6/lib -lgtk -lgdk -lglib -lX11 -lXext" if not defined $libs;
 
-$inc = `gtk-config --cflags`;
+$inc = `gtk-config --cflags $threadl`;
 
 $libs =~ s/\s+/ /g;
 $inc =~ s/\s+/ /g;
@@ -432,9 +440,13 @@ Makefile: ' . join(' ',
 build/PerlGtkExt.h build/PerlGtkExt.c build/PerlGtkInt.h: build/GtkDefs.h tools/genext.pl
 	$(PERL) tools/genext.pl Gtk
 
+gendoc:
+	tools/gendoc.pl $(XS_FILES)
+
+world: all
+	@for i in GdkImlib GtkGLArea Gnome Glade GdkPixbuf GtkHTML GtkXmHTML; do cd $$i && perl Makefile.PL && make && cd .. ; done
+
 ';
-
-
 
 }
 

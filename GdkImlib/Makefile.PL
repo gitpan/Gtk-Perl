@@ -5,6 +5,11 @@ use Cwd;
 require '../Depends.pm';
 import ExtUtils::Depends;
 
+#eval {require '../build/IFiles.pm'};
+#warn ("Using installed Gtk\n"), require Gtk::Install::Files if $@;
+
+#$Gtk::Install::Files::CORE = cwd()."../build" unless $Gtk::Install::Files::CORE;
+
 mkdir('build', 0777);
 
 $pm = {};
@@ -58,11 +63,14 @@ WriteMakefile(
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
 	'INC' => $inc,
 	'LIBS' => [$libs],
-	#'OBJECT' => $object,
-	# don't know why, but this file is misplaced
-	'OBJECT' => 'xs/GdkImlib.o',
+	'OBJECT' => $object,
 	'clean' => {FILES => join(' ', @clean) },
-	'LDFROM' => 'GdkImlib.o',
 );
 
-	
+
+sub MY::c_o {
+	package MY; # so that "SUPER" works right
+	my $inherited = shift->SUPER::c_o(@_);
+	$inherited =~ s/CCCMD.*$/$&\n\t\@if test -f `basename \$*.o` -a "`basename \$*.o`" != "\$*.o"; then mv `basename \$*.o` \$*.o; fi/m;
+    $inherited;
+}

@@ -133,11 +133,12 @@ gnome_canvas_item_new(Class, parent, type, ...)
 	OUTPUT:
 	RETVAL
 
-#if 1 /* This code is needed, as Gtk::Object::set() behaves differently from Gnome::CanvasItem::set(), which is a bug IMO. */
+#if 1 
+# This code is needed, as Gtk::Object::set() behaves differently from Gnome::CanvasItem::set(), which is a bug IMO. 
 
 void
-gnome_canvas_item_set (self, name, value,...)
-	Gnome::CanvasItem	self
+gnome_canvas_item_set (item, name, value,...)
+	Gnome::CanvasItem	item
 	CODE:
 	{
 		GtkArg	*argv;
@@ -148,7 +149,7 @@ gnome_canvas_item_set (self, name, value,...)
 		if ( argc % 2 )
 			croak("too few arguments");
 		
-		obj = GTK_OBJECT(self);
+		obj = GTK_OBJECT(item);
 		argv = malloc(sizeof(GtkArg)*argc);
 
 		i=0;
@@ -158,7 +159,7 @@ gnome_canvas_item_set (self, name, value,...)
 			GtkSetArg(&argv[i], ST(p+1), ST(0), obj);
 			p += 2;
 		}
-		gnome_canvas_item_setv(self, i, argv);
+		gnome_canvas_item_setv(item, i, argv);
 		
 		for(p=0;p<i;p++)
 			GtkFreeArg(&argv[i]);
@@ -169,8 +170,8 @@ gnome_canvas_item_set (self, name, value,...)
 #endif
 
 void
-gnome_canvas_item_move(self, dx, dy)
-	Gnome::CanvasItem	self
+gnome_canvas_item_move(item, dx, dy)
+	Gnome::CanvasItem	item
 	double	dx
 	double	dy
 
@@ -259,41 +260,41 @@ gnome_canvas_item_rotate (item, x, y, angle)
 #endif
 
 void
-gnome_canvas_item_raise(self, positions)
-	Gnome::CanvasItem	self
+gnome_canvas_item_raise(item, positions)
+	Gnome::CanvasItem	item
 	int	positions
 
 void
-gnome_canvas_item_lower(self, positions)
-	Gnome::CanvasItem	self
+gnome_canvas_item_lower(item, positions)
+	Gnome::CanvasItem	item
 	int	positions
 
 void
-gnome_canvas_item_raise_to_top(self)
-	Gnome::CanvasItem	self
+gnome_canvas_item_raise_to_top(item)
+	Gnome::CanvasItem	item
 
 void
-gnome_canvas_item_lower_to_bottom(self)
-	Gnome::CanvasItem	self
+gnome_canvas_item_lower_to_bottom(item)
+	Gnome::CanvasItem	item
 
 void
-gnome_canvas_item_show(self)
-	Gnome::CanvasItem	self
+gnome_canvas_item_show(item)
+	Gnome::CanvasItem	item
 
 void
-gnome_canvas_item_hide(self)
-	Gnome::CanvasItem	self
+gnome_canvas_item_hide(item)
+	Gnome::CanvasItem	item
 
 int
-gnome_canvas_item_grab(self, event_mask, cursor, time)
-	Gnome::CanvasItem	self
+gnome_canvas_item_grab(item, event_mask, cursor, time)
+	Gnome::CanvasItem	item
 	Gtk::Gdk::EventMask	event_mask
 	Gtk::Gdk::Cursor	cursor
 	int		time
 
 void
-gnome_canvas_item_ungrab(self, time)
-	Gnome::CanvasItem	self
+gnome_canvas_item_ungrab(item, time)
+	Gnome::CanvasItem	item
 	int		time
 
 void
@@ -324,26 +325,26 @@ gnome_canvas_item_request_update (item)
 	Gnome::CanvasItem	item
 
 void
-gnome_canvas_item_w2i(self, x, y)
-	Gnome::CanvasItem	self
+gnome_canvas_item_w2i(item, x, y)
+	Gnome::CanvasItem	item
 	double	x
 	double	y
 	PPCODE:
 	{
-		gnome_canvas_item_w2i(self, &x, &y);
+		gnome_canvas_item_w2i(item, &x, &y);
 		EXTEND(sp,2);
 		PUSHs(sv_2mortal(newSVnv(x)));
 		PUSHs(sv_2mortal(newSVnv(y)));
 	}
 
 void
-gnome_canvas_item_i2w(self, x, y)
-	Gnome::CanvasItem	self
+gnome_canvas_item_i2w(item, x, y)
+	Gnome::CanvasItem	item
 	double	x
 	double	y
 	PPCODE:
 	{
-		gnome_canvas_item_i2w(self, &x, &y);
+		gnome_canvas_item_i2w(item, &x, &y);
 		EXTEND(sp,2);
 		PUSHs(sv_2mortal(newSVnv(x)));
 		PUSHs(sv_2mortal(newSVnv(y)));

@@ -122,6 +122,9 @@ Makefile: ' . join(' ',
 build/PerlGtkGladeXMLExt.h build/PerlGtkGladeXMLExt.c build/PerlGtkGladeXMLInt.h: build/GtkGladeXMLDefs.h ../tools/genext.pl
 	$(PERL) ../tools/genext.pl GtkGladeXML </dev/null
 
+gendoc:
+	../tools/gendoc.pl -t glade $(XS_FILES)
+
 ';
 
 

@@ -30,11 +30,11 @@ sub main {
 	$window->border_width(4);
 	
 	my($top_pack) = new Gtk::Packer;
-	$window_pack->add_defaults($top_pack, -top, -center, [-fill_x, -fill_y, -pack_expand]);
+	$window_pack->add_defaults($top_pack, -top, -center, [-fill_x, -fill_y, -expand]);
 	
 	my($frame) = new Gtk::Frame("Packing Area");
 	$frame->set_usize(400,400);
-	$top_pack->add($frame, -left, -center, [-fill_x, -fill_y, -pack_expand], 0, 8, 8, 0, 0);
+	$top_pack->add($frame, -left, -center, [-fill_x, -fill_y, -expand], 0, 8, 8, 0, 0);
 	my($packer) = new Gtk::Packer;
 	$frame->add($packer);
 	
@@ -90,7 +90,7 @@ sub main {
 	$anchor_frame->add($anchor_pack);
 	
 	my($anchor_table) = new Gtk::Table(3, 3, 1);
-	$anchor_pack->add($anchor_table, -top, -center, [-fill_y, -fill_x, -pack_expand], 0, 10, 5, 0, 0);
+	$anchor_pack->add($anchor_table, -top, -center, [-fill_y, -fill_x, -expand], 0, 10, 5, 0, 0);
 	
 	my($button_n) = new Gtk::ToggleButton "N";
 	my($button_ne) = new Gtk::ToggleButton "NE";
@@ -142,13 +142,13 @@ sub main {
 	my($button_filly) = new Gtk::ToggleButton "Fill Y";
 	my($button_expand) = new Gtk::ToggleButton "Expand";
 	
-	$options_pack->add($button_fillx, -top, -north, [-fill_x, -pack_expand], 0, 10, 5, 0, 0);
-	$options_pack->add($button_filly, -top, -center, [-fill_x, -pack_expand], 0, 10, 5, 0, 0);
-	$options_pack->add($button_expand, -top, -south, [-fill_x, -pack_expand], 0, 10, 5, 0, 0);
+	$options_pack->add($button_fillx, -top, -north, [-fill_x, -expand], 0, 10, 5, 0, 0);
+	$options_pack->add($button_filly, -top, -center, [-fill_x, -expand], 0, 10, 5, 0, 0);
+	$options_pack->add($button_expand, -top, -south, [-fill_x, -expand], 0, 10, 5, 0, 0);
 	
 	$button_fillx->{option} = -fill_x;
 	$button_filly->{option} = -fill_y;
-	$button_expand->{option} = -pack_expand;
+	$button_expand->{option} = -expand;
 	
 	$button_fillx->signal_connect(toggled => \&toggle_options, $info);
 	$button_filly->signal_connect(toggled => \&toggle_options, $info);
@@ -199,7 +199,7 @@ sub toggle_options {
 	
 	push @options, -fill_x if $info->{button_fillx}->active;
 	push @options, -fill_y if $info->{button_filly}->active;
-	push @options, -pack_expand if $info->{button_expand}->active;
+	push @options, -expand if $info->{button_expand}->active;
 	
 	$info->{packer}->configure($info->{current},
 								$pchild->side,
@@ -325,7 +325,7 @@ sub set_widget {
 		$info->{button_nw}->set_state(1) if $pchild->anchor eq "nw";
 		$info->{button_center}->set_state(1) if $pchild->anchor eq "center";
 		
-		$info->{button_expand}->set_state($pchild->options->{pack_expand} || 0);
+		$info->{button_expand}->set_state($pchild->options->{expand} || 0);
 		$info->{button_fillx}->set_state($pchild->options->{fill_x} || 0);
 		$info->{button_filly}->set_state($pchild->options->{fill_y} || 0);
 		

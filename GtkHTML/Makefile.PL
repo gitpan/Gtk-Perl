@@ -12,9 +12,9 @@ mkdir('build', 0777);
 
 $pm = {};
 
-$inc = `gnome-config --cflags gdk_pixbuf gnomeui`;
+$inc = `gnome-config --cflags gdk_pixbuf gnomeui print`;
 chomp($inc);
-$libs = "-lgtkhtml ".`gnome-config --libs gdk_pixbuf gnomeui`;
+$libs = "-lgtkhtml ".`gnome-config --libs gdk_pixbuf gnomeui print`;
 chomp($libs);
 
 @typemaps = @Gtk::Install::Files::typemaps;
@@ -112,6 +112,9 @@ Makefile: ' . join(' ',
 
 build/PerlGtkHTMLExt.h build/PerlGtkHTMLExt.c build/PerlGtkHTMLInt.h: build/GtkHTMLDefs.h ../tools/genext.pl
 	$(PERL) ../tools/genext.pl GtkHTML </dev/null
+
+gendoc:
+	../tools/gendoc.pl -t gtkhtml $(XS_FILES)
 
 ';
 

@@ -16,6 +16,8 @@ $inc = `gtk-config --cflags`;
 chomp($inc);
 $libs = "-lgtkgl  -lMesaGL -lMesaGLU " . `gtk-config --libs`;
 chomp($libs);
+$nomesa = $libs;
+$nomesa =~ s/Mesa//g;
 
 @typemaps = @Gtk::Install::Files::typemaps;
 $typemaps = [cwd() . '/pkg.typemap', cwd().'/build/GtkGLAreaTypemap'];
@@ -99,7 +101,7 @@ WriteMakefile(
 	'DEFINE'    => join(' ',@defines),
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
 	'INC' => $inc,
-	'LIBS' => [$libs],
+	'LIBS' => [$nomesa, $libs],
 	'OBJECT' => $object,
 	'clean' => {FILES => join(' ', @clean) },
 	#'LDFROM' => $ldfrom,
@@ -116,6 +118,9 @@ Makefile: ' . join(' ',
 
 build/PerlGtkGLAreaExt.h build/PerlGtkGLAreaExt.c build/PerlGtkGLAreaInt.h: build/GtkGLAreaDefs.h ../tools/genext.pl
 	$(PERL) ../tools/genext.pl GtkGLArea </dev/null
+
+gendoc:
+	../tools/gendoc.pl -t gtkglarea $(XS_FILES)
 
 ';
 

@@ -6,6 +6,9 @@
 #include "GtkDefs.h"
 #include "GnomeDefs.h"
 
+static GnomeUIInfo * svrv_to_uiinfo_tree(SV *data);
+extern void menu_callback(GtkWidget *w, gpointer data);
+
 extern int did_we_init_gdk, did_we_init_gtk;
 int did_we_init_gnome = 0;
 
@@ -215,6 +218,145 @@ void GnomeInit_internal(char * app_id, char * app_version)
 			}
 #endif
 		}
+}
+
+static GnomeUIInfo *
+svrv_to_uiinfo_tree(SV* data)
+{
+	AV *a;
+	int i, count;
+	GnomeUIInfo* infos;
+
+	g_assert(data != NULL);
+	if ((!SvOK(data)) || (!SvRV(data)) || (SvTYPE(SvRV(data)) != SVt_PVAV)) {
+		croak("Subtree must be an array reference");
+	}
+
+	a = (AV*)SvRV(data);
+	count = av_len(a) + 1;
+	infos = alloc_temp(sizeof(GnomeUIInfo) * (count+1));
+	memset(infos, 0, sizeof(GnomeUIInfo) * (count+1));
+	for (i = 0; i < count; i++) {
+		SV** s = av_fetch(a, i, 0);
+		SvGnomeUIInfo(*s, infos + i);
+	}
+	infos[count].type = GNOME_APP_UI_ENDOFINFO;
+	
+	return infos;
+}
+
+void
+SvGnomeUIInfo(SV *data, GnomeUIInfo *info)
+{
+	g_assert(data != NULL);
+	g_assert(info != NULL);
+
+	if (!SvOK(data))
+		return; /* fail silently if undef */
+	if ((!SvRV(data)) ||
+	    (SvTYPE(SvRV(data)) != SVt_PVHV && SvTYPE(SvRV(data)) != SVt_PVAV)) {
+		croak("GnomeUIInfo must be a hash or array reference");
+	}
+
+	if (SvTYPE(SvRV(data)) == SVt_PVHV) {
+		HV *h = (HV*)SvRV(data);
+		SV **s;
+		STRLEN len;
+		if ((s = hv_fetch(h, "type", 4, 0)) && SvOK(*s))
+			info->type = SvGnomeUIInfoType(*s);
+		if ((s = hv_fetch(h, "label", 5, 0)) && SvOK(*s))
+			info->label = SvPV(*s, len);
+		if ((s = hv_fetch(h, "hint", 4, 0)) && SvOK(*s))
+			info->hint = SvPV(*s, len);
+
+		/* 'subtree' and 'callback' are also allowed - they
+                   have the bonus that we know what you mean if you
+                   use them */
+		if ((s = hv_fetch(h, "moreinfo", 8, 0)) && SvOK(*s)) {
+			info->moreinfo = *s;
+		} else if ((s = hv_fetch(h, "subtree", 7, 0)) && SvOK(*s)) {
+			if (info->type != GNOME_APP_UI_SUBTREE &&
+			    info->type != GNOME_APP_UI_SUBTREE_STOCK)
+				croak("'subtree' argument specified, but GnomeUIInfo type"
+				      " is not 'subtree'");
+			info->moreinfo = *s;
+		} else if ((s = hv_fetch(h, "callback", 8, 0)) && SvOK(*s)) {
+			if ((info->type != GNOME_APP_UI_ITEM) &&
+			    (info->type != GNOME_APP_UI_TOGGLEITEM))
+				croak("'callback' argument specified, but GnomeUIInfo type"
+				      " is not an item type");
+				info->moreinfo = *s;
+		}
+
+		if ((s = hv_fetch(h, "pixmap_type", 11, 0)) && SvOK(*s))
+			info->pixmap_type = SvGnomeUIPixmapType(*s);
+		if ((s = hv_fetch(h, "pixmap_info", 11, 0)) && SvOK(*s))
+			info->pixmap_info = SvPV(*s, len); /* works for stock pixmaps at least */
+		if ((s = hv_fetch(h, "accelerator_key", 15, 0)) && SvOK(*s)) /* keysym */
+			info->accelerator_key = SvIV(*s);
+		if ((s = hv_fetch(h, "ac_mods", 7, 0)) && SvOK(*s))
+			info->ac_mods = SvGdkModifierType(*s);
+	} else { /* As in Python - it's an array of:
+		    type, label, hint, moreinfo, pixmap_type, pixmap_info,
+		    accelerator_key, modifiers */
+		AV *a = (AV*)SvRV(data);
+		SV **s;
+		STRLEN len;
+		if ((s = av_fetch(a, 0, 0)) && SvOK(*s))
+			info->type = SvGnomeUIInfoType(*s);
+		if ((s = av_fetch(a, 1, 0)) && SvOK(*s))
+			info->label = SvPV(*s, len);
+		if ((s = av_fetch(a, 2, 0)) && SvOK(*s))
+			info->hint = SvPV(*s, len);
+		if ((s = av_fetch(a, 3, 0)) && SvOK(*s))
+			info->moreinfo = *s;
+		if ((s = av_fetch(a, 4, 0)) && SvOK(*s))
+			info->pixmap_type = SvGnomeUIPixmapType(*s);
+		if ((s = av_fetch(a, 5, 0)) && SvOK(*s))
+			info->pixmap_info = SvPV(*s, len);
+		if ((s = av_fetch(a, 6, 0)) && SvOK(*s)) /* keysym */
+			info->accelerator_key = SvIV(*s);		
+		if ((s = av_fetch(a, 7, 0)) && SvOK(*s))
+			info->ac_mods = SvGdkModifierType(*s);
+	}
+
+	/* Decide what to do with the moreinfo */
+	switch (info->type) {
+	case GNOME_APP_UI_SUBTREE:
+	case GNOME_APP_UI_SUBTREE_STOCK:
+	case GNOME_APP_UI_RADIOITEMS:
+		if (info->moreinfo == NULL)
+			croak("GnomeUIInfo type requires a 'moreinfo' or 'subtree' argument, "
+			      "but none was specified");
+		/* Now we can recurse */
+		info->moreinfo = svrv_to_uiinfo_tree(info->moreinfo);
+		break;
+
+	case GNOME_APP_UI_ITEM:
+	case GNOME_APP_UI_ITEM_CONFIGURABLE:
+	case GNOME_APP_UI_TOGGLEITEM:
+		if (info->moreinfo) {
+			/* Build a callback */
+			info->user_data = info->moreinfo;
+			SvREFCNT_inc(info->user_data); /* XXX: memory leak? */
+			info->moreinfo = &menu_callback; /* might as well reuse this */
+		}
+		break;
+
+	case GNOME_APP_UI_HELP:
+		if (info->moreinfo == NULL)
+			croak("GnomeUIInfo type requires a 'moreinfo' argument, "
+			      "but none was specified");
+		{
+			STRLEN len;
+			/* It's just a string */
+			info->moreinfo = SvPV((SV*)info->moreinfo, len);
+			break;
+		}
+
+	default:
+		/* Do nothing */
+	}
 }
 
 

@@ -359,11 +359,11 @@
 (export-enum GtkWindowPosition)
 (export-flags GdkDragAction)
 (export-flags GdkEventMask)
-;(export-flags GdkGCValuesMask)
+(export-flags GdkGCValuesMask)
 (export-flags GdkInputCondition)
 (export-flags GdkModifierType)
-;(export-flags GdkWMDecoration)
-;(export-flags GdkWMFunction)
+(export-flags GdkWMDecoration)
+(export-flags GdkWMFunction)
 (export-flags GdkWindowAttributesType)
 (export-flags GdkWindowHints)
 (export-flags GtkArgFlags)
@@ -382,4 +382,17 @@
 (export-boxed GdkDragContext)
 (export-boxed GdkVisual)
 (export-boxed GdkColormap)
+
+(define-enum GdkVisibilityState
+  (unobscured GDK_VISIBILITY_UNOBSCURED)
+  (partial GDK_VISIBILITY_PARTIAL)
+  (fully-obscured GDK_VISIBILITY_FULLY_OBSCURED))
+
+(define-enum GdkCrossingMode
+  (normal GDK_CROSSING_NORMAL)
+  (grab GDK_CROSSING_GRAB)
+  (ungrab GDK_CROSSING_UNGRAB))
+  
+(export-enum GdkVisibilityState)
+(export-enum GdkCrossingMode)
 

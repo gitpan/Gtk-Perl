@@ -31,12 +31,12 @@ new(Class, label=0, previous=0)
 	RETVAL
 
 void
-group(self)
-	Gtk::RadioMenuItem	self
+group(radiomenuitem)
+	Gtk::RadioMenuItem	radiomenuitem
 	PPCODE:
 	{
 		GSList * group = 0;
-		group = gtk_radio_menu_item_group(self);
+		group = gtk_radio_menu_item_group(radiomenuitem);
 		while(group) {
 			EXTEND(sp, 1);
 			PUSHs(sv_2mortal(newSVGtkRadioMenuItem(group->data)));

@@ -80,6 +80,7 @@ long SvOpt(SV * name, char * optname, struct opts * o)
 		if (strEQ(o[i].name, n))
 			return o[i].value;
 	CroakOpts(optname, n, o);
+	return 0;
 }
 
 SV * newSVOpt(long value, char * optname, struct opts * o) 
@@ -89,6 +90,7 @@ SV * newSVOpt(long value, char * optname, struct opts * o)
 		if (o[i].value == value)
 			return newSVpv(o[i].name, 0);
 	croak("invalid %s value %d", optname, value);
+	return NULL;
 }
 
 
@@ -131,6 +133,7 @@ long SvOptsHash(SV * name, char * optname, HV * o)
 	if (s)
 		return SvIV(*s);
 	CroakOptsHash(optname, n, o);
+	return 0;
 }
 
 SV * newSVOptsHash(long value, char * optname, HV * o) 
@@ -139,7 +142,7 @@ SV * newSVOptsHash(long value, char * optname, HV * o)
 	HE * h;
 	SV * result = 0;
 	hv_iterinit(o);
-	while(h = hv_iternext(o)) {
+	while((h = hv_iternext(o))) {
 		SV * s = hv_iterval(o, h);
 		if (SvIV(s) == value) {
 			I32 len;
@@ -166,7 +169,7 @@ long SvFlagsHash(SV * name, char * optname, HV * o)
 		HV * r = (HV*)SvRV(name);
 		HE * h;
 		hv_iterinit(r);
-		while(h = hv_iternext(r)) {
+		while((h = hv_iternext(r))) {
 			I32 len;
 			char * key = hv_iterkey(h, &len);
 			SV ** f;
@@ -200,7 +203,7 @@ SV * newSVFlagsHash(long value, char * optname, HV * o)
 		target = (SV*)newAV();
 		
 	hv_iterinit(o);
-	while(s = hv_iternextsv(o, &key, &len)) {
+	while((s = hv_iternextsv(o, &key, &len))) {
 		int val = SvIV(s);
 			
 		if ((value & val) == val) {
@@ -282,7 +285,7 @@ SV * newSVDefEnumHash (GtkType type, long value) {
 				char *s = SvPV(result, PL_na);
 				while (*s) {
 					if (*s == '-') *s = '_';
-					*s++;
+					s++;
 				}
 			}
 			return result;
@@ -305,14 +308,14 @@ SV * newSVDefFlagsHash (GtkType type, long value) {
 		result = newRV((SV*)h);
 		SvREFCNT_dec(h);
 		while(vals && vals->value_nick) {
-			if ((vals->value & value) == value) {
+			if ((value & vals->value) == vals->value) {
 				if (pgtk_use_minus)
 					hv_store(h, vals->value_nick, strlen(vals->value_nick), newSViv(1), 0);
 				else {
 					p = s = g_strdup(vals->value_nick);
 					while (*s) {
 						if (*s == '-') *s = '_';
-						*s++;
+						s++;
 					}
 					hv_store(h, p, strlen(p), newSViv(1), 0);
 					g_free(p);
@@ -326,14 +329,14 @@ SV * newSVDefFlagsHash (GtkType type, long value) {
 		result = newRV((SV*)a);
 		SvREFCNT_dec(a);
 		while(vals && vals->value_nick) {
-			if ((vals->value & value) == value) {
+			if ((value & vals->value) == vals->value) {
 				if (pgtk_use_minus)
 					av_push(a, newSVpv(vals->value_nick, 0));
 				else {
 					p = s = g_strdup(vals->value_nick);
 					while (*s) {
 						if (*s == '-') *s = '_';
-						*s++;
+						s++;
 					}
 					av_push(a, newSVpv(p, 0));
 					g_free(p);
@@ -374,12 +377,12 @@ long SvEFValueLookup (GtkEnumValue * vals, char* name, GtkType type) {
 	}
 	{
 		SV * r;
-		char * endc;
+		char * endc=NULL;
 		long val;
 		
 		/* last chanche: integer value... */
 		val = strtol(name, &endc, 0);
-		if (*name && *endc == '\0')
+		if (*name && endc && *endc == '\0')
 			return val;
 		v = vals;
 		r = sv_newmortal();
@@ -414,11 +417,11 @@ long SvDefFlagsHash (GtkType type, SV *name) {
 	vals = gtk_type_flags_get_values(type);
 	if (!vals)
 		croak("Invalid type for flags: %s", gtk_type_name(type));
-	if (SvRV(name) && (SvTYPE(SvRV(name)) == SVt_PVAV)) {
+	if (SvROK(name) && (SvTYPE(SvRV(name)) == SVt_PVAV)) {
 		AV * r = (AV*)SvRV(name);
 		for(i=0;i<=av_len(r);i++)
 			val |= SvEFValueLookup(vals, SvPV(*av_fetch(r, i, 0), PL_na), type);
-	} else if (SvRV(name) && (SvTYPE(SvRV(name)) == SVt_PVHV)) {
+	} else if (SvROK(name) && (SvTYPE(SvRV(name)) == SVt_PVHV)) {
 		HV * r = (HV*)SvRV(name);
 		HE * he;
 		I32 len;
@@ -491,5 +494,6 @@ void * alloc_temp(int size)
 
     SV * s = sv_2mortal(newSVpv("",0));
     SvGROW(s, size);
+	memset(SvPV(s, PL_na), 0, size);
     return SvPV(s, PL_na);
 }

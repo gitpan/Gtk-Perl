@@ -18,21 +18,21 @@ new(Class)
 	RETVAL
 
 void
-gtk_tips_query_start_query(self)
-	Gtk::TipsQuery self
+gtk_tips_query_start_query(tips_query)
+	Gtk::TipsQuery tips_query
 
 void
-gtk_tips_query_stop_query(self)
-	Gtk::TipsQuery self
+gtk_tips_query_stop_query(tips_query)
+	Gtk::TipsQuery tips_query
 
 void
-gtk_tips_query_set_caller(self, caller)
-	Gtk::TipsQuery self
+gtk_tips_query_set_caller(tips_query, caller)
+	Gtk::TipsQuery tips_query
 	Gtk::Widget caller
 
 void
-gtk_tips_query_set_labels(self, label_inactive, label_no_tip)
-	Gtk::TipsQuery self
+gtk_tips_query_set_labels(tips_query, label_inactive, label_no_tip)
+	Gtk::TipsQuery tips_query
 	char* label_inactive
 	char* label_no_tip
 

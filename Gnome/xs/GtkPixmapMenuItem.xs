@@ -13,11 +13,10 @@ MODULE = Gtk::PixmapMenuItem		PACKAGE = Gtk::PixmapMenuItem		PREFIX = gtk_pixmap
 
 #ifdef GTK_PIXMAP_MENU_ITEM
 
-#if 0
 
 Gtk::PixmapMenuItem_Sink
 new (Class)
-	SV *	CLass
+	SV *	Class
 	CODE:
 	RETVAL = GTK_PIXMAP_MENU_ITEM(gtk_pixmap_menu_item_new());
 	OUTPUT:
@@ -28,7 +27,6 @@ gtk_pixmap_menu_item_set_pixmap (menu_item, pixmap)
 	Gtk::PixmapMenuItem	menu_item
 	Gtk::Widget	pixmap
 
-#endif
 
 #endif
 

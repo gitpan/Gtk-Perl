@@ -54,6 +54,13 @@ gnome_file_entry_get_full_path (fentry, file_must_exist)
 	Gnome::FileEntry	fentry
 	int	file_must_exist
 
+Gtk::Widget_Up
+fsw (fentry)
+	Gnome::FileEntry	fentry
+	CODE:
+	RETVAL = fentry->fsw;
+	OUTPUT:
+	RETVAL
 
 #endif
 

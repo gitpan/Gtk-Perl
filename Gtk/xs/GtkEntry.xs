@@ -10,7 +10,7 @@ MODULE = Gtk::Entry		PACKAGE = Gtk::Entry	PREFIX = gtk_entry_
 #ifdef GTK_ENTRY
 
 Gtk::Entry_Sink
-new(Class, max_length = 0)
+new(Class, max_length=0)
 	SV *	Class
 	int	max_length
 	ALIAS:
@@ -25,48 +25,48 @@ new(Class, max_length = 0)
 	RETVAL
 
 void
-gtk_entry_set_text(self, text)
-	Gtk::Entry	self
+gtk_entry_set_text(entry, text)
+	Gtk::Entry	entry
 	char *	text
 
 void
-gtk_entry_append_text(self, text)
-	Gtk::Entry	self
+gtk_entry_append_text(entry, text)
+	Gtk::Entry	entry
 	char *	text
 
 void
-gtk_entry_prepend_text(self, text)
-	Gtk::Entry	self
+gtk_entry_prepend_text(entry, text)
+	Gtk::Entry	entry
 	char *	text
 
 void
-gtk_entry_set_position(self, position)
-	Gtk::Entry	self
+gtk_entry_set_position(entry, position)
+	Gtk::Entry	entry
 	int	position
 
 char *
-gtk_entry_get_text(self)
-	Gtk::Entry	self
+gtk_entry_get_text(entry)
+	Gtk::Entry	entry
 
 void
-gtk_entry_select_region (self, start, end)
-	Gtk::Entry  self
+gtk_entry_select_region (entry, start=0, end=-1)
+	Gtk::Entry  entry
 	int start
 	int end
 
 void
-gtk_entry_set_visibility (self, visibility)
-	Gtk::Entry  self
+gtk_entry_set_visibility (entry, visibility=TRUE)
+	Gtk::Entry  entry
 	bool visibility
 
 void
-gtk_entry_set_editable (self, editable)
-	Gtk::Entry  self
+gtk_entry_set_editable (entry, editable=TRUE)
+	Gtk::Entry  entry
 	bool editable
 
 void
-gtk_entry_set_max_length (self, max)
-	Gtk::Entry  self
+gtk_entry_set_max_length (entry, max)
+	Gtk::Entry  entry
 	int max
 
 #endif

@@ -19,18 +19,18 @@ new(Class, socket_id)
 	RETVAL
 
 Gtk::Gdk::Window
-socket_window(self)
-	Gtk::Plug     self
+socket_window(plug)
+	Gtk::Plug     plug
 	CODE:
-		RETVAL = self->socket_window;
+		RETVAL = plug->socket_window;
 	OUTPUT:
 	RETVAL
 
 int
-same_app(self)
-	Gtk::Plug     self
+same_app(plug)
+	Gtk::Plug     plug
 	CODE:
-		RETVAL = self->same_app;
+		RETVAL = plug->same_app;
 	OUTPUT:
 	RETVAL
 

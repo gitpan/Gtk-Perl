@@ -523,7 +523,14 @@ static void DestroyGtkObject(GtkObject * gtk_object, gpointer data)
 	HV * hv_object = (HV*)data;
 	
 	/*printf("DestroyGtkObject (1) called on PO %x/%d for GO %x/%d\n", hv_object, SvREFCNT(hv_object), gtk_object, gtk_object->ref_count);*/
-	
+
+	if (!SvREFCNT(hv_object)) {
+		/* FIXME: */
+		/*char *lab=NULL;
+		gtk_label_get(GTK_LABEL(gtk_object), &lab);
+		printf("tryed to destroy dead PO: %s %s\n", gtk_widget_get_name(gtk_object), lab);*/
+		return;
+	}
 	GCHVObject(hv_object);
 	
 	GCDuringIdle();
@@ -541,7 +548,11 @@ static void FreeGtkObject(gpointer data)
 	HV * hv_object = (HV*)data;
 	SV ** r;
 	GCDuringIdle();
-	/*printf("FreeGtkObject of (PO %p/%d) ", hv_object, SvREFCNT(hv_object));*/
+	/*printf("FreeGtkObject of (PO %p/%d) \n", hv_object, SvREFCNT(hv_object));*/
+	if (!SvREFCNT(hv_object)) {
+		/* FIXME: printf("tryed to destroy dead PO\n");*/
+		return;
+	}
 	r = hv_fetch(hv_object, "_gtk", 4, 0);
 	if (r && SvIV(*r)) {
 		GtkObject * gtk_object = (GtkObject*)SvIV(*r);
@@ -962,8 +973,10 @@ SV * GtkGetArg(GtkArg * a)
 		case GTK_TYPE_BOXED:
 			if (a->type == GTK_TYPE_GDK_EVENT)
 				result = newSVGdkEvent(GTK_VALUE_BOXED(*a));
+			else if (a->type == GTK_TYPE_GDK_COLOR)
+				result = newSVGdkColor(GTK_VALUE_BOXED(*a));
 			else
-			break;
+				break;
 	}
 	
 	if (result)
@@ -1073,8 +1086,10 @@ void GtkSetArg(GtkArg * a, SV * v, SV * Class, GtkObject * Object)
 		case GTK_TYPE_BOXED:
 			if (a->type == GTK_TYPE_GDK_EVENT)
 				GTK_VALUE_BOXED(*a) = SvGdkEvent(v);
+			else if (a->type == GTK_TYPE_GDK_COLOR)
+				GTK_VALUE_BOXED(*a) = SvGdkColor(v);
 			else
-			result = 0;
+				result = 0;
 			break;
 		default:
 			result = 0;
@@ -1132,6 +1147,8 @@ void GtkSetRetArg(GtkArg * a, SV * v, SV * Class, GtkObject * Object)
 		case GTK_TYPE_BOXED:
 			if (a->type == GTK_TYPE_GDK_EVENT)
 				*GTK_RETLOC_BOXED(*a) = SvGdkEvent(v);
+			else if (a->type == GTK_TYPE_GDK_COLOR)
+				*GTK_RETLOC_BOXED(*a) = SvGdkColor(v);
 			else
 				result = 0;
 			break;
@@ -1188,6 +1205,8 @@ SV * GtkGetRetArg(GtkArg * a)
 		case GTK_TYPE_BOXED:
 			if (a->type == GTK_TYPE_GDK_EVENT)
 				result = newSVGdkEvent(*GTK_RETLOC_BOXED(*a));
+			else if (a->type == GTK_TYPE_GDK_COLOR)
+				result = newSVGdkColor(*GTK_RETLOC_BOXED(*a));
 			break;			
 	}
 	

@@ -14,6 +14,11 @@
 
 #include "GtkDefs.h"
 
+#define MY_GTK_WIDGET_SET_FLAGS(widget, flag, value) G_STMT_START{ \
+	value?GTK_WIDGET_SET_FLAGS((widget), (flag)) \
+	:GTK_WIDGET_UNSET_FLAGS((widget), (flag)); \
+	}G_STMT_END 
+
 MODULE = Gtk::Widget		PACKAGE = Gtk::Widget		PREFIX = gtk_widget_
 
 #ifdef GTK_WIDGET
@@ -400,7 +405,7 @@ gtk_widget_visible(widget, newvalue=0)
 	CODE:
 	RETVAL = GTK_WIDGET_VISIBLE(widget);
 	if (items>1)
-		GTK_WIDGET_SET_FLAGS(widget, GTK_VISIBLE);
+		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_VISIBLE, newvalue);
 	OUTPUT:
 	RETVAL
 
@@ -411,7 +416,7 @@ gtk_widget_mapped(widget, newvalue=0)
 	CODE:
 	RETVAL = GTK_WIDGET_MAPPED(widget);
 	if (items>1)
-		GTK_WIDGET_SET_FLAGS(widget, GTK_MAPPED);
+		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_MAPPED, newvalue);
 	OUTPUT:
 	RETVAL
 
@@ -437,7 +442,7 @@ gtk_widget_realized(widget, newvalue=0)
 	CODE:
 	RETVAL = GTK_WIDGET_REALIZED(widget);
 	if (items>1)
-		GTK_WIDGET_SET_FLAGS(widget, GTK_REALIZED);
+		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_REALIZED, newvalue);
 	OUTPUT:
 	RETVAL
 
@@ -448,7 +453,7 @@ gtk_widget_sensitive(widget, newvalue=0)
 	CODE:
 	RETVAL = GTK_WIDGET_SENSITIVE(widget);
 	if (items>1)
-		GTK_WIDGET_SET_FLAGS(widget, GTK_SENSITIVE);
+		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_SENSITIVE, newvalue);
 	OUTPUT:
 	RETVAL
 
@@ -459,7 +464,7 @@ gtk_widget_parent_sensitive(widget, newvalue=0)
 	CODE:
 	RETVAL = GTK_WIDGET_PARENT_SENSITIVE(widget);
 	if (items>1)
-		GTK_WIDGET_SET_FLAGS(widget, GTK_PARENT_SENSITIVE);
+		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_PARENT_SENSITIVE, newvalue);
 	OUTPUT:
 	RETVAL
 
@@ -478,7 +483,7 @@ gtk_widget_no_window(widget, newvalue=0)
 	CODE:
 	RETVAL = GTK_WIDGET_NO_WINDOW(widget);
 	if (items>1)
-		GTK_WIDGET_SET_FLAGS(widget, GTK_NO_WINDOW);
+		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_NO_WINDOW, newvalue);
 	OUTPUT:
 	RETVAL
 
@@ -489,7 +494,7 @@ gtk_widget_has_focus(widget, newvalue=0)
 	CODE:
 	RETVAL = GTK_WIDGET_HAS_FOCUS(widget);
 	if (items>1)
-		GTK_WIDGET_SET_FLAGS(widget, GTK_HAS_FOCUS);
+		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_HAS_FOCUS, newvalue);
 	OUTPUT:
 	RETVAL
 
@@ -501,7 +506,7 @@ gtk_widget_can_focus(widget, newvalue=0)
 	CODE:
 	RETVAL = GTK_WIDGET_CAN_FOCUS(widget);
 	if (items>1)
-		GTK_WIDGET_SET_FLAGS(widget, GTK_CAN_FOCUS);
+		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_CAN_FOCUS, newvalue);
 	OUTPUT:
 	RETVAL
 
@@ -512,7 +517,7 @@ gtk_widget_has_default(widget, newvalue=0)
 	CODE:
 	RETVAL = GTK_WIDGET_HAS_DEFAULT(widget);
 	if (items>1)
-		GTK_WIDGET_SET_FLAGS(widget, GTK_HAS_DEFAULT);
+		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_HAS_DEFAULT, newvalue);
 	OUTPUT:
 	RETVAL
 
@@ -524,7 +529,7 @@ gtk_widget_can_default(widget, newvalue=0)
 	CODE:
 	RETVAL = GTK_WIDGET_CAN_DEFAULT(widget);
 	if (items>1)
-		GTK_WIDGET_SET_FLAGS(widget, GTK_CAN_DEFAULT);
+		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_CAN_DEFAULT, newvalue);
 	OUTPUT:
 	RETVAL
 
@@ -575,7 +580,7 @@ gtk_widget_BASIC(widget, newvalue=0)
 	CODE:
 	RETVAL = GTK_WIDGET_BASIC(widget);
 	if (items>1)
-		GTK_WIDGET_SET_FLAGS(widget, GTK_BASIC);
+		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_BASIC, newvalue);
 	OUTPUT:
 	RETVAL
 
@@ -596,18 +601,18 @@ gtk_widget_user_style(widget, newvalue=0)
 #endif
 
 Gtk::Widget_Up
-parent(self)
-	Gtk::Widget	self
+parent(widget)
+	Gtk::Widget	widget
 	CODE:
-		RETVAL = self->parent;
+		RETVAL = widget->parent;
 	OUTPUT:
 	RETVAL
 
 Gtk::Gdk::Window
-window(self)
-	Gtk::Widget	self
+window(widget)
+	Gtk::Widget	widget
 	CODE:
-		RETVAL = self->window;
+		RETVAL = widget->window;
 	OUTPUT:
 	RETVAL
 
@@ -623,16 +628,16 @@ motion_notify_event(widget, event)
 
 
 void
-grab_add(self)
-	Gtk::Widget	self
+grab_add(widget)
+	Gtk::Widget	widget
 	CODE:
-	gtk_grab_add(self);
+	gtk_grab_add(widget);
 
 void
-grab_remove(self)
-	Gtk::Widget	self
+grab_remove(widget)
+	Gtk::Widget	widget
 	CODE:
-	gtk_grab_remove(self);
+	gtk_grab_remove(widget);
 
 Gtk::Widget_Sink_Up
 new_from_pointer(klass, pointer)
@@ -645,10 +650,10 @@ new_from_pointer(klass, pointer)
 
 
 unsigned long
-_return_pointer(self)
-	Gtk::Widget	self
+_return_pointer(widget)
+	Gtk::Widget	widget
 	CODE:
-	RETVAL = (unsigned long)self;
+	RETVAL = (unsigned long)widget;
 	OUTPUT:
 	RETVAL
 
@@ -719,7 +724,7 @@ gtk_widget_shape_combine_mask(widget, shape_mask, offset_x, offset_y)
 	gint	offset_x
 	gint	offset_y
 
-#if ((GTK_MAJOR_VERSION < 1) || ((GTK_MAJOR_VERSION == 1) && (GTK_MINOR_VERSION < 1)))
+#if GTK_HVER < 0x010100
 
 void
 gtk_widget_dnd_drag_set(widget, drag_enable, type_name, ...)

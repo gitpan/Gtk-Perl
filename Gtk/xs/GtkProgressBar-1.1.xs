@@ -19,28 +19,28 @@ new_with_adjustment(Class, adjustment)
 	RETVAL
 
 void
-gtk_progress_bar_set_bar_style(self, style)
-	Gtk::ProgressBar	self
+gtk_progress_bar_set_bar_style(progressbar, style)
+	Gtk::ProgressBar	progressbar
 	Gtk::ProgressBarStyle	style
 
 void
-gtk_progress_bar_set_discrete_blocks(self, blocks)
-	Gtk::ProgressBar	self
+gtk_progress_bar_set_discrete_blocks(progressbar, blocks)
+	Gtk::ProgressBar	progressbar
 	int	blocks
 
 void
-gtk_progress_bar_set_activity_step(self, step)
-	Gtk::ProgressBar	self
+gtk_progress_bar_set_activity_step(progressbar, step)
+	Gtk::ProgressBar	progressbar
 	int	step
 
 void
-gtk_progress_bar_set_activity_blocks(self, blocks)
-	Gtk::ProgressBar	self
+gtk_progress_bar_set_activity_blocks(progressbar, blocks)
+	Gtk::ProgressBar	progressbar
 	int	blocks
 
 void
-gtk_progress_bar_set_orientation(self, orientation)
-	Gtk::ProgressBar	self
+gtk_progress_bar_set_orientation(progressbar, orientation)
+	Gtk::ProgressBar	progressbar
 	Gtk::ProgressBarOrientation	orientation
 
 #endif

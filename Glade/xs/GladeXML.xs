@@ -60,6 +60,7 @@ pgtk_glade_custom_widget (char* name, char* string1, char* string2, int int1, in
 	SV * s;
 	char *handler="Gtk::GladeXML::create_custom_widget";
 	int i;
+	GtkWidget *result;
 	dSP;
 
 	ENTER;
@@ -83,10 +84,11 @@ pgtk_glade_custom_widget (char* name, char* string1, char* string2, int int1, in
 	if (i != 1)
 		croak("create_custom_widget failed");
 	s = POPs;
+	result = SvGtkObjectRef(s, "Gtk::Widget");
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
-	return (GtkWidget*)SvGtkObjectRef(s, NULL);
+	return result;
 }
 
 MODULE = Gtk::GladeXML		PACKAGE = Gtk::GladeXML		PREFIX = glade_xml_
@@ -113,44 +115,60 @@ init (Class)
 
 
 Gtk::GladeXML_Sink
-glade_xml_new (Class, fname, root=0)
+glade_xml_new (Class, filename, root=0)
 	SV* Class
-	char* fname
+	char* filename
 	char* root
 	CODE: 
 	{
-		RETVAL = glade_xml_new(fname, root);
+		RETVAL = glade_xml_new(filename, root);
 	}
 	OUTPUT:
 	RETVAL
 
 Gtk::GladeXML_Sink
-glade_xml_new_with_domain (Class, fname, root, domain)
+glade_xml_new_with_domain (Class, filename, root=0, domain=0)
 	SV* Class
-	char* fname
+	char* filename
 	char* root
 	char* domain
 	CODE: 
 	{
-		RETVAL = glade_xml_new_with_domain(fname, root, domain);
+		RETVAL = glade_xml_new_with_domain(filename, root, domain);
+	}
+	OUTPUT:
+	RETVAL
+
+Gtk::GladeXML_Sink
+glade_xml_new_from_memory (Class, buffer, root=0, domain=0)
+	SV* Class
+	SV* buffer
+	char* root
+	char* domain
+	CODE: 
+	{
+		STRLEN len;
+		RETVAL = glade_xml_new_from_memory(SvPV(buffer, len), len, root, domain);
 	}
 	OUTPUT:
 	RETVAL
 
 bool
-glade_xml_construct (self, fname, root, domain)
-	Gtk::GladeXML	self
-	char* fname
+glade_xml_construct (gladexml, filename, root=0, domain=0)
+	Gtk::GladeXML	gladexml
+	char* filename
 	char* root
 	char* domain
 
 void
-glade_xml_signal_autoconnect(self)
-	Gtk::GladeXML self
+glade_xml_signal_autoconnect(gladexml)
+	Gtk::GladeXML gladexml
 
+ #ARG: $func subroutine (signal connect helper)
+ #ARG: ... list (additional arguments for $func)
 void
-glade_xml_signal_connect_full (self, handler_name, func, ...)
-	Gtk::GladeXML self
+glade_xml_signal_connect_full (gladexml, handler_name, func, ...)
+	Gtk::GladeXML gladexml
 	char*	handler_name
 	SV*	func
 	CODE:
@@ -159,12 +177,14 @@ glade_xml_signal_connect_full (self, handler_name, func, ...)
 
 		args = newAV();
 		PackCallbackST(args, 2);
-		glade_xml_signal_connect_full(self, handler_name, connect_func_handler, (gpointer)args);
+		glade_xml_signal_connect_full(gladexml, handler_name, connect_func_handler, (gpointer)args);
 	}
 
+ #ARG: $func subroutine (signal connect helper)
+ #ARG: ... list (additional arguments for $func)
 void
-glade_xml_signal_autoconnect_full (self, func, ...)
-	Gtk::GladeXML self
+glade_xml_signal_autoconnect_full (gladexml, func, ...)
+	Gtk::GladeXML gladexml
 	SV*	func
 	CODE:
 	{
@@ -172,38 +192,38 @@ glade_xml_signal_autoconnect_full (self, func, ...)
 
 		args = newAV();
 		PackCallbackST(args, 1);
-		glade_xml_signal_autoconnect_full(self, connect_func_handler, (gpointer)args);
+		glade_xml_signal_autoconnect_full(gladexml, connect_func_handler, (gpointer)args);
 	}
 
 Gtk::Widget_OrNULL_Up
-glade_xml_get_widget (self, name)
-	Gtk::GladeXML self
+glade_xml_get_widget (gladexml, name)
+	Gtk::GladeXML gladexml
 	char* name
 
 Gtk::Widget_OrNULL_Up
-glade_xml_get_widget_by_long_name (self, name)
-	Gtk::GladeXML self
+glade_xml_get_widget_by_long_name (gladexml, name)
+	Gtk::GladeXML gladexml
 	char* name
 
 char*
-glade_xml_relative_file (self, filename)
-	Gtk::GladeXML	self
+glade_xml_relative_file (gladexml, filename)
+	Gtk::GladeXML	gladexml
 	char*	filename
 
 
 MODULE = Gtk::GladeXML		PACKAGE = Gtk::Widget		PREFIX = glade_
 
 char*
-glade_get_widget_name (self)
-	Gtk::Widget self
+glade_get_widget_name (widget)
+	Gtk::Widget widget
 
 char*
-glade_get_widget_long_name (self)
-	Gtk::Widget self
+glade_get_widget_long_name (widget)
+	Gtk::Widget widget
 
-Gtk::GladeXML
-glade_get_widget_tree (self)
-	Gtk::Widget self
+Gtk::GladeXML_OrNULL
+glade_get_widget_tree (widget)
+	Gtk::Widget widget
 
 
 #endif

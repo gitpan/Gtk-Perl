@@ -43,3 +43,12 @@ sub gtk_widget_show {
 	print STDERR Dumper($w);
 	$w->show;
 }
+
+# custom widget creation func
+sub Gtk::GladeXML::create_custom_widget {
+	my @args = @_;
+	my $w = new Gtk::Label($args[1])|| die;
+	print "custom widget got: @args -> $w\n";
+	return $w;
+}
+

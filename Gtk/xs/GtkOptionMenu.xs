@@ -17,21 +17,21 @@ new(Class)
 	RETVAL
 
 Gtk::Widget
-gtk_option_menu_get_menu(self)
-	Gtk::OptionMenu	self
+gtk_option_menu_get_menu(optionmenu)
+	Gtk::OptionMenu	optionmenu
 
 void
-gtk_option_menu_set_menu(self, menu)
-	Gtk::OptionMenu	self
+gtk_option_menu_set_menu(optionmenu, menu)
+	Gtk::OptionMenu	optionmenu
 	Gtk::Widget	menu
 
 void
-gtk_option_menu_remove_menu(self)
-	Gtk::OptionMenu	self
+gtk_option_menu_remove_menu(optionmenu)
+	Gtk::OptionMenu	optionmenu
 
 void
-gtk_option_menu_set_history(self, index)
-	Gtk::OptionMenu	self
+gtk_option_menu_set_history(optionmenu, index)
+	Gtk::OptionMenu	optionmenu
 	int	index
 
 #endif

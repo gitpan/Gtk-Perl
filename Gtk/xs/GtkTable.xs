@@ -10,7 +10,7 @@ MODULE = Gtk::Table		PACKAGE = Gtk::Table	PREFIX = gtk_table_
 #ifdef GTK_TABLE
 
 Gtk::Table_Sink
-new(Class, rows, cols, homogeneous)
+new(Class, rows, cols, homogeneous=FALSE)
 	SV *	Class
 	int	rows
 	int	cols
@@ -65,7 +65,7 @@ gtk_table_set_col_spacings(table, spacing)
 	int	spacing
 
 void
-gtk_table_set_homogeneous(table, homogeneous)
+gtk_table_set_homogeneous(table, homogeneous=TRUE)
 	Gtk::Table	table
 	int	homogeneous
 

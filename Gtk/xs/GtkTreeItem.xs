@@ -56,4 +56,12 @@ subtree(tree_item)
 	OUTPUT:
 	RETVAL
 
+int
+expanded(tree_item)
+       Gtk::TreeItem tree_item
+       CODE:
+       RETVAL=tree_item->expanded;
+       OUTPUT:
+       RETVAL
+
 #endif

@@ -20,131 +20,133 @@ new(Class)
 	RETVAL
 
 void
-gtk_notebook_append_page(self, child, tab_label)
-	Gtk::Notebook	self
+gtk_notebook_append_page(notebook, child, tab_label=NULL)
+	Gtk::Notebook	notebook
 	Gtk::Widget	child
-	Gtk::Widget	tab_label
+	Gtk::Widget_OrNULL	tab_label
 
 void
-gtk_notebook_append_page_menu(self, child, tab_label, menu_label)
-	Gtk::Notebook	self
+gtk_notebook_append_page_menu(notebook, child, tab_label=NULL, menu_label=NULL)
+	Gtk::Notebook	notebook
 	Gtk::Widget	child
-	Gtk::Widget	tab_label
-	Gtk::Widget	menu_label
+	Gtk::Widget_OrNULL	tab_label
+	Gtk::Widget_OrNULL	menu_label
 
 void
-gtk_notebook_prepend_page(self, child, tab_label)
-	Gtk::Notebook	self
+gtk_notebook_prepend_page(notebook, child, tab_label=NULL)
+	Gtk::Notebook	notebook
 	Gtk::Widget	child
-	Gtk::Widget	tab_label
+	Gtk::Widget_OrNULL	tab_label
 
 void
-gtk_notebook_prepend_page_menu(self, child, tab_label, menu_label)
-	Gtk::Notebook	self
+gtk_notebook_prepend_page_menu(notebook, child, tab_label=NULL, menu_label=NULL)
+	Gtk::Notebook	notebook
 	Gtk::Widget	child
-	Gtk::Widget	tab_label
-	Gtk::Widget	menu_label
+	Gtk::Widget_OrNULL	tab_label
+	Gtk::Widget_OrNULL	menu_label
 
 void
-gtk_notebook_insert_page(self, child, tab_label, position)
-	Gtk::Notebook	self
-	Gtk::Widget	child
-	Gtk::Widget	tab_label
+gtk_notebook_insert_page(notebook, child, tab_label, position)
+	Gtk::Notebook	notebook
+	Gtk::Widget_OrNULL	child
+	Gtk::Widget_OrNULL	tab_label
 	int	position
 
 void
-gtk_notebook_insert_page_menu(self, child, tab_label, menu_label, position)
-	Gtk::Notebook	self
+gtk_notebook_insert_page_menu(notebook, child, tab_label, menu_label, position)
+	Gtk::Notebook	notebook
 	Gtk::Widget	child
-	Gtk::Widget	tab_label
-	Gtk::Widget	menu_label
+	Gtk::Widget_OrNULL	tab_label
+	Gtk::Widget_OrNULL	menu_label
 	int	position
 
 void
-gtk_notebook_remove_page(self, page_num)
-	Gtk::Notebook	self
+gtk_notebook_remove_page(notebook, page_num)
+	Gtk::Notebook	notebook
 	int	page_num
 
 # FIXME: DEPRECATED? Please?
 
 Gtk::NotebookPage_OrNULL
-cur_page(self)
-	Gtk::Notebook	self
+cur_page(notebook)
+	Gtk::Notebook	notebook
 	CODE:
-	RETVAL = self->cur_page;
+	RETVAL = notebook->cur_page;
 	OUTPUT:
 	RETVAL
 
 int
-gtk_notebook_get_current_page(self)
-	Gtk::Notebook	self
+gtk_notebook_get_current_page(notebook)
+	Gtk::Notebook	notebook
 	ALIAS:
 		Gtk::Notebook::current_page = 1
 	CODE:
 #if GTK_HVER >= 0x010106
-	RETVAL = gtk_notebook_get_current_page(self);
+	RETVAL = gtk_notebook_get_current_page(notebook);
 #else
 	/* DEPRECATED */
-	RETVAL = gtk_notebook_current_page(self);
+	RETVAL = gtk_notebook_current_page(notebook);
 #endif
 	OUTPUT:
 	RETVAL
 
 void
-gtk_notebook_set_page(self, page_num)
-	Gtk::Notebook	self
+gtk_notebook_set_page(notebook, page_num)
+	Gtk::Notebook	notebook
 	int	page_num
 
 void
-gtk_notebook_next_page(self)
-	Gtk::Notebook	self
+gtk_notebook_next_page(notebook)
+	Gtk::Notebook	notebook
 
 void
-gtk_notebook_prev_page(self)
-	Gtk::Notebook	self
+gtk_notebook_prev_page(notebook)
+	Gtk::Notebook	notebook
 
 
 void
-gtk_notebook_set_show_border(self, show_border)
-	Gtk::Notebook	self
+gtk_notebook_set_show_border(notebook, show_border=TRUE)
+	Gtk::Notebook	notebook
 	bool	show_border
 
 void
-gtk_notebook_set_show_tabs(self, show_tabs)
-	Gtk::Notebook self
+gtk_notebook_set_show_tabs(notebook, show_tabs=TRUE)
+	Gtk::Notebook notebook
 	bool	show_tabs
 
 void
-gtk_notebook_set_tab_pos(self, pos)
-	Gtk::Notebook	self
+gtk_notebook_set_tab_pos(notebook, pos)
+	Gtk::Notebook	notebook
 	Gtk::PositionType	pos
 
 void
-gtk_notebook_set_tab_border(self, border)
-	Gtk::Notebook   self
+gtk_notebook_set_tab_border(notebook, border)
+	Gtk::Notebook   notebook
 	int border
 
 void
-gtk_notebook_set_scrollable(self, scrollable)
-	Gtk::Notebook   self
+gtk_notebook_set_scrollable(notebook, scrollable=TRUE)
+	Gtk::Notebook   notebook
 	bool    scrollable
 
 void
-gtk_notebook_popup_enable(self)
-	Gtk::Notebook	self
+gtk_notebook_popup_enable(notebook)
+	Gtk::Notebook	notebook
 
 void
-gtk_notebook_popup_disable(self)
-	Gtk::Notebook	self
+gtk_notebook_popup_disable(notebook)
+	Gtk::Notebook	notebook
 
 Gtk::PositionType
-gtk_notebook_tab_pos(self)
-	Gtk::Notebook	self
+gtk_notebook_tab_pos(notebook)
+	Gtk::Notebook	notebook
 	CODE:
-	RETVAL = self->tab_pos;
+	RETVAL = notebook->tab_pos;
 	OUTPUT:
 	RETVAL
 
+ #OUTPUT: list
+ #RETURNS: the number of pages in scalar context, a list of Gtk::NotebookPages otherwise
 void
 children(notebook)
 	Gtk::Notebook	notebook
@@ -164,35 +166,37 @@ children(notebook)
 
 #if GTK_HVER >= 0x010106
 
-Gtk::Widget
-gtk_notebook_get_nth_page(self, page_num)
-	Gtk::Notebook	self
+Gtk::Widget_OrNULL
+gtk_notebook_get_nth_page(notebook, page_num)
+	Gtk::Notebook	notebook
 	int		page_num
 
 int
-gtk_notebook_page_num(self, child)
-	Gtk::Notebook	self
+gtk_notebook_page_num(notebook, child)
+	Gtk::Notebook	notebook
 	Gtk::Widget	child
 
 void
-gtk_notebook_set_homogeneous_tabs(self, homog)
-	Gtk::Notebook self
+gtk_notebook_set_homogeneous_tabs(notebook, homog=TRUE)
+	Gtk::Notebook notebook
 	bool	homog
 
 void
-gtk_notebook_set_tab_hborder(self, border)
-	Gtk::Notebook   self
+gtk_notebook_set_tab_hborder(notebook, border)
+	Gtk::Notebook   notebook
 	int border
 
 void
-gtk_notebook_set_tab_vborder(self, border)
-	Gtk::Notebook   self
+gtk_notebook_set_tab_vborder(notebook, border)
+	Gtk::Notebook   notebook
 	int border
 
 #endif
 
 #if GTK_HVER >= 0x010200
 
+ #OUTPUT: list
+ #RETURNS: the expand, fill and pack_type options for child
 void
 gtk_notebook_query_tab_label_packing (notebook, child)
 	Gtk::Notebook	notebook
@@ -264,42 +268,42 @@ MODULE = Gtk::Notebook		PACKAGE = Gtk::NotebookPage		PREFIX = gtk_notebook_
 #ifdef GTK_NOTEBOOK
 
 Gtk::Widget_Up
-child(self)
-	Gtk::NotebookPage	self
+child(notebookpage)
+	Gtk::NotebookPage	notebookpage
 	CODE:
-	RETVAL = self->child;
+	RETVAL = notebookpage->child;
 	OUTPUT:
 	RETVAL
 
 Gtk::Widget_Up
-tab_label(self)
-	Gtk::NotebookPage	self
+tab_label(notebookpage)
+	Gtk::NotebookPage	notebookpage
 	CODE:
-	RETVAL = self->tab_label;
+	RETVAL = notebookpage->tab_label;
 	OUTPUT:
 	RETVAL
 
 Gtk::Widget_Up
-menu_label(self)
-	Gtk::NotebookPage	self
+menu_label(notebookpage)
+	Gtk::NotebookPage	notebookpage
 	CODE:
-	RETVAL = self->menu_label;
+	RETVAL = notebookpage->menu_label;
 	OUTPUT:
 	RETVAL
 
 int
-default_menu(self)
-	Gtk::NotebookPage	self
+default_menu(notebookpage)
+	Gtk::NotebookPage	notebookpage
 	CODE:
-	RETVAL = self->default_menu;
+	RETVAL = notebookpage->default_menu;
 	OUTPUT:
 	RETVAL
 
 int
-default_tab(self)
-	Gtk::NotebookPage	self
+default_tab(notebookpage)
+	Gtk::NotebookPage	notebookpage
 	CODE:
-	RETVAL = self->default_tab;
+	RETVAL = notebookpage->default_tab;
 	OUTPUT:
 	RETVAL
 

@@ -203,46 +203,46 @@ gdk_imlib_best_color_match (Class, r, g, b)
 	}
 
 int
-gdk_imlib_render( self, width, height)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_render( image, width, height)
+	Gtk::Gdk::ImlibImage image
 	int width
 	int height
 
 Gtk::Gdk::Pixmap
-gdk_imlib_copy_image(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_copy_image(image)
+	Gtk::Gdk::ImlibImage image
 
 Gtk::Gdk::Bitmap
-gdk_imlib_copy_mask(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_copy_mask(image)
+	Gtk::Gdk::ImlibImage image
 
 Gtk::Gdk::Pixmap
-gdk_imlib_move_image(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_move_image(image)
+	Gtk::Gdk::ImlibImage image
 
 Gtk::Gdk::Bitmap_OrNULL
-gdk_imlib_move_mask(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_move_mask(image)
+	Gtk::Gdk::ImlibImage image
 
 void
-gdk_imlib_destroy_image(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_destroy_image(image)
+	Gtk::Gdk::ImlibImage image
 	CODE:
-	gdk_imlib_destroy_image(self);
-	UnregisterMisc((HV*)SvRV(ST(0)), self);
+	gdk_imlib_destroy_image(image);
+	UnregisterMisc((HV*)SvRV(ST(0)), image);
 
 void
-gdk_imlib_kill_image(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_kill_image(image)
+	Gtk::Gdk::ImlibImage image
 	CODE:
-	gdk_imlib_kill_image(self);
-	UnregisterMisc((HV*)SvRV(ST(0)), self);
+	gdk_imlib_kill_image(image);
+	UnregisterMisc((HV*)SvRV(ST(0)), image);
 
 void
-DESTROY(self)
-	Gtk::Gdk::ImlibImage self
+DESTROY(image)
+	Gtk::Gdk::ImlibImage image
 	CODE:
-	UnregisterMisc((HV*)SvRV(ST(0)), self);
+	UnregisterMisc((HV*)SvRV(ST(0)), image);
 
 void
 gdk_imlib_free_colors(Class)
@@ -251,8 +251,8 @@ gdk_imlib_free_colors(Class)
 	gdk_imlib_free_colors();
 
 void
-gdk_imlib_set_image_border (self, left, right, top, bottom)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_set_image_border (image, left, right, top, bottom)
+	Gtk::Gdk::ImlibImage image
 	int	left
 	int	right
 	int	top
@@ -264,16 +264,16 @@ gdk_imlib_set_image_border (self, left, right, top, bottom)
 		border.right = right;
 		border.top = top;
 		border.bottom = bottom;
-		gdk_imlib_set_image_border(self, &border);
+		gdk_imlib_set_image_border(image, &border);
 	}
 
 void
-gdk_imlib_get_image_border (self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_get_image_border (image)
+	Gtk::Gdk::ImlibImage image
 	PPCODE:
 	{
 		GdkImlibBorder border;
-		gdk_imlib_get_image_border (self, &border);
+		gdk_imlib_get_image_border (image, &border);
 		EXTEND(sp, 4);
 		XPUSHs(sv_2mortal(newSViv(border.left)));
 		XPUSHs(sv_2mortal(newSViv(border.right)));
@@ -282,8 +282,8 @@ gdk_imlib_get_image_border (self)
 	}
 
 void
-gdk_imlib_set_image_shape(self, r, g, b)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_set_image_shape(image, r, g, b)
+	Gtk::Gdk::ImlibImage image
 	int	r
 	int	g
 	int	b
@@ -291,22 +291,22 @@ gdk_imlib_set_image_shape(self, r, g, b)
 	{
 		GdkImlibColor color;
 		color.r = r; color.g = g; color.b = b;
-		gdk_imlib_set_image_shape(self, &color);
+		gdk_imlib_set_image_shape(image, &color);
 	}
 
 int
-gdk_imlib_save_image_to_eim(self, file)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_save_image_to_eim(image, file)
+	Gtk::Gdk::ImlibImage image
 	char* file
 
 int
-gdk_imlib_add_image_to_eim(self, file)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_add_image_to_eim(image, file)
+	Gtk::Gdk::ImlibImage image
 	char* file
 
 int
-gdk_imlib_save_image_to_ppm(self, file)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_save_image_to_ppm(image, file)
+	Gtk::Gdk::ImlibImage image
 	char* file
 
 void
@@ -330,76 +330,76 @@ gdk_imlib_load_file_to_pixmap(Class, file)
 	}
 
 void
-gdk_imlib_set_image_modifier(self, mod)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_set_image_modifier(image, mod)
+	Gtk::Gdk::ImlibImage image
 	Gtk::Gdk::Imlib::ColorModifier mod
 
 void
-gdk_imlib_set_image_red_modifier(self, mod)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_set_image_red_modifier(image, mod)
+	Gtk::Gdk::ImlibImage image
 	Gtk::Gdk::Imlib::ColorModifier mod
 
 void
-gdk_imlib_set_image_green_modifier(self, mod)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_set_image_green_modifier(image, mod)
+	Gtk::Gdk::ImlibImage image
 	Gtk::Gdk::Imlib::ColorModifier mod
 
 void
-gdk_imlib_set_image_blue_modifier(self, mod)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_set_image_blue_modifier(image, mod)
+	Gtk::Gdk::ImlibImage image
 	Gtk::Gdk::Imlib::ColorModifier mod
 
 Gtk::Gdk::Imlib::ColorModifier
-gdk_imlib_get_image_modifier(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_get_image_modifier(image)
+	Gtk::Gdk::ImlibImage image
 	CODE:
 	{
 		GdkImlibColorModifier mod;
-		gdk_imlib_get_image_modifier(self, &mod);
+		gdk_imlib_get_image_modifier(image, &mod);
 		RETVAL = &mod;
 	}
 	OUTPUT:
 	RETVAL
 
 Gtk::Gdk::Imlib::ColorModifier
-gdk_imlib_get_image_red_modifier(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_get_image_red_modifier(image)
+	Gtk::Gdk::ImlibImage image
 	CODE:
 	{
 		GdkImlibColorModifier mod;
-		gdk_imlib_get_image_red_modifier(self, &mod);
+		gdk_imlib_get_image_red_modifier(image, &mod);
 		RETVAL = &mod;
 	}
 	OUTPUT:
 	RETVAL
 
 Gtk::Gdk::Imlib::ColorModifier
-gdk_imlib_get_image_green_modifier(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_get_image_green_modifier(image)
+	Gtk::Gdk::ImlibImage image
 	CODE:
 	{
 		GdkImlibColorModifier mod;
-		gdk_imlib_get_image_green_modifier(self, &mod);
+		gdk_imlib_get_image_green_modifier(image, &mod);
 		RETVAL = &mod;
 	}
 	OUTPUT:
 	RETVAL
 
 Gtk::Gdk::Imlib::ColorModifier
-gdk_imlib_get_image_blue_modifier(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_get_image_blue_modifier(image)
+	Gtk::Gdk::ImlibImage image
 	CODE:
 	{
 		GdkImlibColorModifier mod;
-		gdk_imlib_get_image_blue_modifier(self, &mod);
+		gdk_imlib_get_image_blue_modifier(image, &mod);
 		RETVAL = &mod;
 	}
 	OUTPUT:
 	RETVAL
 
 void
-gdk_imlib_set_image_red_curve(self, mod)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_set_image_red_curve(image, mod)
+	Gtk::Gdk::ImlibImage image
 	SV * mod
 	CODE:
 	{
@@ -407,12 +407,12 @@ gdk_imlib_set_image_red_curve(self, mod)
 		unsigned char* rmod = SvPV(mod, len);
 		if ( len < 256 )
 			croak("mod must be 256 bytes long");
-		gdk_imlib_set_image_red_curve(self, rmod);
+		gdk_imlib_set_image_red_curve(image, rmod);
 	}
 
 void
-gdk_imlib_set_image_green_curve(self, mod)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_set_image_green_curve(image, mod)
+	Gtk::Gdk::ImlibImage image
 	SV * mod
 	CODE:
 	{
@@ -420,12 +420,12 @@ gdk_imlib_set_image_green_curve(self, mod)
 		unsigned char* rmod = SvPV(mod, len);
 		if ( len < 256 )
 			croak("mod must be 256 bytes long");
-		gdk_imlib_set_image_green_curve(self, rmod);
+		gdk_imlib_set_image_green_curve(image, rmod);
 	}
 
 void
-gdk_imlib_set_image_blue_curve(self, mod)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_set_image_blue_curve(image, mod)
+	Gtk::Gdk::ImlibImage image
 	SV * mod
 	CODE:
 	{
@@ -433,70 +433,61 @@ gdk_imlib_set_image_blue_curve(self, mod)
 		unsigned char* rmod = SvPV(mod, len);
 		if ( len < 256 )
 			croak("mod must be 256 bytes long");
-		gdk_imlib_set_image_blue_curve(self, rmod);
+		gdk_imlib_set_image_blue_curve(image, rmod);
 	}
 
 SV*
-gdk_imlib_get_image_red_curve(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_get_image_red_curve(image)
+	Gtk::Gdk::ImlibImage image
 	CODE:
 	{
 		unsigned char mod[256];
-		gdk_imlib_get_image_red_curve(self, mod);
+		gdk_imlib_get_image_red_curve(image, mod);
 		sv_setpvn(RETVAL, mod, 256);
 	}
 	OUTPUT:
 	RETVAL
 
 SV*
-gdk_imlib_get_image_green_curve(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_get_image_green_curve(image)
+	Gtk::Gdk::ImlibImage image
 	CODE:
 	{
 		unsigned char mod[256];
-		gdk_imlib_get_image_green_curve(self, mod);
+		gdk_imlib_get_image_green_curve(image, mod);
 		sv_setpvn(RETVAL, mod, 256);
 	}
 	OUTPUT:
 	RETVAL
 
 SV*
-gdk_imlib_get_image_blue_curve(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_get_image_blue_curve(image)
+	Gtk::Gdk::ImlibImage image
 	CODE:
 	{
 		unsigned char mod[256];
-		gdk_imlib_get_image_blue_curve(self, mod);
+		gdk_imlib_get_image_blue_curve(image, mod);
 		sv_setpvn(RETVAL, mod, 256);
 	}
 	OUTPUT:
 	RETVAL
 
 void
-gdk_imlib_apply_modifiers_to_rgb(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_apply_modifiers_to_rgb(image)
+	Gtk::Gdk::ImlibImage image
 
 void
-gdk_imlib_changed_image(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_changed_image(image)
+	Gtk::Gdk::ImlibImage image
 
 void
-gdk_imlib_apply_image(self, window)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_apply_image(image, window)
+	Gtk::Gdk::ImlibImage image
 	Gtk::Gdk::Window window
 
 void
-gdk_imlib_paste_image(self, window, x, y, w, h)
-	Gtk::Gdk::ImlibImage self
-	Gtk::Gdk::Window window
-	int x
-	int y
-	int w
-	int h
-
-void
-gdk_imlib_paste_image_border(self, window, x, y, w, h)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_paste_image(image, window, x, y, w, h)
+	Gtk::Gdk::ImlibImage image
 	Gtk::Gdk::Window window
 	int x
 	int y
@@ -504,16 +495,25 @@ gdk_imlib_paste_image_border(self, window, x, y, w, h)
 	int h
 
 void
-gdk_imlib_flip_image_horizontal(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_paste_image_border(image, window, x, y, w, h)
+	Gtk::Gdk::ImlibImage image
+	Gtk::Gdk::Window window
+	int x
+	int y
+	int w
+	int h
 
 void
-gdk_imlib_flip_image_vertical(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_flip_image_horizontal(image)
+	Gtk::Gdk::ImlibImage image
 
 void
-gdk_imlib_rotate_image(self, d)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_flip_image_vertical(image)
+	Gtk::Gdk::ImlibImage image
+
+void
+gdk_imlib_rotate_image(image, d)
+	Gtk::Gdk::ImlibImage image
 	int d
 
 Gtk::Gdk::ImlibImage
@@ -556,26 +556,26 @@ gdk_imlib_inlined_png_to_image(Class, data)
 
 
 Gtk::Gdk::ImlibImage
-gdk_imlib_clone_image(self)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_clone_image(image)
+	Gtk::Gdk::ImlibImage image
 
 Gtk::Gdk::ImlibImage
-gdk_imlib_clone_scaled_image(self, w, h)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_clone_scaled_image(image, w, h)
+	Gtk::Gdk::ImlibImage image
 	int w
 	int h
 
 void
-gdk_imlib_crop_image(self, x, y, w, h)
-       Gtk::Gdk::ImlibImage self
+gdk_imlib_crop_image(image, x, y, w, h)
+       Gtk::Gdk::ImlibImage image
        int x
        int y
        int w
        int h
 
 Gtk::Gdk::ImlibImage
-gdk_imlib_crop_and_clone_image(self, x, y, w, h)
-       Gtk::Gdk::ImlibImage self
+gdk_imlib_crop_and_clone_image(image, x, y, w, h)
+       Gtk::Gdk::ImlibImage image
        int x
        int y
        int w
@@ -681,28 +681,28 @@ gdk_imlib_set_cache_info(Class, cache_pixmaps, cache_images)
 	gdk_imlib_set_cache_info(cache_pixmaps, cache_images);
 
 gint
-gdk_imlib_save_image(self, file, info=0)
-	Gtk::Gdk::ImlibImage self
+gdk_imlib_save_image(image, file, info=0)
+	Gtk::Gdk::ImlibImage image
 	char *	file
 	Gtk::Gdk::Imlib::SaveInfo info
 	CODE:
-	RETVAL = gdk_imlib_save_image(self, file, info);
+	RETVAL = gdk_imlib_save_image(image, file, info);
 	OUTPUT:
 	RETVAL
 
 int
-rgb_width(self)
-	Gtk::Gdk::ImlibImage self
+rgb_width(image)
+	Gtk::Gdk::ImlibImage image
 	CODE:
-	RETVAL = self->rgb_width;
+	RETVAL = image->rgb_width;
 	OUTPUT:
 	RETVAL
 
 int
-rgb_height(self)
-	Gtk::Gdk::ImlibImage self
+rgb_height(image)
+	Gtk::Gdk::ImlibImage image
 	CODE:
-	RETVAL = self->rgb_height;
+	RETVAL = image->rgb_height;
 	OUTPUT:
 	RETVAL
 

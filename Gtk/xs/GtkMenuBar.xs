@@ -18,26 +18,26 @@ new(Class)
 	RETVAL
 
 void
-gtk_menu_bar_append(self, child)
-	Gtk::MenuBar	self
+gtk_menu_bar_append(menubar, child)
+	Gtk::MenuBar	menubar
 	Gtk::Widget	child
 
 void
-gtk_menu_bar_prepend(self, child)
-	Gtk::MenuBar	self
+gtk_menu_bar_prepend(menubar, child)
+	Gtk::MenuBar	menubar
 	Gtk::Widget	child
 
 void
-gtk_menu_bar_insert(self, child, position)
-	Gtk::MenuBar	self
+gtk_menu_bar_insert(menubar, child, position)
+	Gtk::MenuBar	menubar
 	Gtk::Widget	child
 	int	position
 
 # if GTK_HVER >= 0x010105
 
 void
-gtk_menu_bar_set_shadow_type (self, type)
-	Gtk::MenuBar	self
+gtk_menu_bar_set_shadow_type (menubar, type)
+	Gtk::MenuBar	menubar
 	Gtk::ShadowType	type
 	
 #endif

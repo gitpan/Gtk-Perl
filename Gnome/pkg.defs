@@ -7,13 +7,13 @@
 ;    (define-object GnomeAbout (GtkWindow) (perl Gnome::About))
 ;
 
-(define-object GnomeAbout (GtkWindow))
+(define-object GnomeAbout (GnomeDialog))
 (define-object GnomeApp (GtkWindow))
 (define-object GnomeClient (GtkObject))
 (define-object GnomeEntry (GtkCombo))
 (define-object GnomeFontSelector (GtkDialog))
 (define-object GnomePixmap (GtkWidget))
-(define-object GnomeScores (GtkWindow))
+(define-object GnomeScores (GnomeDialog))
 ; this changed in gnome-libs sometime
 ;(define-object GnomeMessageBox (GtkWindow) (cast GNOME_MESSAGE_BOX))
 (define-object GnomeMessageBox (GnomeDialog) (cast GNOME_MESSAGE_BOX))
@@ -30,6 +30,7 @@
 (define-object GnomeCanvasText (GnomeCanvasItem))
 (define-object GnomeCanvasImage (GnomeCanvasItem))
 (define-object GnomeCanvasLine (GnomeCanvasItem))
+(define-object GnomeCanvasPolygon (GnomeCanvasItem))
 (define-object GnomeCanvasRE (GnomeCanvasItem))
 (define-object GnomeCanvasRect (GnomeCanvasRE))
 (define-object GnomeCanvasEllipse (GnomeCanvasRE))
@@ -40,7 +41,7 @@
 (define-object GnomeDateEdit (GtkHBox))
 (define-object GnomeCalculator (GtkVBox))
 (define-object GnomeFileEntry (GtkHBox))
-(define-object GnomeIconList (GtkContainer))
+(define-object GnomeIconList (GnomeCanvas))
 (define-object GnomeLamp (GnomePixmap))
 (define-object GnomeLess (GtkVBox))
 (define-object GnomePropertyBox (GnomeDialog))
@@ -167,7 +168,9 @@
    (subtree GNOME_APP_UI_SUBTREE)
    (separator GNOME_APP_UI_SEPARATOR)
    (help GNOME_APP_UI_HELP)
-   (builder-data GNOME_APP_UI_BUILDER_DATA))
+   (builder-data GNOME_APP_UI_BUILDER_DATA)
+   (item-configurable GNOME_APP_UI_ITEM_CONFIGURABLE)
+   (subtree-stock GNOME_APP_UI_SUBTREE_STOCK))
 
 (define-enum GnomeUIPixmapType
    (none GNOME_APP_PIXMAP_NONE)
@@ -285,8 +288,8 @@
 
 (export-enum GnomeAnimatorStatus)
 (export-enum GnomeAnimatorLoopType)
-(export-enum GnomeUIInfoType)
-(export-enum GnomeUIPixmapType)
+;(export-enum GnomeUIInfoType)
+;(export-enum GnomeUIPixmapType)
 (export-enum GnomeCalculatorMode)
 (export-enum GnomeInteractStyle)
 (export-enum GnomeDialogType)

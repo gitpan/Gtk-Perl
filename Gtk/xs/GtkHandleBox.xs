@@ -20,18 +20,18 @@ new(Class)
 #if GTK_HVER >= 0x01010F
 
 void
-gtk_handle_box_set_shadow_type(self, type)
-	Gtk::HandleBox	self
+gtk_handle_box_set_shadow_type(handlebox, type)
+	Gtk::HandleBox	handlebox
 	Gtk::ShadowType	type
 
 void
-gtk_handle_box_set_handle_position(self, position)
-	Gtk::HandleBox	self
+gtk_handle_box_set_handle_position(handlebox, position)
+	Gtk::HandleBox	handlebox
 	Gtk::PositionType	position
 
 void
-gtk_handle_box_set_snap_edge(self, edge)
-	Gtk::HandleBox	self
+gtk_handle_box_set_snap_edge(handlebox, edge)
+	Gtk::HandleBox	handlebox
 	Gtk::PositionType	edge
 
 #endif

@@ -56,21 +56,23 @@ new(Class)
 	RETVAL
 
 void
-gtk_menu_append(self, child)
-	Gtk::Menu	self
+gtk_menu_append(menu, child)
+	Gtk::Menu	menu
 	Gtk::Widget	child
 
 void
-gtk_menu_prepend(self, child)
-	Gtk::Menu	self
+gtk_menu_prepend(menu, child)
+	Gtk::Menu	menu
 	Gtk::Widget	child
 
 void
-gtk_menu_insert(self, child, position)
-	Gtk::Menu	self
+gtk_menu_insert(menu, child, position)
+	Gtk::Menu	menu
 	Gtk::Widget	child
 	int	position
 
+ #ARG: $func subroutine (subroutine to handle positioning of the menu: it gets the widget, the x and y coordinates; it should return the x, y coordinates)
+ #ARG: ... list (additional arguments that are passed to $func after the widget)
 void
 gtk_menu_popup(menu, parent_menu_shell, parent_menu_item, button, activate_time, func=0, ...)
 	Gtk::Menu	menu
@@ -95,23 +97,23 @@ gtk_menu_popup(menu, parent_menu_shell, parent_menu_item, button, activate_time,
 
 
 void
-gtk_menu_popdown(self)
-	Gtk::Menu	self
+gtk_menu_popdown(menu)
+	Gtk::Menu	menu
 
 Gtk::Widget
-gtk_menu_get_active(self)
-	Gtk::Menu	self
+gtk_menu_get_active(menu)
+	Gtk::Menu	menu
 
 void
-gtk_menu_set_active(self, index)
-	Gtk::Menu	self
+gtk_menu_set_active(menu, index)
+	Gtk::Menu	menu
 	int	index
 
 # FIXME: detach_handler can't be supported in 0.99.10, at least
 #
 #void
-#gtk_menu_attach_to_widget (self, attach_widget, detach_handler, ...)
-#	Gtk::Menu   self
+#gtk_menu_attach_to_widget (menu, attach_widget, detach_handler, ...)
+#	Gtk::Menu   menu
 #	Gtk::Widget attach_widget
 #	SV *	detach_handler
 #	CODE:
@@ -120,31 +122,31 @@ gtk_menu_set_active(self, index)
 #	}
 
 Gtk::Widget
-gtk_menu_get_attach_widget (self)
-	Gtk::Menu   self
+gtk_menu_get_attach_widget (menu)
+	Gtk::Menu   menu
 
 void
-gtk_menu_detach (self)
-	Gtk::Menu   self
+gtk_menu_detach (menu)
+	Gtk::Menu   menu
 
 #if GTK_HVER >= 0x010100
 
 void
-gtk_menu_reposition(self)
-	Gtk::Menu	self
+gtk_menu_reposition(menu)
+	Gtk::Menu	menu
 
 #endif
 
 #if GTK_HVER >= 0x01010D
 
 void
-gtk_menu_set_title(self, title)
-	Gtk::Menu	self
+gtk_menu_set_title(menu, title)
+	Gtk::Menu	menu
 	char *	title
 
 void
-gtk_menu_set_tearoff_state(self, torn_off)
-	Gtk::Menu	self
+gtk_menu_set_tearoff_state(menu, torn_off)
+	Gtk::Menu	menu
 	bool	torn_off
 
 #endif

@@ -18,8 +18,8 @@ new(Class)
 	RETVAL
 
 void
-gtk_drawing_area_size(self, width, height)
-	Gtk::DrawingArea	self
+gtk_drawing_area_size(darea, width, height)
+	Gtk::DrawingArea	darea
 	int	width
 	int	height
 

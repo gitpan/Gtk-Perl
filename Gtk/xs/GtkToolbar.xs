@@ -124,16 +124,16 @@ gtk_toolbar_insert_widget(toolbar, widget, tooltip_text, tooltip_private_text, p
 	int position
 
 void
-gtk_toolbar_append_space(self)
-	Gtk::Toolbar    self
+gtk_toolbar_append_space(toolbar)
+	Gtk::Toolbar    toolbar
 
 void
-gtk_toolbar_prepend_space(self)
-	Gtk::Toolbar    self
+gtk_toolbar_prepend_space(toolbar)
+	Gtk::Toolbar    toolbar
 
 void
-gtk_toolbar_insert_space(self, position)
-	Gtk::Toolbar    self
+gtk_toolbar_insert_space(toolbar, position)
+	Gtk::Toolbar    toolbar
 	int       position
 
 

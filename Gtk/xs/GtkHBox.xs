@@ -10,7 +10,7 @@ MODULE = Gtk::HBox		PACKAGE = Gtk::HBox
 #ifdef GTK_HBOX
 
 Gtk::HBox_Sink
-new(Class, homogeneous, spacing)
+new(Class, homogeneous=FALSE, spacing=5)
 	SV *	Class
 	bool	homogeneous
 	int	spacing

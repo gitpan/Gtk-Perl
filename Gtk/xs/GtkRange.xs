@@ -10,46 +10,46 @@ MODULE = Gtk::Range		PACKAGE = Gtk::Range	PREFIX = gtk_range_
 #ifdef GTK_RANGE
 
 Gtk::Adjustment
-gtk_range_get_adjustment(self)
-	Gtk::Range	self
+gtk_range_get_adjustment(range)
+	Gtk::Range	range
 
 void
-gtk_range_set_update_policy(self, policy)
-	Gtk::Range	self
+gtk_range_set_update_policy(range, policy)
+	Gtk::Range	range
 	Gtk::UpdateType	policy
 
 void
-gtk_range_set_adjustment(self, adjustment)
-	Gtk::Range	self
+gtk_range_set_adjustment(range, adjustment)
+	Gtk::Range	range
 	Gtk::Adjustment	adjustment
 
 void
-gtk_range_draw_background(self)
-	Gtk::Range	self
+gtk_range_draw_background(range)
+	Gtk::Range	range
 
 void
-gtk_range_draw_trough(self)
-	Gtk::Range	self
+gtk_range_draw_trough(range)
+	Gtk::Range	range
 
 void
-gtk_range_draw_slider(self)
-	Gtk::Range	self
+gtk_range_draw_slider(range)
+	Gtk::Range	range
 
 void
-gtk_range_draw_step_forw(self)
-	Gtk::Range	self
+gtk_range_draw_step_forw(range)
+	Gtk::Range	range
 
 void
-gtk_range_draw_step_back(self)
-	Gtk::Range	self
+gtk_range_draw_step_back(range)
+	Gtk::Range	range
 
 void
-gtk_range_slider_update(self)
-	Gtk::Range	self
+gtk_range_slider_update(range)
+	Gtk::Range	range
 
 void
-gtk_range_trough_click(self, x, y, jump_perc=0)
-	Gtk::Range	self
+gtk_range_trough_click(range, x, y, jump_perc=0)
+	Gtk::Range	range
 	int	x
 	int	y
 	gfloat	&jump_perc
@@ -57,16 +57,16 @@ gtk_range_trough_click(self, x, y, jump_perc=0)
 	jump_perc
 
 void
-gtk_range_default_hslider_update(self)
-	Gtk::Range	self
+gtk_range_default_hslider_update(range)
+	Gtk::Range	range
 
 void
-gtk_range_default_vslider_update(self)
-	Gtk::Range	self
+gtk_range_default_vslider_update(range)
+	Gtk::Range	range
 
 void
-gtk_range_default_htrough_click(self, x, y, jump_perc=0)
-	Gtk::Range	self
+gtk_range_default_htrough_click(range, x, y, jump_perc=0)
+	Gtk::Range	range
 	int	x
 	int	y
 	gfloat &jump_perc
@@ -74,8 +74,8 @@ gtk_range_default_htrough_click(self, x, y, jump_perc=0)
 	jump_perc
 
 void
-gtk_range_default_vtrough_click(self, x, y, jump_perc=0)
-	Gtk::Range	self
+gtk_range_default_vtrough_click(range, x, y, jump_perc=0)
+	Gtk::Range	range
 	int	x
 	int	y
 	gfloat &jump_perc
@@ -83,22 +83,22 @@ gtk_range_default_vtrough_click(self, x, y, jump_perc=0)
 	jump_perc
 
 void
-gtk_range_default_hmotion(self, xdelta, ydelta)
-	Gtk::Range	self
+gtk_range_default_hmotion(range, xdelta, ydelta)
+	Gtk::Range	range
 	int	xdelta
 	int	ydelta
 
 void
-gtk_range_default_vmotion(self, xdelta, ydelta)
-	Gtk::Range	self
+gtk_range_default_vmotion(range, xdelta, ydelta)
+	Gtk::Range	range
 	int	xdelta
 	int	ydelta
 
 #if 0
 
 double
-gtk_range_calc_value(self, position)
-	Gtk::Range	self
+gtk_range_calc_value(range, position)
+	Gtk::Range	range
 	int	position
 
 #endif

@@ -23,81 +23,81 @@ new(Class, value, lower, upper, step_increment, page_increment, page_size)
 	RETVAL
 
 void
-gtk_adjustment_set_value (self, value)
-	Gtk::Adjustment self
+gtk_adjustment_set_value (adjustment, value)
+	Gtk::Adjustment adjustment
 	double value
 
 gfloat
-gtk_adjustment_get_value (self)
-	Gtk::Adjustment self
+gtk_adjustment_get_value (adjustment)
+	Gtk::Adjustment adjustment
 	CODE:
-	RETVAL = self->value;
+	RETVAL = adjustment->value;
 	OUTPUT:
 	RETVAL
 
 gfloat
-gtk_adjustment_value (self, change=0)
-	Gtk::Adjustment self
+gtk_adjustment_value (adjustment, change=0)
+	Gtk::Adjustment adjustment
 	gfloat	change
 	CODE:
-	RETVAL = self->value;
+	RETVAL = adjustment->value;
 	if (items==2)
-		self->value = change;
+		adjustment->value = change;
 	OUTPUT:
 	RETVAL
 
 gfloat
-gtk_adjustment_lower (self, change=0)
-	Gtk::Adjustment self
+gtk_adjustment_lower (adjustment, change=0)
+	Gtk::Adjustment adjustment
 	gfloat	change
 	CODE:
-	RETVAL = self->lower;
+	RETVAL = adjustment->lower;
 	if (items==2)
-		self->lower = change;
+		adjustment->lower = change;
 	OUTPUT:
 	RETVAL
 
 gfloat
-gtk_adjustment_upper (self, change=0)
-	Gtk::Adjustment self
+gtk_adjustment_upper (adjustment, change=0)
+	Gtk::Adjustment adjustment
 	gfloat	change
 	CODE:
-	RETVAL = self->upper;
+	RETVAL = adjustment->upper;
 	if (items==2)
-		self->upper = change;
+		adjustment->upper = change;
 	OUTPUT:
 	RETVAL
 
 gfloat
-gtk_adjustment_step_increment (self, change=0)
-	Gtk::Adjustment self
+gtk_adjustment_step_increment (adjustment, change=0)
+	Gtk::Adjustment adjustment
 	gfloat	change
 	CODE:
-	RETVAL = self->step_increment;
+	RETVAL = adjustment->step_increment;
 	if (items==2)
-		self->step_increment = change;
+		adjustment->step_increment = change;
 	OUTPUT:
 	RETVAL
 
 gfloat
-gtk_adjustment_page_increment (self, change=0)
-	Gtk::Adjustment self
+gtk_adjustment_page_increment (adjustment, change=0)
+	Gtk::Adjustment adjustment
 	gfloat	change
 	CODE:
-	RETVAL = self->page_increment;
+	RETVAL = adjustment->page_increment;
 	if (items==2)
-		self->page_increment = change;
+		adjustment->page_increment = change;
 	OUTPUT:
 	RETVAL
 
 gfloat
-gtk_adjustment_page_size (self, change=0)
-	Gtk::Adjustment self
+gtk_adjustment_page_size (adjustment, change=0)
+	Gtk::Adjustment adjustment
 	gfloat	change
 	CODE:
-	RETVAL = self->page_size;
+	RETVAL = adjustment->page_size;
 	if (items==2)
-		self->page_size = change;
+		adjustment->page_size = change;
 	OUTPUT:
 	RETVAL
 

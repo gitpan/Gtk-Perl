@@ -1483,7 +1483,7 @@ sub create_tree_mode_window
 		$box2->pack_start($button, 1, 1, 0);
 		$button->show;
 
-		$button = new Gtk::Button 'Colse';
+		$button = new Gtk::Button 'Close';
 		$button->signal_connect("clicked", sub {destroy $tree_mode_window});
 		$box2->pack_start($button, 1, 1, 0);
 		$button->show;
@@ -2002,12 +2002,12 @@ sub create_entry {
 		$box2->pack_start($entry, 1, 1, 0);
 		$entry->show;
 
-		#$cb = new Gtk::ComboBox;
-		#$cb->set_text('hello world');
-		#$cb->select_region(0, length($cb->get_text));
-		#$cb->set_popdown_strings('item1', 'item2', 'and item3');
-		#$cb->show;
-		#$box2->pack_start($cb, 1, 1, 0);
+		$cb = new Gtk::Combo;
+		$cb->set_popdown_strings('item1', 'item2', 'and item3');
+		$cb->entry->set_text('hello world');
+		$cb->entry->select_region(0, length($cb->entry->get_text));
+		$cb->show;
+		$box2->pack_start($cb, 1, 1, 0);
 
 		$editable = new Gtk::CheckButton('Editable');
 		$editable->signal_connect('toggled', sub {$entry->set_editable($_[0]->active)});
@@ -2150,7 +2150,9 @@ sub select_clist {
 	my($widget, $row, $column, $event) = @_;
 
 	my($i);
-  
+ 
+    $widget->set_focus_row ($row);
+
 	print "Gtk::CList Selection: row $row column $column button ", $event ? $event->{button} : 0, "\n";
   
 	for($i=0;$i<$widget->columns;$i++) {
@@ -2341,7 +2343,13 @@ sub create_clist {
 		$clist->signal_connect('select_row', \&select_clist);
 		$clist->signal_connect('unselect_row', \&unselect_clist);
 
+		$clist->set_sort_column(0);
+		$clist->set_compare_func(sub {
+			shift; 
+			return $_[0] cmp $_[1]
+		});
 		$clist->set_column_width(0, 100);
+
 		for $i ( 1 .. scalar(@titles) ) {
 			$clist->set_column_width($i, 80);
 			$text[$i] = "Column $i";
@@ -2376,6 +2384,11 @@ sub create_clist {
 		$box2->border_width(10);
 		$box1->pack_start($box2, 0, 1, 0);
 		$box2->show;
+
+		$button = new Gtk::Button('sort');
+		$button->signal_connect('clicked', sub {$clist->sort});
+		$box2->pack_start($button, 1, 1, 0);
+		$button->show;
 
 		$button = new Gtk::Button('close');
 		$button->signal_connect('clicked', sub {$clist_window->destroy});
@@ -2599,7 +2612,7 @@ sub ctree_change_indent {
 sub ctree_toggle_reorderable {
 	my ( $widget, $ctree ) = @_;
 
-	# $ctree->set_reorderable( $widget->active );
+	$ctree->set_reorderable( $widget->active );
 }
 
 sub ctree_toggle_line_style {
@@ -2809,6 +2822,18 @@ sub ctree_click_column {
 	$ctree->sort_recursive( undef );
 }
 
+sub ctree_after_move {
+	my ($ctree, $child, $parent, $sibling) = @_;
+	my ($source) = $ctree->get_node_info($child);
+	my ($target1) = $ctree->get_node_info($parent) if $parent;
+	my ($target2) = $ctree->get_node_info($sibling) if $sibling;
+
+	$target1 ||= 'nil';
+	$target2 ||= 'nil';
+	
+	print "Moving \"$source\" to \"$target1\" with sibling \"$target2\"\n";
+}
+
 sub create_ctree {
 
 	if (not defined $ctree_window ) {
@@ -2867,7 +2892,20 @@ sub create_ctree {
 
 		$ctree = new_with_titles Gtk::CTree ( 0, @titles );
 		$ctree->set_line_style( 'dotted' );
-		# $ctree->set_reorderable( 1 );
+		$ctree->drag_source_set('button3_mask', ['copy', 'move'], {target=>'STRING', flags=>0, info=>0});
+		$ctree->signal_connect('drag_data_get', sub {
+			my ($w, $context, $data, $info, $time) = @_;
+			$data->set($data->target, 8, $w->{"my-drag-info"});
+		});
+		$ctree->signal_connect('drag_begin', sub {
+			my ($w, $context) = @_;
+			my ($x,$y) = $w->clist_window->get_pointer();
+			my ($row) = $w->get_selection_info($x, $y);
+			my ($node) = $w->node_nth($row);
+			print "Got row: $row\n";
+			($w->{"my-drag-info"}) = $w->get_node_info($node);
+		});
+		$ctree->set_reorderable( 1 );
 
 		$ctree->signal_connect( 'click_column', \&ctree_click_column );
 		$ctree->signal_connect( 'button_press_event', \&ctree_button_press );
@@ -3476,7 +3514,8 @@ sub create_text {
 		$table->show;
 		
 		$text = new Gtk::Text(undef,undef);
-		$table->attach_defaults($text, 0,1,0,1);
+		#$table->attach_defaults($text, 0,1,0,1);
+		$table->attach($text, 0,1,0,1,  0, 0,0,0);
 		show $text;
 		
 		$hscrollbar = new Gtk::HScrollbar($text->hadj);

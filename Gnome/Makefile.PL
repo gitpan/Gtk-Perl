@@ -143,6 +143,9 @@ Makefile: ' . join(' ',
 build/PerlGnomeExt.h build/PerlGnomeExt.c build/PerlGnomeInt.h: build/GnomeDefs.h ../tools/genext.pl
 	$(PERL) ../tools/genext.pl Gnome </dev/null
 
+gendoc:
+	../tools/gendoc.pl -t gnome $(XS_FILES)
+
 ';
 
 

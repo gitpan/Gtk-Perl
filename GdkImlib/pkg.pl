@@ -9,7 +9,8 @@ add_xs qw( GdkImlib.xs );
 
 $gdkimlibs = `imlib-config --libs-gdk` || "-lgdk_imlib -lgdk -rdynamic -lgmodule -lglib -lz";
 
-$libs = "$libs $gdkimlibs"; 
+$libs = "$libs $gdkimlibs";
+chomp($libs);
 
 add_boot "Gtk::Gdk::ImlibImage";
 

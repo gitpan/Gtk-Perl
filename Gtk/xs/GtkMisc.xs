@@ -10,14 +10,14 @@ MODULE = Gtk::Misc		PACKAGE = Gtk::Misc		PREFIX = gtk_misc_
 #ifdef GTK_MISC
 
 void
-gtk_misc_set_alignment(self, xalign, yalign)
-	Gtk::Misc	self
+gtk_misc_set_alignment(misc, xalign, yalign)
+	Gtk::Misc	misc
 	double	xalign
 	double	yalign
 
 void
-gtk_misc_set_padding(self, xpad, ypad)
-	Gtk::Misc	self
+gtk_misc_set_padding(misc, xpad, ypad)
+	Gtk::Misc	misc
 	double	xpad
 	double	ypad
 

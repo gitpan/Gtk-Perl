@@ -250,6 +250,10 @@ void generic_handler(GtkObject * object, gpointer data, guint n_args, GtkArg * a
 	int i;
 	dSP;
 
+#ifdef PGTK_THREADS
+	gdk_threads_enter();
+#endif
+
 	stuff = (AV*)data;
 	handler = *av_fetch(stuff, 0, 0);
 
@@ -278,6 +282,11 @@ void generic_handler(GtkObject * object, gpointer data, guint n_args, GtkArg * a
 	
 	FREETMPS;
 	LEAVE;
+
+#ifdef PGTK_THREADS
+	gdk_threads_leave();
+#endif
+
 }
 
 int init_handler(gpointer data) {
@@ -335,7 +344,11 @@ void input_handler(gpointer data, gint source, GdkInputCondition condition) {
 	int i;
 	SV * s;
 	dSP;
-	
+
+#ifdef PGTK_THREADS
+	gdk_threads_enter();
+#endif
+
 	ENTER;
 	SAVETMPS;
 	
@@ -351,6 +364,11 @@ void input_handler(gpointer data, gint source, GdkInputCondition condition) {
 	
 	FREETMPS;
 	LEAVE;
+
+#ifdef PGTK_THREADS
+	gdk_threads_leave();
+#endif
+
 }
 
 void menu_callback (GtkWidget *widget, gpointer user_data)
@@ -702,7 +720,7 @@ gc(Class)
  #RETURNS: a TRUE value on success and undef on failure.
  #SEEALSO: Gtk::init
  #OUTPUT: bool
- #PARAMS:Class
+ #PARAMS: $Class
 
  # DESC: Initialize the Gtk module.
  # Parses the args out of @ARGV.
@@ -721,7 +739,9 @@ init(Class)
 
 	if (did_we_init_gtk)
 		return;
-		
+#ifdef PGTK_THREADS
+			g_thread_init(NULL); /* should probably check the perl thread implementation... */
+#endif
 			/* FIXME: Check version */
 #if GTK_HVER < 0x010103
 			g_set_error_handler((GErrorFunc)g_error_handler);
@@ -852,18 +872,22 @@ main_quit(Class)
  #DESC: Utility function that always return a FALSE value.
  #Most useful in some signal handler.
  #OUTPUT: boolean
+ #PARAMS: $Class
 int
-false(...)
+false(Class=0, ...)
+	SV *	Class
 	CODE:
 	RETVAL = 0;
 	OUTPUT:
 	RETVAL
 
- #DESC: Utility function that always return a TRUE value.
+ #DESC: Utility function that always returns a TRUE value.
  #Most useful in some signal handler.
  #OUTPUT: boolean
+ #PARAMS: $Class
 int
-true(...)
+true(Class=0, ...)
+	SV *	Class
 	CODE:
 	RETVAL = 1;
 	OUTPUT:
@@ -916,6 +940,7 @@ print(Class, text)
  #This function also exits the program with an error.
 void
 error(Class, text)
+	SV *	Class
 	char *	text
 	CODE:
 	g_error("%s", text);
@@ -932,7 +957,8 @@ warning(Class, text)
  #arguments as parameters.
  #RETURNS: An integer that identifies the handler 
  #(for use in Gtk::timeout_remove).
- #ARG: handler subroutine (generic subroutine)
+ #ARG: $handler subroutine (generic subroutine)
+ #ARG: ... list (additional args for $handler)
  #SEEALSO: Gtk::idle_add, Gtk::timeout_remove, Gtk::idle_remove
 int
 timeout_add(Class, interval, handler, ...)
@@ -967,7 +993,8 @@ timeout_remove(Class, tag)
  #handler is called with the additional arguments as parameters.
  #RETURNS: An integer that identifies the handler 
  #(for use in Gtk::idle_remove)..
- #ARG: handler subroutine (generic subroutine)
+ #ARG: $handler subroutine (generic subroutine)
+ #ARG: ... list (additional args for $handler)
  #SEEALSO: Gtk::idle_remove, Gtk::timeout_remove, Gtk::timeout_add, Gtk::idle_add_priority
 int
 idle_add(Class, handler, ...)
@@ -996,7 +1023,8 @@ idle_add(Class, handler, ...)
  #The lower the value of priority, the highter the priority of the handler.
  #RETURNS: An integer that identifies the handler 
  #(for use in Gtk::idle_remove)..
- #ARG: handler subroutine (generic subroutine)
+ #ARG: $handler subroutine (generic subroutine)
+ #ARG: ... list (additional args for $handler)
  #SEEALSO: Gtk::idle_remove, Gtk::timeout_remove, Gtk::timeout_add
 int
 idle_add_priority (Class, priority, handler, ...)
@@ -1029,7 +1057,8 @@ idle_remove(Class, tag)
 	gtk_idle_remove(tag);
 
  #DESC: Add an handler to be called at initialization time.
- #ARG: handler subroutine (generic subroutine)
+ #ARG: $handler subroutine (generic subroutine)
+ #ARG: ... list (additional args for $handler)
 void
 init_add(Class, handler, ...)
 	SV *	Class
@@ -1049,7 +1078,8 @@ init_add(Class, handler, ...)
 
  #DESC: Add an handler to be called when the main loop of level
  #main_level quits.
- #ARG: handler subroutine (generic subroutine)
+ #ARG: $handler subroutine (generic subroutine)
+ #ARG: ... list (additional arguments for $handler)
 int
 quit_add(Class, main_level, handler, ...)
 	int	main_level
@@ -1077,6 +1107,14 @@ quit_remove(Class, tag)
 	CODE:
 	gtk_quit_remove(tag);
 
+ #DESC: Install a key snooper handler: the subroutine will get a Gtk::Widget, a
+ #Gtk::Gdk::Event and any additional args that are passed to this function.
+ #If the function returns a TRUE value the key event will not be handed over to
+ #the Gtk internals.
+ #RETURNS: an integer tag that can be used to remove the handler.
+ #SEEALSO: Gtk::key_snooper_remove
+ #ARG: $handler subroutine (key snooper subroutine)
+ #ARG: ... list (additional arguments for $handler)
 int
 key_snooper_install(Class, handler, ...)
 	SV *	handler
@@ -1095,6 +1133,7 @@ key_snooper_install(Class, handler, ...)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Removes the key snooper handler identified by tag.
 void
 key_snooper_remove(Class, tag)
 	int	tag
@@ -1111,6 +1150,7 @@ get_current_event(Class=0)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get the widget the event event is destined for.
 Gtk::Widget_Up
 get_event_widget(Class=0, event)
 	SV *	Class
@@ -1134,10 +1174,15 @@ events_pending(Class)
 #if GTK_HVER >= 0x010200
 
 char*
-gtk_check_version (req_maj, req_min, req_micro)
+gtk_check_version (Class, req_maj, req_min, req_micro)
+	SV *	Class
 	guint	req_maj
 	guint	req_min
 	guint	req_micro
+	CODE:
+	RETVAL = gtk_check_version(req_maj, req_min, req_micro);
+	OUTPUT:
+	RETVAL
 
 #endif
 
@@ -1226,6 +1271,7 @@ gtk_menu_factory_remove_subfactory(factory, subfactory, path)
 	Gtk::MenuFactory	subfactory
 	char *	path
 
+ #OUTPUT: string
 void
 gtk_menu_factory_find(factory, path)
 	Gtk::MenuFactory	factory
@@ -1264,20 +1310,10 @@ widget(factory)
 	OUTPUT:
 	RETVAL
 
-void
-_PerlTypeFromGtk(gtktype)
-	char *	gtktype
-	PPCODE:
-	{
-		char * s;
-		if (s = ptname_for_gtname(gtktype)) {
-			PUSHs(sv_2mortal(newSVpv(s, 0)));
-		}
-	}
-
 
 MODULE = Gtk		PACKAGE = Gtk::Rc	PREFIX = gtk_rc_
 
+ #DESC: Parse filename for style and resource information.
 void
 gtk_rc_parse(Class, filename)
 	SV *	Class
@@ -1285,6 +1321,7 @@ gtk_rc_parse(Class, filename)
 	CODE:
 	gtk_rc_parse(filename);
 
+ #DESC: Parse the string data for style and resource information.
 void
 gtk_rc_parse_string(Class, data)
 	SV *	Class
@@ -1292,6 +1329,7 @@ gtk_rc_parse_string(Class, data)
 	CODE:
 	gtk_rc_parse_string(data);
 
+ #DESC: Get the style of widget.
 Gtk::Style
 gtk_rc_get_style(Class, widget)
 	SV *	Class
@@ -1323,6 +1361,7 @@ gtk_rc_add_widget_class_style(Class, style, pattern)
 
 #if GTK_HVER >= 0x010200
 
+ #DESC: Add file as a default resource file to read.
 void
 gtk_rc_add_default_file (Class, file)
 	SV * Class
@@ -1330,6 +1369,7 @@ gtk_rc_add_default_file (Class, file)
 	CODE:
 	gtk_rc_add_default_file (file);
 
+ #DESC: Add file and any additional filename as default resource file sto read.
 void
 gtk_rc_set_default_files(Class, file,...)
 	SV * Class
@@ -1345,8 +1385,11 @@ gtk_rc_set_default_files(Class, file,...)
 		free(files);
 	}
 
+ #DESC: Get a list of the default resource files.
+ #OUTPUT: list
+ #RETURNS: a list of filenames
 void
-gtk_rc_get_default_files (Class)
+gtk_rc_get_default_files (Class=0)
 	SV * Class
 	PPCODE:
 	{
@@ -1358,8 +1401,11 @@ gtk_rc_get_default_files (Class)
 		}
 	}
 
+ #DESC: Parse again all the resource files loaded by the application and apply
+ #the changes, if any. The files are not reloaded if they haven't changed.
+ #RETURNS: a TRUE value if any file was actually reloaded.
 gboolean
-gtk_rc_reparse_all (Class)
+gtk_rc_reparse_all (Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gtk_rc_reparse_all();
@@ -1367,7 +1413,7 @@ gtk_rc_reparse_all (Class)
 	RETVAL
 
 gstring
-gtk_rc_get_module_dir(Class)
+gtk_rc_get_module_dir(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gtk_rc_get_module_dir();
@@ -1375,7 +1421,7 @@ gtk_rc_get_module_dir(Class)
 	RETVAL
 
 gstring
-gtk_rc_get_theme_dir(Class)
+gtk_rc_get_theme_dir(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gtk_rc_get_theme_dir();
@@ -1386,60 +1432,70 @@ gtk_rc_get_theme_dir(Class)
 
 MODULE = Gtk		PACKAGE = Gtk::SelectionData PREFIX = gtk_selection_data_
 
+ #DESC: Get a Gtk::Gdk:Atom describing the selection.
 Gtk::Gdk::Atom
-selection(self)
-	Gtk::SelectionData	self
+selection(selectiondata)
+	Gtk::SelectionData	selectiondata
 	CODE:
-		RETVAL = self->selection;
+		RETVAL = selectiondata->selection;
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get a Gtk::Gdk:Atom describing the target type of the data of the selection.
 Gtk::Gdk::Atom
-target(self)
-	Gtk::SelectionData	self
+target(selectiondata)
+	Gtk::SelectionData	selectiondata
 	CODE:
-		RETVAL = self->target;
+		RETVAL = selectiondata->target;
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get a Gtk::Gdk:Atom describing the type of data of the selection.
 Gtk::Gdk::Atom
-type(self)
-	Gtk::SelectionData	self
+type(selectiondata)
+	Gtk::SelectionData	selectiondata
 	CODE:
-		RETVAL = self->type;
+		RETVAL = selectiondata->type;
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get the format of the data (8, 16 or 32 bit data).
 int
-format(self)
-	Gtk::SelectionData	self
+format(selectiondata)
+	Gtk::SelectionData	selectiondata
 	CODE:
-		RETVAL = self->format;
+		RETVAL = selectiondata->format;
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get the length of the data in the selection.
 int
-length(self)
-	Gtk::SelectionData	self
+length(selectiondata)
+	Gtk::SelectionData	selectiondata
 	CODE:
-		RETVAL = self->length;
+		RETVAL = selectiondata->length;
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get the data in the selection.
+ #RETURNS: undef if there is no data.
 SV *
-data(self)
-	Gtk::SelectionData	self
+data(selectiondata)
+	Gtk::SelectionData	selectiondata
 	CODE:
-		if (self->length < 0)
+		if (selectiondata->length < 0)
 			RETVAL = newSVsv(&PL_sv_undef);
 		else
-			RETVAL = newSVpv(self->data, self->length);
+			RETVAL = newSVpv(selectiondata->data, selectiondata->length);
 	OUTPUT:
 	RETVAL
 
+ #DESC: Set the data in the selection.
+ #ARG: $format int (8, 16 or 32 bit data)
+ #ARG: $data scalar (the data to set in the selection)
 void
-set(self, type, format, data)
-	Gtk::SelectionData      self
+set(selectiondata, type, format, data)
+	Gtk::SelectionData      selectiondata
 	Gtk::Gdk::Atom          type
 	int                     format
 	SV *                    data
@@ -1448,19 +1504,20 @@ set(self, type, format, data)
 		STRLEN len;
 		char *bytes;
 		bytes = SvPV (data, len);
-		gtk_selection_data_set (self, type, format, 
+		gtk_selection_data_set (selectiondata, type, format, 
 					(guchar *)bytes, len);
 	}
 
 void
-DESTROY(self)
-	Gtk::SelectionData	self
+DESTROY(selectiondata)
+	Gtk::SelectionData	selectiondata
 	CODE:
-	UnregisterMisc((HV *)SvRV(ST(0)), self);
+	UnregisterMisc((HV *)SvRV(ST(0)), selectiondata);
 
 
 MODULE = Gtk		PACKAGE = Gtk::Style	PREFIX = gtk_style_
 
+ #CONSTRUCTOR: yes
 Gtk::Style
 new(Class=0)
 	SV *	Class
@@ -1470,29 +1527,29 @@ new(Class=0)
 	RETVAL
 
 Gtk::Style
-gtk_style_attach(self, window)
-	Gtk::Style	self
+gtk_style_attach(style, window)
+	Gtk::Style	style
 	Gtk::Gdk::Window	window
 
 void
-gtk_style_detach(self)
-	Gtk::Style	self
+gtk_style_detach(style)
+	Gtk::Style	style
 
 Gtk::Style
-gtk_style_copy(self)
-	Gtk::Style	self
+gtk_style_copy(style)
+	Gtk::Style	style
 
 void
-gtk_style_ref(self)
-	Gtk::Style	self
+gtk_style_ref(style)
+	Gtk::Style	style
 
 void
-gtk_style_unref(self)
-	Gtk::Style	self
+gtk_style_unref(style)
+	Gtk::Style	style
 
 void
-gtk_style_set_background(self, window, state_type)
-	Gtk::Style	self
+gtk_style_set_background(style, window, state_type)
+	Gtk::Style	style
 	Gtk::Gdk::Window	window
 	Gtk::StateType	state_type
 
@@ -1599,7 +1656,13 @@ font(style, new_font=0)
 	Gtk::Gdk::Font	new_font
 	CODE:
 	RETVAL = style->font;
-	if (items>1) style->font = new_font;
+	if (items>1) {
+		if (style->font)
+			gdk_font_unref(style->font);
+		style->font = new_font;
+		if (style->font)
+			gdk_font_ref(style->font);
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1610,7 +1673,13 @@ fg_gc(style, state, new_gc=0)
 	Gtk::Gdk::GC	new_gc
 	CODE:
 	RETVAL = style->fg_gc[state];
-	if (items>2) style->fg_gc[state] = new_gc;
+	if (items>2) {
+		if(style->fg_gc[state])
+			gdk_gc_unref(style->fg_gc[state]);
+		style->fg_gc[state] = new_gc;
+		if(style->fg_gc[state])
+			gdk_gc_ref(style->fg_gc[state]);
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1621,7 +1690,13 @@ bg_gc(style, state, new_gc=0)
 	Gtk::Gdk::GC	new_gc
 	CODE:
 	RETVAL = style->bg_gc[state];
-	if (items>2) style->bg_gc[state] = new_gc;
+	if (items>2) {
+		if(style->bg_gc[state])
+			gdk_gc_unref(style->bg_gc[state]);
+		style->bg_gc[state] = new_gc;
+		if(style->bg_gc[state])
+			gdk_gc_ref(style->bg_gc[state]);
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1632,7 +1707,13 @@ light_gc(style, state, new_gc=0)
 	Gtk::Gdk::GC	new_gc
 	CODE:
 	RETVAL = style->light_gc[state];
-	if (items>2) style->light_gc[state] = new_gc;
+	if (items>2) {
+		if (style->light_gc[state])
+			gdk_gc_unref(style->light_gc[state]);
+		style->light_gc[state] = new_gc;
+		if (style->light_gc[state])
+			gdk_gc_ref(style->light_gc[state]);
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1643,7 +1724,13 @@ dark_gc(style, state, new_gc=0)
 	Gtk::Gdk::GC	new_gc
 	CODE:
 	RETVAL = style->dark_gc[state];
-	if (items>2) style->dark_gc[state] = new_gc;
+	if (items>2) {
+		if (style->dark_gc[state])
+			gdk_gc_unref(style->dark_gc[state]);
+		style->dark_gc[state] = new_gc;
+		if (style->dark_gc[state])
+			gdk_gc_ref(style->dark_gc[state]);
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1654,7 +1741,13 @@ mid_gc(style, state, new_gc=0)
 	Gtk::Gdk::GC	new_gc
 	CODE:
 	RETVAL = style->mid_gc[state];
-	if (items>2) style->mid_gc[state] = new_gc;
+	if (items>2) {
+		if (style->mid_gc[state])
+			gdk_gc_unref(style->mid_gc[state]);
+		style->mid_gc[state] = new_gc;
+		if (style->mid_gc[state])
+			gdk_gc_ref(style->mid_gc[state]);
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1665,7 +1758,13 @@ text_gc(style, state, new_gc=0)
 	Gtk::Gdk::GC	new_gc
 	CODE:
 	RETVAL = style->text_gc[state];
-	if (items>2) style->text_gc[state] = new_gc;
+	if (items>2) {
+		if (style->text_gc[state])
+			gdk_gc_unref(style->text_gc[state]);
+		style->text_gc[state] = new_gc;
+		if (style->text_gc[state])
+			gdk_gc_ref(style->text_gc[state]);
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1676,7 +1775,13 @@ base_gc(style, state, new_gc=0)
 	Gtk::Gdk::GC	new_gc
 	CODE:
 	RETVAL = style->base_gc[state];
-	if (items>2) style->base_gc[state] = new_gc;
+	if (items>2) {
+		if (style->base_gc[state])
+			gdk_gc_unref(style->base_gc[state]);
+		style->base_gc[state] = new_gc;
+		if (style->base_gc[state])
+			gdk_gc_ref(style->base_gc[state]);
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1686,7 +1791,13 @@ black_gc(style, new_gc=0)
 	Gtk::Gdk::GC	new_gc
 	CODE:
 	RETVAL = style->black_gc;
-	if (items>1) style->black_gc = new_gc;
+	if (items>1) {
+		if (style->black_gc)
+			gdk_gc_unref(style->black_gc);
+		style->black_gc = new_gc;
+		if (style->black_gc)
+			gdk_gc_ref(style->black_gc);
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1696,7 +1807,13 @@ white_gc(style, new_gc=0)
 	Gtk::Gdk::GC	new_gc
 	CODE:
 	RETVAL = style->white_gc;
-	if (items>1) style->white_gc = new_gc;
+	if (items>1) {
+		if (style->white_gc)
+			gdk_gc_unref(style->white_gc);
+		style->white_gc = new_gc;
+		if (style->white_gc)
+			gdk_gc_ref(style->white_gc);
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1707,7 +1824,13 @@ bg_pixmap(style, state, new_pixmap=0)
 	Gtk::Gdk::Pixmap	new_pixmap
 	CODE:
 	RETVAL = style->bg_pixmap[state];
-	if (items>2) style->bg_pixmap[state] = new_pixmap;
+	if (items>2) {
+		if (style->bg_pixmap[state])
+			gdk_pixmap_unref(style->bg_pixmap[state]);
+		style->bg_pixmap[state] = new_pixmap;
+		if (style->bg_pixmap[state])
+			gdk_pixmap_ref(style->bg_pixmap[state]);
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1727,7 +1850,13 @@ colormap(style, new_colormap=0)
 	Gtk::Gdk::Colormap	new_colormap
 	CODE:
 	RETVAL = style->colormap;
-	if (items>2) style->colormap = new_colormap;
+	if (items>2) {
+		if (style->colormap)
+			gdk_colormap_unref(style->colormap);
+		style->colormap = new_colormap;
+		if (style->colormap)
+			gdk_colormap_ref(style->colormap);
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1831,6 +1960,37 @@ gtk_draw_string(style, window, state_type, x, y, string)
 
 MODULE = Gtk		PACKAGE = Gtk::Type
 
+ #DESC: get a perl reference to an array that corresponds to
+ #the given $value for the enum or flag $type. This is an internal function.
+SV*
+int_to_hash (Class, type, value)
+	SV	*Class
+	char	*type
+	long	value
+	CODE:
+	{
+		GtkType gtype = gtk_type_from_name(type);
+		if (GTK_FUNDAMENTAL_TYPE(gtype) == GTK_TYPE_ENUM)
+			RETVAL = newSVDefEnumHash(gtype, value);
+		else if (GTK_FUNDAMENTAL_TYPE(gtype) == GTK_TYPE_FLAGS)
+			RETVAL = newSVDefFlagsHash(gtype, value);
+		else
+			croak("type '%s' must be an enum or a flag type", type);
+	}
+	OUTPUT:
+	RETVAL
+
+ #DESC: internal: do not use.
+void
+_PerlTypeFromGtk(gtktype)
+	char *	gtktype
+	PPCODE:
+	{
+		char * s;
+		if ((s = ptname_for_gtname(gtktype))) {
+			PUSHs(sv_2mortal(newSVpv(s, 0)));
+		}
+	}
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk		PREFIX = gdk_
 
@@ -1839,6 +1999,16 @@ constant(name,arg)
 	char *	name
 	int	arg
 
+ #PROTO: init_check
+ #DESC:
+ # Initialize the Gtk::Gdk module checking for a connection to the display.
+ #RETURNS: a TRUE value on success and undef on failure.
+ #SEEALSO: Gtk::Gdk::init
+ #OUTPUT: bool
+ #PARAMS: $Class
+
+ # DESC: Initialize the Gtk::Gdk module.
+ # Parses the args out of @ARGV.
 void
 init(Class)
 	SV *	Class
@@ -1889,8 +2059,9 @@ init(Class)
 		}
 	}
 
+ #DESC: Exit the program with status code.
 void
-exit(Class, code)
+exit(Class, code=0)
 	SV *	Class
 	int	code
 	CODE:
@@ -1899,13 +2070,13 @@ exit(Class, code)
 #if GTK_HVER >= 0x010110
 
 void
-error_trap_push(Class)
+error_trap_push(Class=0)
 	SV *	Class
 	CODE:
 	gdk_error_trap_push();
 
 int
-error_trap_pop(Class)
+error_trap_pop(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_error_trap_pop();
@@ -1914,16 +2085,32 @@ error_trap_pop(Class)
 
 #endif
 
+ #DESC: Get the number of events in the Gdk queue that need to be serviced.
 int
-events_pending(Class)
+events_pending(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_events_pending();
 	OUTPUT:
 	RETVAL
 
+ #DESC: Create a new event structure.
+Gtk::Gdk::Event
+event_new (Class=0)
+	SV *	Class
+	CODE:
+	{
+		GdkEvent e;
+		e.type = GDK_NOTHING;
+		RETVAL = gdk_event_copy(&e);
+	}
+	OUTPUT:
+	RETVAL
+
+ #DESC: Get the next event from the event queue (may return undef).
+ #OUTPUT: Gtk::Gdk::Event
 void
-event_get(Class)
+event_get(Class=0)
 	SV *	Class
 	PPCODE:
 	{
@@ -1932,13 +2119,14 @@ event_get(Class)
 		GV * stash;
 		int i, dohandle=0;
 
-		if (e = gdk_event_get()) {
+		if ((e = gdk_event_get())) {
 			EXTEND(sp,1);
 			PUSHs(sv_2mortal(newSVGdkEvent(e)));
 		} 
 
 	}
 
+ #DESC: Put the evnt in the event queue.
 void
 gdk_event_put(Class, event)
 	SV *	Class
@@ -1953,6 +2141,7 @@ gdk_set_show_events(Class, show_events)
 	CODE:
 	gdk_set_show_events(show_events);
 
+ #DESC: Enable or disable the use of the X Shred memory extension.
 void
 gdk_set_use_xshm(Class, use_xshm)
 	SV *	Class
@@ -1973,15 +2162,16 @@ gdk_get_debug_level(Class)
 #endif
 
 int
-gdk_get_show_events(Class)
+gdk_get_show_events(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_get_show_events();
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get information about the use of the X Shared memory extension.
 int
-gdk_get_use_xshm(Class)
+gdk_get_use_xshm(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_get_use_xshm();
@@ -1990,7 +2180,7 @@ gdk_get_use_xshm(Class)
 
 
 int
-gdk_time_get(Class)
+gdk_time_get(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_time_get();
@@ -1998,7 +2188,7 @@ gdk_time_get(Class)
 	RETVAL
 
 int
-gdk_timer_get(Class)
+gdk_timer_get(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_timer_get();
@@ -2013,15 +2203,23 @@ gdk_timer_set(Class, value)
 	gdk_timer_set(value);
 
 void
-gdk_timer_enable(Class)
+gdk_timer_enable(Class=0)
 	CODE:
 	gdk_timer_enable();
 
 void
-gdk_timer_disable(Class)
+gdk_timer_disable(Class=0)
 	CODE:
 	gdk_timer_disable();
 
+ #DESC: Add an handler to be called when source (possibly a file descriptor)
+ #meets the specified condition. The handler is called with any additional
+ #arguments that are passed to this function, the source id and the condition
+ #that triggered the handler. Any return value from the handler is discarded.
+ #RETURNS: a tag that can be used to remove the handler.
+ #SEEALSO: Gtk::Gdk::input_remove
+ #ARG: $handler subroutine (input subroutine)
+ #ARG: ... list (additional args for $handler)
 int
 input_add(Class, source, condition, handler, ...)
 	SV *	Class
@@ -2043,14 +2241,17 @@ input_add(Class, source, condition, handler, ...)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Remove the input handler identified by tag.
 void
 input_remove(Class, tag)
 	int	tag
 	CODE:
 	gdk_input_remove(tag);
 
+ #DESC: Grab the pointer optionally confining the cursor in the window confine_to
+ #and changing the cursor. Cursor events are reported only to window.
 int
-gdk_pointer_grab(Class, window, owner_events, event_mask, confine_to, cursor, time)
+gdk_pointer_grab(Class, window, owner_events, event_mask, confine_to=NULL, cursor=NULL, time=GDK_CURRENT_TIME)
 	SV *	Class
 	Gtk::Gdk::Window	window
 	int	owner_events
@@ -2063,72 +2264,77 @@ gdk_pointer_grab(Class, window, owner_events, event_mask, confine_to, cursor, ti
 	OUTPUT:
 	RETVAL
 
+ #DESC: Ungrab the pointer.
 void
-gdk_pointer_ungrab(Class, value)
+gdk_pointer_ungrab(Class, time=GDK_CURRENT_TIME)
 	SV *	Class
-	int value
+	int time
 	CODE:
-	gdk_pointer_ungrab(value);
+	gdk_pointer_ungrab(time);
 
 int
-gdk_keyboard_grab(window, owner_events, time)
+gdk_keyboard_grab(window, owner_events, time=GDK_CURRENT_TIME)
 	Gtk::Gdk::Window	window
 	int	owner_events
 	int	time
 
 void
-gdk_keyboard_ungrab(time)
+gdk_keyboard_ungrab(time=GDK_CURRENT_TIME)
 	int	time
 
+ #DESC: Get the width of the screen.
 int
-gdk_screen_width(Class)
+gdk_screen_width(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_screen_width();
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get the height of the screen.
 int
-gdk_screen_height(Class)
+gdk_screen_height(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_screen_height();
 	OUTPUT:
 	RETVAL
 
+ #DESC: Flush any pending graphic operation.
 void
-gdk_flush(Class)
+gdk_flush(Class=0)
 	SV *	Class
 	CODE:
 	gdk_flush();
 
+ #DESC: Make the display issue a beep to the user.
 void
-gdk_beep(Class)
+gdk_beep(Class=0)
 	SV *	Class
 	CODE:
 	gdk_beep();
 
 void
-gdk_key_repeat_disable(Class)
+gdk_key_repeat_disable(Class=0)
 	SV *	Class
 	CODE:
 	gdk_key_repeat_disable();
 
 void
-gdk_key_repeat_restore(Class)
+gdk_key_repeat_restore(Class=0)
 	SV *	Class
 	CODE:
 	gdk_key_repeat_restore();
 
 long
-ROOT_WINDOW(Class)
+ROOT_WINDOW(Class=0)
 	CODE:
 	RETVAL = GDK_ROOT_WINDOW();
 	OUTPUT:
 	RETVAL
 
 Gtk::Gdk::Window
-ROOT_PARENT(Class)
+ROOT_PARENT(Class=0)
 	CODE:
 	RETVAL = GDK_ROOT_PARENT();
 	OUTPUT:
@@ -2137,19 +2343,19 @@ ROOT_PARENT(Class)
 #if GTK_HVER >= 0x010200
 
 void
-gdk_threads_enter (Class)
+gdk_threads_enter (Class=0)
 	SV *	Class
 	CODE:
 	gdk_threads_enter();
 
 void
-gdk_threads_leave (Class)
+gdk_threads_leave (Class=0)
 	SV *	Class
 	CODE:
 	gdk_threads_leave();
 
 char*
-gdk_set_locale (Class)
+gdk_set_locale (Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_set_locale();
@@ -2164,7 +2370,7 @@ gdk_set_sm_client_id (Class, client_id)
 	gdk_set_sm_client_id(client_id);
 
 void
-gdk_selection_send_notify (Class, requestor, selection, target, property, time)
+gdk_selection_send_notify (Class, requestor, selection, target, property, time=GDK_CURRENT_TIME)
 	SV *	Class
 	guint32	requestor
 	Gtk::Gdk::Atom	selection
@@ -2174,32 +2380,36 @@ gdk_selection_send_notify (Class, requestor, selection, target, property, time)
 	CODE:
 	gdk_selection_send_notify(requestor, selection, target, property, time);
 
+ #DESC: Get the width of the screen in mm.
 gint
-gdk_screen_width_mm (Class)
+gdk_screen_width_mm (Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_screen_width_mm();
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get the height of the screen in mm.
 gint
-gdk_screen_height_mm (Class)
+gdk_screen_height_mm (Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_screen_height_mm();
 	OUTPUT:
 	RETVAL
 
+ #DESC: Returns TRUE if the pointer is grabbed.
 gint
-gdk_pointer_is_grabbed (Class)
+gdk_pointer_is_grabbed (Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_pointer_is_grabbed();
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get the string describing the display the application runs on.
 char *
-gdk_get_display(Class)
+gdk_get_display(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_get_display();
@@ -2260,13 +2470,15 @@ gdk_keyval_is_lower (Class, keyval)
 	OUTPUT:
 	RETVAL
 
+ #OUTPUT: Gtk::Gdk::Event
+ #DESC: Returns an event from the queue if one is available (may return undef).
 void
-event_peek(Class)
+event_peek(Class=0)
 	SV *    Class
 	PPCODE:
 	{
 		GdkEvent * e;
-		if (e = gdk_event_peek()) {
+		if ((e = gdk_event_peek())) {
 			EXTEND(sp,1);
 			PUSHs(sv_2mortal(newSVGdkEvent(e)));
 		}
@@ -2291,6 +2503,7 @@ gdk_event_send_client_message (Class, event, xid)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Send to all the clients of the X server the client message event.
 void
 gdk_event_send_clientmessage_toall (Class, event)
 	SV *	Class
@@ -2304,8 +2517,10 @@ MODULE = Gtk		PACKAGE = Gtk::Gdk::Rgb				PREFIX = gdk_rgb_
 
 #if GTK_HVER > 0x010100
 
+ #DESC: Initialize the Gtk::Gdk::Rgb subsystem. This is required before calling any of the
+ #Gtk::Gdk::Rgb functions.
 void
-gdk_rgb_init(Class)
+gdk_rgb_init(Class=0)
 	CODE:
 	gdk_rgb_init();
 
@@ -2318,7 +2533,7 @@ gdk_rgb_xpixel_from_rgb(Class, rgb)
 	RETVAL
 
 gboolean
-gdk_rgb_ditherable(Class)
+gdk_rgb_ditherable(Class=0)
 	CODE:
 	RETVAL = gdk_rgb_ditherable();
 	OUTPUT:
@@ -2337,14 +2552,14 @@ gdk_rgb_set_min_colors(Class, min_colors)
 	gdk_rgb_set_min_colors(min_colors);
 
 Gtk::Gdk::Colormap
-gdk_rgb_get_cmap(Class)
+gdk_rgb_get_cmap(Class=0)
 	CODE:
 	RETVAL = gdk_rgb_get_cmap();
 	OUTPUT:
 	RETVAL
 
 Gtk::Gdk::Visual
-gdk_rgb_get_visual(Class)
+gdk_rgb_get_visual(Class=0)
 	CODE:
 	RETVAL = gdk_rgb_get_visual();
 	OUTPUT:
@@ -2356,8 +2571,8 @@ gdk_rgb_get_visual(Class)
 MODULE = Gtk		PACKAGE = Gtk::Gdk::ColorContext	PREFIX = gdk_color_context_
 
 Gtk::Gdk::ColorContext
-new(Self, visual, colormap)
-	SV *	Self
+new(Class, visual, colormap)
+	SV *	Class
 	Gtk::Gdk::Visual	visual
 	Gtk::Gdk::Colormap	colormap
 	CODE:
@@ -2366,8 +2581,8 @@ new(Self, visual, colormap)
 	RETVAL
 
 Gtk::Gdk::ColorContext
-new_mono(Self, visual, colormap)
-	SV *	Self
+new_mono(Class, visual, colormap)
+	SV *	Class
 	Gtk::Gdk::Visual	visual
 	Gtk::Gdk::Colormap	colormap
 	CODE:
@@ -2375,42 +2590,45 @@ new_mono(Self, visual, colormap)
 	OUTPUT:
 	RETVAL
 
+ #OUTPUT: integer
+ #DESC: Get the pixel value for the given (red, green, blue) tuple.
 void
-get_pixel(object, red, green, blue)
-	Gtk::Gdk::ColorContext	object
+get_pixel(colorc, red, green, blue)
+	Gtk::Gdk::ColorContext	colorc
 	int	red
 	int	green
 	int	blue
 	PPCODE:
 	{
 		int failed = 0;
-		unsigned long result = gdk_color_context_get_pixel(object, red, green, blue, &failed);
+		unsigned long result = gdk_color_context_get_pixel(colorc, red, green, blue, &failed);
 		if (!failed) {
 			PUSHs(sv_2mortal(newSViv(result)));
 		}
 	}
 
 void
-free(object)
-	Gtk::Gdk::ColorContext	object
+free(colorc)
+	Gtk::Gdk::ColorContext	colorc
 	CODE:
-	gdk_color_context_free(object);
+	gdk_color_context_free(colorc);
 
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Window	PREFIX = gdk_window_
 
  #CONSTRUCTOR: yes
+ #DESC: Create a new Gtk::Gdk::Window using the specified attributes.
 Gtk::Gdk::Window
-new(Self, attr)
-	SV *	Self
+new(Class, attr)
+	SV *	Class
 	SV *	attr
 	CODE:
 	{
 		GdkWindow * parent = 0;
 		GdkWindowAttr a;
 		gint mask;
-		if (Self && SvOK(Self) && SvRV(Self))
-			parent = SvGdkWindow(Self);
+		if (Class && SvOK(Class) && SvRV(Class))
+			parent = SvGdkWindow(Class);
 
 		SvGdkWindowAttr(attr, &a, &mask);
 		
@@ -2421,9 +2639,11 @@ new(Self, attr)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Create a new Gtk::Gd;::Window from the specified window id. This function
+ #croaks if the window cannot be created.
 Gtk::Gdk::Window
-new_foreign(Self, anid)
-	SV *	Self
+new_foreign(Class, anid)
+	SV *	Class
 	long	anid
 	CODE:
 	{
@@ -2435,14 +2655,17 @@ new_foreign(Self, anid)
 	RETVAL
 
 
+ #DESC: Destroy a window.
 void
 gdk_window_destroy(window)
 	Gtk::Gdk::Window	window
 
+ #DESC: Show a window on the screen.
 void
 gdk_window_show(window)
 	Gtk::Gdk::Window	window
 
+ #DESC: Hide a window.
 void
 gdk_window_hide(window)
 	Gtk::Gdk::Window	window
@@ -2451,20 +2674,21 @@ void
 gdk_window_withdraw(window)
 	Gtk::Gdk::Window	window
 
+ #DESC: Move the window to the new x and y coordinates.
 void
 gdk_window_move(window, x, y)
 	Gtk::Gdk::Window	window
 	int	x
 	int	y
 
-
+ #DESC: Resize the window to the new width and height.
 void
 gdk_window_resize(window, width, height)
 	Gtk::Gdk::Window	window
 	int	width
 	int	height
 
-
+ #DESC: Move and resize the window at the same time.
 void
 gdk_window_move_resize(window, x, y, width, height)
 	Gtk::Gdk::Window	window
@@ -2473,6 +2697,7 @@ gdk_window_move_resize(window, x, y, width, height)
 	int	width
 	int	height
 
+ #DESC: Reparent window at the x and y coordinates in new_parent.
 void
 gdk_window_reparent(window, new_parent, x, y)
 	Gtk::Gdk::Window	window
@@ -2482,6 +2707,7 @@ gdk_window_reparent(window, new_parent, x, y)
 
 #if GTK_HVER > 0x010106
 
+ #DESC: Set window as a transient window for leader.
 void
 gdk_window_set_transient_for(window, leader)
 	Gtk::Gdk::Window	window
@@ -2494,10 +2720,12 @@ gdk_window_set_role(window, role)
 
 #endif
 
+ #DESC: Clear the background of the window.
 void
 gdk_window_clear(window)
 	Gtk::Gdk::Window	window
 
+ #DESC: Clear the specified area of the background of the window.
 void
 gdk_window_clear_area(window, x, y, width, height)
 	Gtk::Gdk::Window	window
@@ -2506,6 +2734,8 @@ gdk_window_clear_area(window, x, y, width, height)
 	int	width
 	int	height
 
+ #DESC: Clear the specified area of the background of the window. Also generate
+ #an expose event for the area.
 void
 gdk_window_clear_area_e(window, x, y, width, height)
 	Gtk::Gdk::Window	window
@@ -2514,6 +2744,7 @@ gdk_window_clear_area_e(window, x, y, width, height)
 	int	width
 	int	height
 
+ #DESC: Copy the specified area from source_window to the (x, y) position in window.
 void
 gdk_window_copy_area(window, gc, x, y, source_window, source_x, source_y, width, height)
 	Gtk::Gdk::Window	window
@@ -2526,14 +2757,17 @@ gdk_window_copy_area(window, gc, x, y, source_window, source_x, source_y, width,
 	int	width
 	int	height
 
+ #DESC: Raise the window in front of all the others.
 void
 gdk_window_raise(window)
 	Gtk::Gdk::Window	window
 
+ #DESC: Lower the window behind all the others.
 void
 gdk_window_lower(window)
 	Gtk::Gdk::Window	window
 
+ #DESC: Set if the window manager should handle this window or not.
 void
 gdk_window_set_override_redirect(window, override_redirect)
 	Gtk::Gdk::Window	window
@@ -2557,22 +2791,27 @@ gdk_window_set_hints(window, x, y, min_width, min_height, max_width, max_height,
 	int	max_height
 	Gtk::Gdk::WindowHints	flags
 
+ #DESC: Set the title of the window.
 void
 gdk_window_set_title(window, title)
 	Gtk::Gdk::Window	window
 	char *	title
 
+ #DESC: Set the background color of the window.
 void
 gdk_window_set_background(window, color)
 	Gtk::Gdk::Window	window
 	Gtk::Gdk::Color	color
 
+ #DESC: Set the specified pixmap as the background of window.
 void
 gdk_window_set_back_pixmap(window, pixmap, parent_relative)
 	Gtk::Gdk::Window	window
 	Gtk::Gdk::Pixmap	pixmap
 	int	parent_relative
 
+ #DESC: Get info about the geometry of the window.
+ #RETURNS: a list with the (x, y) coordinates, width, height and depth.
 void
 gdk_window_get_geometry(window)
 	Gtk::Gdk::Window	window
@@ -2590,6 +2829,8 @@ gdk_window_get_geometry(window)
 		PUSHs(sv_2mortal(newSViv(depth)));
 	}
 
+ #DESC: Get the position of the window. This function croaks if not called in list context.
+ #RETURNS: a list with the (x, y) coordinates.
 void
 gdk_window_get_position(window)
 	Gtk::Gdk::Window	window
@@ -2604,14 +2845,18 @@ gdk_window_get_position(window)
 		PUSHs(sv_2mortal(newSViv(y)));
 	}
 
+ #DESC: Get the visual of the window.
 Gtk::Gdk::Visual
 gdk_window_get_visual(window)
 	Gtk::Gdk::Window	window
 
+ #DESC: Get the colormap of the window.
 Gtk::Gdk::Colormap
 gdk_window_get_colormap(window)
 	Gtk::Gdk::Window	window
 
+ #OUTPUT: list
+ #RETURNS: the x and y position
 void
 gdk_window_get_origin(window)
 	Gtk::Gdk::Window	window
@@ -2626,6 +2871,10 @@ gdk_window_get_origin(window)
 		PUSHs(sv_2mortal(newSViv(y)));
 	}
 
+ #DESC: Get information about the pointer position in window. This function croaks if not 
+ #called in list context.
+ #RETURNS: a list with the x and y position of the pointer relative to window, the actual
+ #window the pointer is in and the state of the keyboard modifiers.
 void
 gdk_window_get_pointer(window)
 	Gtk::Gdk::Window	window
@@ -2644,19 +2893,25 @@ gdk_window_get_pointer(window)
 		PUSHs(sv_2mortal(newSVGdkModifierType(mask)));
 	}
 
+ #DESC: Tell the system to use the specified cursor inside window.
+ #An undefined value sets the cursor to the default one.
 void
-gdk_window_set_cursor(Self, Cursor)
-	Gtk::Gdk::Window	Self
-	Gtk::Gdk::Cursor	Cursor
+gdk_window_set_cursor(window, Cursor)
+	Gtk::Gdk::Window	window
+	Gtk::Gdk::Cursor_OrNULL	Cursor
 
+ #DESC: Get the parent window.
 Gtk::Gdk::Window
 gdk_window_get_parent(window)
 	Gtk::Gdk::Window	window
 
+ #DESC: Get the toplevel window.
 Gtk::Gdk::Window
 gdk_window_get_toplevel(window)
 	Gtk::Gdk::Window	window
 
+ #DESC: Get the children of window.
+ #RETURNS: a list with the windows that are children of window.
 void
 gdk_window_get_children(window)
 	Gtk::Gdk::Window	window
@@ -2670,10 +2925,14 @@ gdk_window_get_children(window)
 		}
 	}
 
+ #DESC: Get the event mask for window.
+ #SEEALSO: Gtk::Gdk::Window::set_events
 Gtk::Gdk::EventMask
 gdk_window_get_events (window)
 	Gtk::Gdk::Window    window
 
+ #DESC: Set the event mask for window. Only the events specified by the mask will
+ #be handled.
 void
 gdk_window_set_events (window, event_mask)
 	Gtk::Gdk::Window    window
@@ -2686,6 +2945,7 @@ gdk_window_set_icon (window, icon_window, pixmap, mask)
 	Gtk::Gdk::Pixmap    pixmap
 	Gtk::Gdk::Bitmap    mask
 
+ #DESC: Set the name of the icon for window.
 void
 gdk_window_set_icon_name (window, name)
 	Gtk::Gdk::Window    window
@@ -2696,11 +2956,13 @@ gdk_window_set_group (window, leader)
 	Gtk::Gdk::Window    window
 	Gtk::Gdk::Window    leader
 
+ #DESC: Set the decorations that should appear in the window's frame.
 void
 gdk_window_set_decorations (window, decorations)
 	Gtk::Gdk::Window    window
 	Gtk::Gdk::WMDecoration decorations
 
+ #DESC: Set the functions that should appear in the window's title bar.
 void
 gdk_window_set_functions (window, functions)
 	Gtk::Gdk::Window    window
@@ -2708,8 +2970,12 @@ gdk_window_set_functions (window, functions)
 
 #if GTK_HVER >= 0x010200
 
+ #DESC: Get the window at the current pointer coordinates.
+ #OUTPUT: list
+ #RETURNS: a list with the window and the (x, y) coordinates of the
+ #pointer inside the window.
 void
-gdk_window_at_pointer (Class)
+gdk_window_at_pointer (Class=0)
 	SV *	Class
 	PPCODE:
 	{
@@ -2722,6 +2988,8 @@ gdk_window_at_pointer (Class)
 		}
 	}
 
+ #OUTPUT: list
+ #RETURNS: the x and y position.
 void
 gdk_window_get_deskrelative_origin (window)
 	Gtk::Gdk::Window	window
@@ -2735,6 +3003,8 @@ gdk_window_get_deskrelative_origin (window)
 		}
 	}
 
+ #OUTPUT: list
+ #RETURNS: the x and y position.
 void
 gdk_window_get_root_origin (window)
 	Gtk::Gdk::Window	window
@@ -2746,6 +3016,7 @@ gdk_window_get_root_origin (window)
 		XPUSHs(sv_2mortal(newSViv(wy)));
 	}
 
+ #DESC: Get info about the window visibility.
 gboolean
 gdk_window_is_visible (window)
 	Gtk::Gdk::Window	window
@@ -2762,6 +3033,7 @@ void
 gdk_window_set_child_shapes (window)
 	Gtk::Gdk::Window	window
 
+ #DESC: Set the specified colormap for the window.
 void
 gdk_window_set_colormap (window, colormap)
 	Gtk::Gdk::Window	window
@@ -2779,20 +3051,24 @@ MODULE = Gtk		PACKAGE = Gtk::Gdk::Window		PREFIX = gdk_
 
 #if GTK_HVER >= 0x010200
 
+ #DESC: Convert the specified selection to the type identified by target.
 void
-gdk_selection_convert (window, selection, target, time)
+gdk_selection_convert (window, selection, target, time=GDK_CURRENT_TIME)
 	Gtk::Gdk::Window	window
 	Gtk::Gdk::Atom	selection
 	Gtk::Gdk::Atom	target
 	guint32	time
 
+ #DESWC: Set the window as owner of the specified selection.
 gint
-gdk_selection_owner_set (window, selection, time, send_event)
+gdk_selection_owner_set (window, selection, time=GDK_CURRENT_TIME, send_event=1)
 	Gtk::Gdk::Window	window
 	Gtk::Gdk::Atom	selection
 	guint32	time
 	gint	send_event
 
+ #DESC: Get the value and type of the selection property.
+ #RETURNS: the data (or undef), a Gtk::Gdk::Atom for the type and the format.
 void
 gdk_selection_property_get (window)
 	Gtk::Gdk::Window	window
@@ -2814,6 +3090,7 @@ gdk_selection_property_get (window)
 
 MODULE = Gtk        PACKAGE = Gtk::Gdk::Pixmap  PREFIX = gdk_window_
 
+ #DESC: Get the low-level id of the drawable.
 unsigned int
 XWINDOW(window)
 	Gtk::Gdk::Window	window
@@ -2822,11 +3099,13 @@ XWINDOW(window)
 	OUTPUT:
 	RETVAL
 
-
+ #DESC: Get the type of the drawable.
 Gtk::Gdk::WindowType
 gdk_window_get_type(window)
 	Gtk::Gdk::Window	window
 
+ #DESC: Get the size of the drawable. This function croaks if not called in list context.
+ #RETURNS: width and height
 void
 gdk_window_get_size(window)
 	Gtk::Gdk::Window	window
@@ -2837,6 +3116,7 @@ gdk_window_get_size(window)
 		if (GIMME != G_ARRAY)
 			croak("must accept array");
 		EXTEND(sp,2);
+		/* FIXME: reverse.... */
 		PUSHs(sv_2mortal(newSViv(height)));
 		PUSHs(sv_2mortal(newSViv(width)));
 	}
@@ -2851,7 +3131,7 @@ event_get_graphics_expose(window)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Pixmap	PREFIX = gdk_
 
-
+ #DESC: Draw a point at the ($x, $y) coordinates.
 void
 gdk_draw_point(pixmap, gc, x, y)
 	Gtk::Gdk::Pixmap	pixmap
@@ -2859,6 +3139,7 @@ gdk_draw_point(pixmap, gc, x, y)
 	int	x
 	int y
 
+ #DESC: Draw a line from ($x1, $y1) to ($x2, $y2).
 void
 gdk_draw_line(pixmap, gc, x1, y1, x2, y2)
 	Gtk::Gdk::Pixmap	pixmap
@@ -2868,6 +3149,8 @@ gdk_draw_line(pixmap, gc, x1, y1, x2, y2)
 	int	x2
 	int	y2
 
+ #DESC: Draw an (optionally filled) rectangle at position ($x, $y)
+ # with size ($width, $height).
 void
 gdk_draw_rectangle(pixmap, gc, filled, x, y, width, height)
 	Gtk::Gdk::Pixmap	pixmap
@@ -2878,6 +3161,7 @@ gdk_draw_rectangle(pixmap, gc, filled, x, y, width, height)
 	int	width
 	int	height
 
+ #DESC: Draw an (optionally filled) arc. $angle1 and $angle2 are in degrees * 64.
 void
 gdk_draw_arc(pixmap, gc, filled, x, y, width, height, angle1, angle2)
 	Gtk::Gdk::Pixmap	pixmap
@@ -2890,6 +3174,8 @@ gdk_draw_arc(pixmap, gc, filled, x, y, width, height, angle1, angle2)
 	int	angle1
 	int	angle2
 
+ #DESC: Draw an (optionally filled) polygon.
+ #ARG: ... list (coordinates the the vertex in the polygon)
 void
 gdk_draw_polygon(pixmap, gc, filled, x, y, ...)
 	Gtk::Gdk::Pixmap	pixmap
@@ -2910,6 +3196,7 @@ gdk_draw_polygon(pixmap, gc, filled, x, y, ...)
 		free(points);
 	}
 
+ #DESC: Draw the text $string at coordinates $x, $y.
 void
 gdk_draw_string(pixmap, font, gc, x, y, string)
 	Gtk::Gdk::Pixmap	pixmap
@@ -2925,6 +3212,7 @@ gdk_draw_string(pixmap, font, gc, x, y, string)
 		gdk_draw_text(pixmap, font, gc, x, y, bytes, len);
 	}
 
+ #DESC: Draw the first $text_len chars of $string at coordinates $x, $y.
 void
 gdk_draw_text(pixmap, font, gc, x, y, string, text_length)
 	Gtk::Gdk::Pixmap	pixmap
@@ -2935,6 +3223,7 @@ gdk_draw_text(pixmap, font, gc, x, y, string, text_length)
 	char *	string
 	int     text_length
 
+ #DESC: Copy a rectangle from the $src pixmap to $pixmap at the ($xdest, $ydest) coordinates.
 void
 gdk_draw_pixmap(pixmap, gc, src, xsrc, ysrc, xdest, ydest, width, height)
 	Gtk::Gdk::Pixmap	pixmap
@@ -2959,6 +3248,10 @@ gdk_draw_image(pixmap, gc, image, xsrc, ysrc, xdest, ydest, width, height)
 	int	width
 	int	height
 
+ #DESC: Draw the points.
+ #ARG: $x integer (x coordinate of the point to draw)
+ #ARG: $y integer (y coordinate of the point to draw)
+ #ARG: ... list (list with the x and y coordinates of additional points to draw)
 void
 gdk_draw_points(pixmap, gc, x, y, ...)
 	Gtk::Gdk::Pixmap	pixmap
@@ -2978,6 +3271,7 @@ gdk_draw_points(pixmap, gc, x, y, ...)
 		free(points);
 	}
 
+ #ARG: ... list (list with the x1,y1,x2 and y2 coordinates of the additional segments)
 void
 gdk_draw_segments(pixmap, gc, x1, y1, x2, y2, ...)
 	Gtk::Gdk::Pixmap	pixmap
@@ -3003,6 +3297,7 @@ gdk_draw_segments(pixmap, gc, x1, y1, x2, y2, ...)
 
 #if GTK_HVER >= 0x010200
 
+ #ARG: ... list (list with the x and y coordinates of the line ends)
 void
 gdk_draw_lines (pixmap, gc, ...)
 	Gtk::Gdk::Pixmap	pixmap	
@@ -3015,8 +3310,8 @@ gdk_draw_lines (pixmap, gc, ...)
 		
 		points = (GdkPoint*)g_new0(GdkPoint, np);
 		for (i=0; i < np; ++i) {
-			points[i].x = SvIV(ST(i+2));
-			points[i].y = SvIV(ST(i+2+1));
+			points[i].x = SvIV(ST(i*2));
+			points[i].y = SvIV(ST(i*2+1));
 		}
 		gdk_draw_lines (pixmap, gc, points, np);
 		g_free(points);
@@ -3036,16 +3331,18 @@ new(Class, visual, allocate)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get the system colormap.
 Gtk::Gdk::Colormap
-gdk_colormap_get_system(Class)
+gdk_colormap_get_system(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_colormap_get_system();
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get the size of the system colormap.
 int
-gdk_colormap_get_system_size(Class)
+gdk_colormap_get_system_size(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_colormap_get_system_size();
@@ -3077,6 +3374,8 @@ gdk_colormap_get_visual (colormap)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Colormap	PREFIX = gdk_
 
+ #DESC: Allocate $color in $colormap.
+ #RETURNS: a new color if successfull ($color->pixel is valid).
 void
 gdk_color_alloc(colormap, color)
 	Gtk::Gdk::Colormap	colormap
@@ -3094,6 +3393,8 @@ gdk_color_change(colormap, color)
 	Gtk::Gdk::Colormap	colormap
 	Gtk::Gdk::Color	color
 
+ #DESC: Get the white color from $colormap.
+ #RETURNS: the white color if successfull.
 void
 gdk_color_white(colormap)
 	Gtk::Gdk::Colormap	colormap
@@ -3105,6 +3406,8 @@ gdk_color_white(colormap)
 			PUSHs(sv_2mortal(newSVGdkColor(&col)));
 	}
 
+ #DESC: Get the black color from $colormap.
+ #RETURNS: the black color if successfull.
 void
 gdk_color_black(colormap)
 	Gtk::Gdk::Colormap	colormap
@@ -3119,6 +3422,7 @@ gdk_color_black(colormap)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Color		PREFIX = gdk_color_
 
+ #DESC: Get the red component of $color. Set a new value if given an arg.
 int
 red(color, new_value=0)
 	Gtk::Gdk::Color	color
@@ -3130,6 +3434,7 @@ red(color, new_value=0)
 	color
 	RETVAL
 		
+ #DESC: Get the green component of $color. Set a new value if given an arg.
 int
 green(color, new_value=0)
 	Gtk::Gdk::Color	color
@@ -3141,6 +3446,7 @@ green(color, new_value=0)
 	color
 	RETVAL
 
+ #DESC: Get the blue component of $color. Set a new value if given an arg.
 int
 blue(color, new_value=0)
 	Gtk::Gdk::Color	color
@@ -3152,6 +3458,7 @@ blue(color, new_value=0)
 	color
 	RETVAL
 
+ #DESC: Get the pixel valu of $color. Set a new value if given an arg.
 int
 pixel(color, new_value=0)
 	Gtk::Gdk::Color	color
@@ -3163,8 +3470,12 @@ pixel(color, new_value=0)
 	color
 	RETVAL
 
+ #DESC: Query the red, green and blue components of the named color.
+ #OUTPUT: Gtk::Gdk::Color
+ #CONSTRUCTOR: yes
 void
-parse_color(self, name)
+parse_color(Class, name)
+	SV*	Class
 	char *	name
 	PPCODE:
 	{
@@ -3174,7 +3485,7 @@ parse_color(self, name)
 			PUSHs(sv_2mortal(newSVGdkColor(&col)));
 	}
 
-
+ #DESC: Find out if two colors are equal.
 int
 gdk_color_equal(colora, colorb)
 	Gtk::Gdk::Color	colora
@@ -3183,6 +3494,7 @@ gdk_color_equal(colora, colorb)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Cursor	PREFIX = gdk_cursor_
 
+ #DESC: Create a new cursor.
 Gtk::Gdk::Cursor
 new(Class, type)
 	SV *	Class
@@ -3192,6 +3504,9 @@ new(Class, type)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Create a new cursor from the specified data. Both $source and
+ #$mask must have depth == 1. $x and $y are the coordinates of the hot-spot
+ #in the cursor.
 Gtk::Gdk::Cursor
 gdk_cursor_new_from_pixmap (Class, source, mask, fg, bg, x, y)
 	SV *    Class
@@ -3207,15 +3522,17 @@ gdk_cursor_new_from_pixmap (Class, source, mask, fg, bg, x, y)
 	RETVAL
 
 void
-destroy(self)
-	Gtk::Gdk::Cursor	self
+destroy(cursor)
+	Gtk::Gdk::Cursor	cursor
 	CODE:
-	gdk_cursor_destroy(self);
+	gdk_cursor_destroy(cursor);
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Pixmap	PREFIX = gdk_pixmap_
 
+ #DESC: Create a new pixmap with the specified width and height.
+ #If $depth is not given, use the same depth of $window.
 Gtk::Gdk::Pixmap
-new(Class, window, width, height, depth)
+new(Class, window, width, height, depth=-1)
 	SV *	Class
 	Gtk::Gdk::Window	window
 	int	width
@@ -3241,6 +3558,9 @@ create_from_data(Class, window, data, width, height, depth, fg, bg)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Create a pixmap from $filename.
+ #RETURNS: if successfull a list with the pixmap and the mask.
+ #OUTPUT: list
 void
 create_from_xpm(Class, window, transparent_color, filename)
 	SV *	Class
@@ -3263,6 +3583,10 @@ create_from_xpm(Class, window, transparent_color, filename)
 		}
 	}
 
+ #DESC: Create a pixmap from the XPM formatted data. The data is a list of
+ #strings each of which has a line of data.
+ #RETURNS: if successfull a list with the pixmap and the mask.
+ #OUTPUT: list
 void
 create_from_xpm_d(Class, window, transparent_color, data, ...)
 	SV *	Class
@@ -3290,6 +3614,10 @@ create_from_xpm_d(Class, window, transparent_color, data, ...)
 		}
 	}
 
+ #DESC: Creates a pixmap from $filename. Either $window or $colormap can be undef,
+ #but not both.
+ #RETURNS: if successfull a list with the pixmap and the mask.
+ #OUTPUT: list
 void
 gdk_pixmap_colormap_create_from_xpm (Class, window, colormap, transparent_color, filename)
 	SV *	Class
@@ -3313,6 +3641,10 @@ gdk_pixmap_colormap_create_from_xpm (Class, window, colormap, transparent_color,
 		}
 	}
 
+ #DESC: Creates a pixmap from XPM formatted data. Either $window or $colormap can be undef,
+ #but not both.
+ #RETURNS: if successfull a list with the pixmap and the mask.
+ #OUTPUT: list
 void
 gdk_pixmap_colormap_create_from_xpm_d(Class, window, colormap, transparent_color, data, ...)
 	SV *	Class
@@ -3343,6 +3675,7 @@ gdk_pixmap_colormap_create_from_xpm_d(Class, window, colormap, transparent_color
 
 #if GTK_HVER >= 0x010200
 
+ #DESC: Creates a pixmap from the specified low-level pixmap id.
 Gtk::Gdk::Pixmap
 gdk_pixmap_foreign_new (Class, xid)
 	SV *	Class
@@ -3357,6 +3690,7 @@ gdk_pixmap_foreign_new (Class, xid)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Image	PREFIX = gdk_image_
 
+ #DESC: Create a new image with the specified width, height and visual.
 Gtk::Gdk::Image
 new(Class, type, visual, width, height)
 	SV *	Class
@@ -3369,6 +3703,7 @@ new(Class, type, visual, width, height)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Create a new image with the data from the specified rectangle of $window.
 Gtk::Gdk::Image
 get(Class, window, x, y, width, height)
 	SV *	Class
@@ -3382,12 +3717,14 @@ get(Class, window, x, y, width, height)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Destroy the image.
 void
 destroy(image)
 	Gtk::Gdk::Image	image
 	CODE:
 	gdk_image_destroy(image);
 
+ #DESC: Put the $pixel value at ($x, $y) coordinates.
 void
 gdk_image_put_pixel(image, x, y, pixel)
 	Gtk::Gdk::Image	image
@@ -3395,6 +3732,7 @@ gdk_image_put_pixel(image, x, y, pixel)
 	int	y
 	int	pixel
 
+ #DESC: Get the $pixel value at ($x, $y) coordinates.
 int
 gdk_image_get_pixel(image, x, y)
 	Gtk::Gdk::Image	image
@@ -3417,6 +3755,9 @@ create_from_data(Class, window, data, width, height)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::GC	PREFIX = gdk_gc_
 
+ #DESC: Create a new graphic context for use with $window having the specified
+ #attributes. If the attributes are not specified, use default values.
+ #ARG: $values Gtk::Gdk::GCValues (GC attributes, optional)
 Gtk::Gdk::GC
 new(Class, window, values=0)
 	SV *	Class
@@ -3433,36 +3774,42 @@ new(Class, window, values=0)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get the attributes of the graphics context.
 Gtk::Gdk::GCValues
-gdk_gc_get_values(self)
-	Gtk::Gdk::GC	self
+gdk_gc_get_values(gc)
+	Gtk::Gdk::GC	gc
 	CODE:
 	{
 		GdkGCValues values;
-		gdk_gc_get_values(self, &values);
+		gdk_gc_get_values(gc, &values);
 		RETVAL = &values;
 	}
 
+ #DESC: Set the foreground color of $gc. The color must be already allocated.
 void
 gdk_gc_set_foreground(gc, color)
 	Gtk::Gdk::GC	gc
 	Gtk::Gdk::Color	color
 
+ #DESC: Set the background color of $gc. The color must be already allocated.
 void
 gdk_gc_set_background(gc, color)
 	Gtk::Gdk::GC	gc
 	Gtk::Gdk::Color	color
 
+ #DESC: Set the font in $gc.
 void
 gdk_gc_set_font(gc, font)
 	Gtk::Gdk::GC	gc
 	Gtk::Gdk::Font	font
 
+ #DESC: Set the function to use in drawing operations.
 void
 gdk_gc_set_function(gc, function)
 	Gtk::Gdk::GC	gc
 	Gtk::Gdk::Function	function
 
+ #DESC: Set the fill rule.
 void
 gdk_gc_set_fill(gc, fill)
 	Gtk::Gdk::GC	gc
@@ -3515,6 +3862,7 @@ gdk_gc_set_exposures(gc, exposures)
 	Gtk::Gdk::GC	gc
 	int	exposures
 
+ #DESC: Set the attributes to use when drawing lines.
 void
 gdk_gc_set_line_attributes(gc, line_width, line_style, cap_style, join_style)
 	Gtk::Gdk::GC	gc
@@ -3524,20 +3872,21 @@ gdk_gc_set_line_attributes(gc, line_width, line_style, cap_style, join_style)
 	Gtk::Gdk::JoinStyle	join_style
 
 void
-destroy(self)
-	Gtk::Gdk::GC	self
+destroy(gc)
+	Gtk::Gdk::GC	gc
 	CODE:
-	gdk_gc_destroy(self);
-	UnregisterMisc((HV*)SvRV(ST(0)),self);
+	gdk_gc_destroy(gc);
+	UnregisterMisc((HV*)SvRV(ST(0)),gc);
 
 void
-DESTROY(self)
-	Gtk::Gdk::GC	self
+DESTROY(gc)
+	Gtk::Gdk::GC	gc
 	CODE:
-	UnregisterMisc((HV*)SvRV(ST(0)),self);
+	UnregisterMisc((HV*)SvRV(ST(0)),gc);
 
 #if GTK_HVER >= 0x010200
 
+ #ARG: ... list (list of integers with dash lengths)
 void
 gdk_gc_set_dashes (gc, offset, ...)
 	Gtk::Gdk::GC	gc
@@ -3563,13 +3912,13 @@ MODULE = Gtk		PACKAGE = Gtk::Gdk::GC	PREFIX = gdk_
 #if GTK_HVER > 0x010100
 
 void
-gdk_rgb_gc_set_foreground(self, rgb)
-	Gtk::Gdk::GC	self
+gdk_rgb_gc_set_foreground(gc, rgb)
+	Gtk::Gdk::GC	gc
 	guint	rgb
 
 void
-gdk_rgb_gc_set_background(self, rgb)
-	Gtk::Gdk::GC	self
+gdk_rgb_gc_set_background(gc, rgb)
+	Gtk::Gdk::GC	gc
 	guint	rgb
 
 #endif
@@ -3579,7 +3928,7 @@ gdk_rgb_gc_set_background(self, rgb)
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Visual
 
 Gtk::Gdk::Visual
-system(Class)
+system(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_visual_get_system();
@@ -3587,7 +3936,7 @@ system(Class)
 	RETVAL
 
 int
-best_depth(Class)
+best_depth(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_visual_get_best_depth();
@@ -3595,7 +3944,7 @@ best_depth(Class)
 	RETVAL
 
 SV *
-best_type(Class)
+best_type(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = newSVGdkVisualType(gdk_visual_get_best_type());
@@ -3603,7 +3952,7 @@ best_type(Class)
 	RETVAL
 
 Gtk::Gdk::Visual
-best(Class, depth=0, type=0)
+best(Class=0, depth=0, type=0)
 	SV *	Class
 	SV *	depth
 	SV *	type
@@ -3636,8 +3985,10 @@ best(Class, depth=0, type=0)
 	OUTPUT:
 	RETVAL
 
+ #OUTPUT: list
+ #RETURNS: the list of depths
 void
-depths(Class)
+depths(Class=0)
 	SV *	Class
 	PPCODE:
 	{
@@ -3651,8 +4002,10 @@ depths(Class)
 		}
 	}
 
+ #OUTPUT: list
+ #RETURNS: the list of visual types (Gtk::Gdk::VisualType)
 void
-visual_types(Class)
+visual_types(Class=0)
 	SV *	Class
 	PPCODE:
 	{
@@ -3666,8 +4019,10 @@ visual_types(Class)
 		}
 	}
 
+ #OUTPUT: list
+ #RETURNS: the list of visuals (Gtk::Gdk::Visual)
 void
-visuals(Class)
+visuals(Class=0)
 	SV *	Class
 	PPCODE:
 	{
@@ -3685,6 +4040,7 @@ visuals(Class)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Font	PREFIX = gdk_font_
 
+ #DESC: Create a new font from $name.
  #CONSTRUCTOR: yes
 Gtk::Gdk::Font
 load(Class, font_name)
@@ -3695,6 +4051,7 @@ load(Class, font_name)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Create a new fontset from $name.
  #CONSTRUCTOR: yes
 Gtk::Gdk::Font
 fontset_load(Class, fontset_name)
@@ -3720,8 +4077,9 @@ gdk_font_equal(fonta, fontb)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Atom	PREFIX = gdk_atom_
 
+ #DESC: Get the id bound to $name. Create it if $only_if_exists is false.
 Gtk::Gdk::Atom
-gdk_atom_intern(Class, atom_name, only_if_exists)
+gdk_atom_intern(Class, atom_name, only_if_exists=0)
 	SV *	Class
 	char *	atom_name
 	int	only_if_exists
@@ -3730,6 +4088,8 @@ gdk_atom_intern(Class, atom_name, only_if_exists)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get the name of $atom.
+ #RETURNS: undef if $atom doesn't exist.
 SV *
 gdk_atom_name(Class, atom)
 	SV *            Class
@@ -3748,6 +4108,8 @@ gdk_atom_name(Class, atom)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Property	PREFIX = gdk_property_
 
+ #OUTPUT: list
+ #RETURNS: the data, the type (a Gtk::Gdk::Atom) and the format (integer)
 void
 gdk_property_get(Class, window, property, type, offset, length, pdelete)
 	SV *	Class
@@ -3775,6 +4137,7 @@ gdk_property_get(Class, window, property, type, offset, length, pdelete)
 		}
 	}
 
+ #DESC: Delete the property $property from $window.
 void
 gdk_property_delete(Class, window, property)
 	SV *	Class
@@ -3785,6 +4148,7 @@ gdk_property_delete(Class, window, property)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Selection	PREFIX = gdk_selection_
 
+ #DESC: Get the window the owns $selection.
 Gtk::Gdk::Window
 gdk_selection_owner_get(Class, selection)
 	SV *	Class
@@ -3796,6 +4160,7 @@ gdk_selection_owner_get(Class, selection)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Rectangle	PREFIX = gdk_rectangle_
 
+ #OUTPUT: Gtk::Gdk::Rectangle
 void
 gdk_rectangle_intersect(Class, src1, src2)
 	SV *	Class
@@ -3811,6 +4176,7 @@ gdk_rectangle_intersect(Class, src1, src2)
 		}
 	}
 
+ #OUTPUT: Gtk::Gdk::Rectangle
 void
 gdk_rectangle_union(Class, src1, src2)
 	SV *    Class
@@ -3826,17 +4192,20 @@ gdk_rectangle_union(Class, src1, src2)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Font	PREFIX = gdk_
 
+ #DESC: Get the width of $string.
 int
 gdk_string_width(font, string)
 	Gtk::Gdk::Font	font
 	char *	string
 
+ #DESC: Get the width first $text_len chars of $string.
 int
 gdk_text_width(font, text, text_length)
 	Gtk::Gdk::Font	font
 	char *	text
 	int	text_length
 
+ #DESC: Get the width of $character.
 int
 gdk_char_width(font, character)
 	Gtk::Gdk::Font	font
@@ -3858,6 +4227,7 @@ gdk_char_measure(font, character)
 	Gtk::Gdk::Font	font
 	int	character
 
+ #DESC: Get the ascent of $font.
 int
 ascent(font)
 	Gtk::Gdk::Font	font
@@ -3866,6 +4236,7 @@ ascent(font)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Get the descent of $font.
 int
 descent(font)
 	Gtk::Gdk::Font	font
@@ -3876,6 +4247,8 @@ descent(font)
 
 #if GTK_HVER >= 0x010200
 
+ #DESC: Get infromation about $text's extents.
+ #RETURNS: a list with lbearing, rbearing, width, ascent and descent.
 void
 gdk_string_extents(font, text, len=0)
 	Gtk::Gdk::Font	font
@@ -3896,8 +4269,9 @@ gdk_string_extents(font, text, len=0)
 		XPUSHs(sv_2mortal(newSViv(descent)));
 	}
 
+ #DESC: Get the height of $text.
 gint
-gdk_string_height(font, text, len)
+gdk_string_height(font, text, len=0)
 	Gtk::Gdk::Font	font
 	SV *	text
 	int	len
@@ -3908,6 +4282,8 @@ gdk_string_height(font, text, len)
 		STRLEN tlen;
 		RETVAL = gdk_text_height(font, SvPV(text, tlen), ix==1?len:tlen);
 	}
+	OUTPUT:
+	RETVAL
 
 #endif
 
@@ -3922,12 +4298,12 @@ new(Class)
 	RETVAL
 
 void
-gdk_region_destroy (self)
-	Gtk::Gdk::Region self
+gdk_region_destroy (region)
+	Gtk::Gdk::Region region
 
 bool
-gdk_region_empty (self)
-	Gtk::Gdk::Region self
+gdk_region_empty (region)
+	Gtk::Gdk::Region region
 
 bool
 gdk_region_equal (region1, region2)
@@ -3935,35 +4311,36 @@ gdk_region_equal (region1, region2)
 	Gtk::Gdk::Region region2
 
 bool
-gdk_region_point_in (self, x, y)
-	Gtk::Gdk::Region self
+gdk_region_point_in (region, x, y)
+	Gtk::Gdk::Region region
 	int x
 	int y
 
 Gtk::Gdk::OverlapType
-gdk_region_rect_in (self, rectangle)
-	Gtk::Gdk::Region self
+gdk_region_rect_in (region, rectangle)
+	Gtk::Gdk::Region region
 	Gtk::Gdk::Rectangle rectangle
 
 void
-gdk_region_offset (self, dx, dy)
-	Gtk::Gdk::Region self
+gdk_region_offset (region, dx, dy)
+	Gtk::Gdk::Region region
 	int dx
 	int dy
 
 void
-gdk_region_shrink (self, dx, dy)
-	Gtk::Gdk::Region self
+gdk_region_shrink (region, dx, dy)
+	Gtk::Gdk::Region region
 	int dx
 	int dy
 
 Gtk::Gdk::Region
-gdk_region_union_with_rect (self, rectangle)
-	Gtk::Gdk::Region self
+gdk_region_union_with_rect (region, rectangle)
+	Gtk::Gdk::Region region
 	Gtk::Gdk::Rectangle rectangle
 
 #if GTK_HVER >= 0x010200
 
+ #ARG: ... list (x and y coordinates of the polygon)
 Gtk::Gdk::Region
 gdk_region_polygon (Class, fill_rule, ...)
 	SV *	Class
@@ -4002,24 +4379,24 @@ gdk_region_get_clipbox (region)
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Region		PREFIX = gdk_regions_
 
 Gtk::Gdk::Region
-gdk_regions_intersect (self, region)
-	Gtk::Gdk::Region self
+gdk_regions_intersect (region, regionb)
 	Gtk::Gdk::Region region
+	Gtk::Gdk::Region regionb
 
 Gtk::Gdk::Region
-gdk_regions_union (self, region)
-	Gtk::Gdk::Region self
+gdk_regions_union (region, regionb)
 	Gtk::Gdk::Region region
+	Gtk::Gdk::Region regionb
 
 Gtk::Gdk::Region
-gdk_regions_subtract (self, region)
-	Gtk::Gdk::Region self
+gdk_regions_subtract (region, regionb)
 	Gtk::Gdk::Region region
+	Gtk::Gdk::Region regionb
 
 Gtk::Gdk::Region
-gdk_regions_xor (self, region)
-	Gtk::Gdk::Region self
+gdk_regions_xor (region, regionb)
 	Gtk::Gdk::Region region
+	Gtk::Gdk::Region regionb
 
 INCLUDE: ../../build/boxed.xsh
 

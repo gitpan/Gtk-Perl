@@ -28,6 +28,31 @@ gnome_app_set_menus(app, menubar)
 	Gtk::MenuBar	menubar
 
 void
+gnome_app_create_menus(app, info, ...)
+	Gnome::App	app
+	ALIAS:
+		Gnome::App::create_toolbar = 1
+	CODE:
+	{
+		int i, count;
+		GnomeUIInfo *infos;
+
+		count = items - 1;
+		infos = alloc_temp(sizeof(GnomeUIInfo) * (count+1));
+		memset(infos, 0, sizeof(GnomeUIInfo) * (count+1));
+		/* Because we accept a list rather than an array, we
+                   have to unroll the outer layer of recursion */
+		for (i = 0; i < count; i++) {
+			SvGnomeUIInfo(ST(i+1), infos + i);
+		}
+		infos[count].type = GNOME_APP_UI_ENDOFINFO;
+		if (ix == 1)
+			gnome_app_create_toolbar(app, infos);
+		else
+			gnome_app_create_menus(app, infos);
+	}
+
+void
 gnome_app_set_toolbar(app, toolbar)
 	Gnome::App	app
 	Gtk::Toolbar	toolbar

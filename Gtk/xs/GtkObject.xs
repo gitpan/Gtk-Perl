@@ -145,8 +145,8 @@ MODULE = Gtk::Object		PACKAGE = Gtk::Object		PREFIX = gtk_object_
 # FIXME: See if we need signal_connect_while_alive
 
 int
-signal_connect(self, event, handler, ...)
-	Gtk::Object	self
+signal_connect(object, event, handler, ...)
+	Gtk::Object	object
 	char *	event
 	SV *	handler
 	ALIAS:
@@ -163,13 +163,13 @@ signal_connect(self, event, handler, ...)
 		void * fixupfunc = 0;*/
 		args = newAV();
 		
-		type = gtk_signal_lookup(event, self->klass->type);
+		type = gtk_signal_lookup(event, object->klass->type);
 		
 		if (!ix)
-			i = gtk_signal_connect (GTK_OBJECT (self), event,
+			i = gtk_signal_connect (GTK_OBJECT (object), event,
 				NULL, (void*)args);
 		else
-			i = gtk_signal_connect_after (GTK_OBJECT (self), event,
+			i = gtk_signal_connect_after (GTK_OBJECT (object), event,
 				NULL, (void*)args);
 		
 				
@@ -185,23 +185,23 @@ signal_connect(self, event, handler, ...)
 	RETVAL
 
 void
-signal_disconnect(self, id)
-	Gtk::Object	self
+signal_disconnect(object, id)
+	Gtk::Object	object
 	int	id
 	CODE:
-	gtk_signal_disconnect(self, id);
+	gtk_signal_disconnect(object, id);
 
 void
-signal_handlers_destroy(self)
-	Gtk::Object	self
+signal_handlers_destroy(object)
+	Gtk::Object	object
 	CODE:
-	gtk_signal_handlers_destroy(self);
+	gtk_signal_handlers_destroy(object);
 
 char *
-type_name(self)
-	Gtk::Object	self
+type_name(object)
+	Gtk::Object	object
 	CODE:
-	RETVAL = gtk_type_name(GTK_OBJECT_TYPE(self));
+	RETVAL = gtk_type_name(GTK_OBJECT_TYPE(object));
 	OUTPUT:
 	RETVAL
 
@@ -239,16 +239,16 @@ new_from_pointer(klass, pointer)
 
 
 unsigned long
-_return_pointer(self)
-	Gtk::Object	self
+_return_pointer(object)
+	Gtk::Object	object
 	CODE:
-	RETVAL = (unsigned long)self;
+	RETVAL = (unsigned long)object;
 	OUTPUT:
 	RETVAL
 
 void
-DESTROY(self)
-	SV *	self
+DESTROY(object)
+	SV *	object
 	CODE:
 	FreeHVObject((HV*)SvRV(ST(0)));
 
@@ -281,8 +281,8 @@ _get_arg_info(obj, name)
 	}
 
 void
-set(self, name, value, ...)
-	Gtk::Object	self
+set(object, name, value, ...)
+	Gtk::Object	object
 	SV *	name
 	SV *	value
 	CODE:
@@ -297,15 +297,15 @@ set(self, name, value, ...)
 			if ((p+1)>=items)
 				croak("too few arguments");
 				
-			FindArgumentTypeWithObject(self, ST(p), &argv[0]);
+			FindArgumentTypeWithObject(object, ST(p), &argv[0]);
 
 			value = ST(p+1);
 		
 			argc = 1;
 			
-			GtkSetArg(&argv[0], value, ST(0), self);
+			GtkSetArg(&argv[0], value, ST(0), object);
 
-			gtk_object_setv(self, argc, argv);
+			gtk_object_setv(object, argc, argv);
 			
 			GtkFreeArg(&argv[0]);
 			
@@ -315,8 +315,8 @@ set(self, name, value, ...)
 
 
 void
-get(self, name, ...)
-	Gtk::Object	self
+get(object, name, ...)
+	Gtk::Object	object
 	SV *	name
 	PPCODE:
 	{
@@ -327,12 +327,12 @@ get(self, name, ...)
 		
 		for(p=1;p<items;) {
 		
-			FindArgumentTypeWithObject(self, ST(p), &argv[0]);
+			FindArgumentTypeWithObject(object, ST(p), &argv[0]);
 		
 			argc = 1;
 			t=argv[0].type;
 			
-			gtk_object_getv(self, argc, argv);
+			gtk_object_getv(object, argc, argv);
 			
 			EXTEND(sp,1);
 			PUSHs(sv_2mortal(GtkGetArg(&argv[0])));
@@ -346,23 +346,29 @@ get(self, name, ...)
 	}
 
 SV *
-new(klass, ...)
-	SV *	klass
+new(Class, ...)
+	SV *	Class
 	CODE:
 	{
 		GtkType t;
 		GtkArg	argv[3];
 		int p;
 		int argc;
+		char * perl_class;
 		GtkObject *object;
+		GtkType type;
 		
-		int type = gtnumber_for_ptname(SvPV(klass, PL_na));
-		if (!type)
-			croak("Invalid class name '%s'", SvPV(klass, PL_na));
+		perl_class = SvPV(Class, PL_na);
+		type = gtnumber_for_ptname(perl_class);
+		if (!type) {
+			if ( !(type = gtnumber_for_gtname(perl_class)) )
+				croak("Invalid class name '%s'", perl_class);
+			perl_class = ptname_for_gtnumber(type);
+		}
 	
 		object = gtk_object_new(type, NULL);
 
-		RETVAL = newSVGtkObjectRef(object, SvPV(klass, PL_na));
+		RETVAL = newSVGtkObjectRef(object, perl_class);
 #ifdef DEBUG_TYPES
 		printf("created SV %p for object %p from perltype %s (gtktype: %d -> %s)\n", RETVAL, object, SvPV(klass, PL_na), type, gtk_type_name(type));
 #endif
@@ -431,22 +437,22 @@ add_arg_type(Class, name, type, flags, num=1)
 #ifndef GTK_HAVE_SIGNAL_EMITV
 
 void
-signal_emit(self, name)
-	Gtk::Object	self
+signal_emit(object, name)
+	Gtk::Object	object
 	SV *	name
 	ALIAS:
 		Gtk::Object::signal_emit = 0
 		Gtk::Object::signal_emit_by_name = 1
 	CODE:
 	{
-		gtk_signal_emit_by_name(self, SvPV(name,PL_na), NULL);
+		gtk_signal_emit_by_name(object, SvPV(name,PL_na), NULL);
 	}
 
 #else
 
 void
-signal_emit(self, name, ...)
-	Gtk::Object	self
+signal_emit(object, name, ...)
+	Gtk::Object	object
 	char *	name
 	ALIAS:
 		Gtk::Object::signal_emit = 0
@@ -454,21 +460,21 @@ signal_emit(self, name, ...)
 	PPCODE:
 	{
 		GtkArg * args;
-		guint sig = gtk_signal_lookup(name, self->klass->type);
+		guint sig = gtk_signal_lookup(name, object->klass->type);
 		GtkSignalQuery * q;
 		unsigned long retval;
 		int params;
 		int i,j;
 		
 		if (sig<1) {
-			croak("Unknown signal %s in %s widget", name, gtk_type_name(self->klass->type));
+			croak("Unknown signal %s in %s widget", name, gtk_type_name(object->klass->type));
 		}
 		
 		q = gtk_signal_query(sig);
 		
 		if ((items-2) != q->nparams) {
 			croak("Incorrect number of arguments for emission of signal %s in class %s, needed %d but got %d",
-				name, gtk_type_name(self->klass->type), q->nparams, items-2);
+				name, gtk_type_name(object->klass->type), q->nparams, items-2);
 		}
 		
 		params = q->nparams;
@@ -477,14 +483,14 @@ signal_emit(self, name, ...)
 		
 		for(i=0,j=2;(i<params) && (j<items);i++,j++) {
 			args[i].type = q->params[i];
-			GtkSetArg(args+i, ST(j), 0, self);
+			GtkSetArg(args+i, ST(j), 0, object);
 		}
 		args[params].type = q->return_val;
 		GTK_VALUE_POINTER(args[params]) = &retval;
 		
 		g_free(q);
 		
-		gtk_signal_emitv(self, sig, args);
+		gtk_signal_emitv(object, sig, args);
 		
 		EXTEND(sp,1);
 		PUSHs(sv_2mortal(GtkGetRetArg(args + params)));
@@ -493,120 +499,120 @@ signal_emit(self, name, ...)
 	}
 
 int
-signal_n_emissions(self, name)
-	Gtk::Object self
+signal_n_emissions(object, name)
+	Gtk::Object object
 	char *	name
 	CODE:
-	RETVAL = gtk_signal_n_emissions_by_name(self, name);
+	RETVAL = gtk_signal_n_emissions_by_name(object, name);
 	OUTPUT:
 	RETVAL
 
 #endif
 
 void
-signal_emit_stop(self, name)
-	Gtk::Object	self
+signal_emit_stop(object, name)
+	Gtk::Object	object
 	SV *	name
 	ALIAS:
 		Gtk::Object::signal_emit_stop = 0
 		Gtk::Object::signal_emit_stop_by_name = 1
 	CODE:
 	{
-		gtk_signal_emit_stop_by_name(self, SvPV(name,PL_na));
+		gtk_signal_emit_stop_by_name(object, SvPV(name,PL_na));
 	}
 
 void
-signal_handler_block(self, handler_id)
-		Gtk::Object     self
+signal_handler_block(object, handler_id)
+		Gtk::Object     object
 		unsigned int    handler_id
 		CODE:
 		{
-				gtk_signal_handler_block(self, handler_id);
+				gtk_signal_handler_block(object, handler_id);
 		}
 
 void
-signal_handler_unblock(self, handler_id)
-		Gtk::Object     self
+signal_handler_unblock(object, handler_id)
+		Gtk::Object     object
 		unsigned int    handler_id
 		CODE:
 		{
-				gtk_signal_handler_unblock(self, handler_id);
+				gtk_signal_handler_unblock(object, handler_id);
 		}
 
 unsigned int
-signal_handler_pending(self, handler_id, may_be_blocked)
-		Gtk::Object     self
+signal_handler_pending(object, handler_id, may_be_blocked)
+		Gtk::Object     object
 		unsigned int    handler_id
 		bool    may_be_blocked
 		CODE:
-		RETVAL= gtk_signal_handler_pending(self, handler_id, may_be_blocked);
+		RETVAL= gtk_signal_handler_pending(object, handler_id, may_be_blocked);
 		OUTPUT:
 		RETVAL
 
 #if GTK_HVER >= 0x010110
 
 int
-signal_handler_pending_by_id(self, handler_id, may_be_blocked)
-		Gtk::Object     self
+signal_handler_pending_by_id(object, handler_id, may_be_blocked)
+		Gtk::Object     object
 		unsigned int    handler_id
 		bool    may_be_blocked
 		CODE:
-		RETVAL= gtk_signal_handler_pending_by_id(self, handler_id, may_be_blocked);
+		RETVAL= gtk_signal_handler_pending_by_id(object, handler_id, may_be_blocked);
 		OUTPUT:
 		RETVAL
 
 #endif
 
 unsigned int
-_object_type(self)
-		SV *	self
+_object_type(object)
+		SV *	object
 		CODE:
 		{
-			GtkObject * o = SvGtkObjectRef(self, 0);
+			GtkObject * o = SvGtkObjectRef(object, 0);
 			int type;
 			if (o)
 				type = o->klass->type;
 			else
-				type = gtnumber_for_ptname(SvPV(self, PL_na));
+				type = gtnumber_for_ptname(SvPV(object, PL_na));
 			RETVAL=type;
 		}
 		OUTPUT:
 		RETVAL
 
 unsigned int
-_object_size(self)
-		SV *	self
+_object_size(object)
+		SV *	object
 		CODE:
 		{
-			GtkObject * o = SvGtkObjectRef(self, 0);
+			GtkObject * o = SvGtkObjectRef(object, 0);
 			int type;
 			if (o)
 				type = o->klass->type;
 			else
-				type = gtnumber_for_ptname(SvPV(self, PL_na));
+				type = gtnumber_for_ptname(SvPV(object, PL_na));
 			RETVAL = obj_size_for_gtname(gtk_type_name(type));
 		}
 		OUTPUT:
 		RETVAL
 
 unsigned int
-_class_size(self)
-		SV *	self
+_class_size(object)
+		SV *	object
 		CODE:
 		{
-			GtkObject * o = SvGtkObjectRef(self, 0);
+			GtkObject * o = SvGtkObjectRef(object, 0);
 			int type;
 			if (o)
 				type = o->klass->type;
 			else
-				type = gtnumber_for_ptname(SvPV(self, PL_na));
+				type = gtnumber_for_ptname(SvPV(object, PL_na));
 			RETVAL = class_size_for_gtname(gtk_type_name(type));
 		}
 		OUTPUT:
 		RETVAL
 
 int
-register_subtype(parentClass, perlClass...)
+register_subtype(parentClass, perlClass, ...)
 	SV *	parentClass
 	SV *	perlClass
 	CODE:
@@ -793,42 +799,42 @@ add_signals (Class, ...)
 	}
 
 void
-destroy(self)
-	Gtk::Object	self
+destroy(object)
+	Gtk::Object	object
 	CODE:
-	gtk_object_destroy(self);
+	gtk_object_destroy(object);
 
 void
-gtk_object_ref(self)
-	Gtk::Object	self
+gtk_object_ref(object)
+	Gtk::Object	object
 
 void
-gtk_object_unref(self)
-	Gtk::Object	self
+gtk_object_unref(object)
+	Gtk::Object	object
 
 bool
-gtk_object_destroyed(self)
-	Gtk::Object	self
+gtk_object_destroyed(object)
+	Gtk::Object	object
 	CODE:
-	RETVAL = GTK_OBJECT_DESTROYED(self);
+	RETVAL = GTK_OBJECT_DESTROYED(object);
 	OUTPUT:
 	RETVAL
 
 bool
-gtk_object_floating(self)
-	Gtk::Object	self
+gtk_object_floating(object)
+	Gtk::Object	object
 	CODE:
-	RETVAL = GTK_OBJECT_FLOATING(self);
+	RETVAL = GTK_OBJECT_FLOATING(object);
 	OUTPUT:
 	RETVAL
 
 #ifdef GTK_OBJECT_CONNECTED
 
 bool
-gtk_object_connected(self)
-	Gtk::Object	self
+gtk_object_connected(object)
+	Gtk::Object	object
 	CODE:
-	RETVAL = GTK_OBJECT_CONNECTED(self);
+	RETVAL = GTK_OBJECT_CONNECTED(object);
 	OUTPUT:
 	RETVAL
 

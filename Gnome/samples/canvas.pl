@@ -12,6 +12,11 @@ use Gnome;
 init Gnome "canvas.pl";
 init Gtk::Gdk::ImlibImage;
 
+#DnD target data
+@target_table = (
+	{target => 'STRING', flags => 0, info => 0}
+);
+
 my($window) = new Gtk::Widget "Gtk::Window",
 	-type => -toplevel,
 	-visible => 1,
@@ -30,6 +35,9 @@ $canvas->show;
 
 #$canvas->set_size(300,300);
 # kill 19,$$;
+
+$canvas->drag_dest_set('all', ['copy', 'move'], @target_table);
+$canvas->signal_connect('drag_data_received', \&canvas_drag_data);
 
 $canvas->style->bg('normal', $canvas->style->white);
 
@@ -128,3 +136,17 @@ $img = $imgitem->get('image');
 print "IMAGE: ", ref($img), "\n";
 
 main Gtk;
+
+
+sub canvas_drag_data {
+	my ($canvas, $context, $x, $y, $data, $info, $time) = @_;
+
+	if ( ($data->length() >= 0) && ($data->format() == 8) ) {
+		print "creating text in canvas\n";
+		$croot->new($croot, 'Gnome::CanvasText', text => $data->data(),
+			'x' => $x, 'y' => $y, font => 'fixed');
+		$context->finish(1, 0, $time);
+	} else {
+		$context->finish(0, 0, $time);
+	}
+}

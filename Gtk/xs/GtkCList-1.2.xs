@@ -72,9 +72,11 @@ MODULE = Gtk::CList12		PACKAGE = Gtk::CList		PREFIX = gtk_clist_
 
 #ifdef GTK_CLIST
 
+ #ARG: $text string (text to put in the first column)
+ #ARG: ... list (additional strings to put in the second, third... columns)
 int
-gtk_clist_prepend(self, text, ...)
-	Gtk::CList	self
+gtk_clist_prepend(clist, text, ...)
+	Gtk::CList	clist
 	SV *	text
 	CODE:
 	{
@@ -83,45 +85,45 @@ gtk_clist_prepend(self, text, ...)
 		char** val = malloc(num*sizeof(char*));
 		for (i=1; i < items; ++i)
 			val[i-1] = SvPV(ST(i),PL_na);
-		RETVAL = gtk_clist_prepend(self, val);
+		RETVAL = gtk_clist_prepend(clist, val);
 		free(val);
 	}
 	OUTPUT:
 	RETVAL
 
 void
-gtk_clist_set_sort_type (self, sort_type)
-	Gtk::CList	self
+gtk_clist_set_sort_type (clist, sort_type)
+	Gtk::CList	clist
 	Gtk::SortType	sort_type
 
 void
-gtk_clist_set_sort_column (self, column)
-	Gtk::CList	self
+gtk_clist_set_sort_column (clist, column)
+	Gtk::CList	clist
 	int		column
 
 Gtk::SortType
-sort_type (self)
-	Gtk::CList	self
+sort_type (clist)
+	Gtk::CList	clist
 	CODE:
-	RETVAL=self->sort_type;
+	RETVAL=clist->sort_type;
 	OUTPUT:
 	RETVAL
 
 int
-sort_column (self)
-	Gtk::CList	self
+sort_column (clist)
+	Gtk::CList	clist
 	CODE:
-	RETVAL=self->sort_column;
+	RETVAL=clist->sort_column;
 	OUTPUT:
 	RETVAL
 
 void
-gtk_clist_sort (self)
-	Gtk::CList	self
+gtk_clist_sort (clist)
+	Gtk::CList	clist
 
 void
-gtk_clist_set_auto_sort (self, auto_sort)
-	Gtk::CList	self
+gtk_clist_set_auto_sort (clist, auto_sort=TRUE)
+	Gtk::CList	clist
 	bool		auto_sort
 
 int
@@ -190,13 +192,13 @@ gtk_clist_set_vadjustment (clist, adj)
 	Gtk::Adjustment	adj
 
 void
-gtk_clist_set_selectable (clist, row, selectable)
+gtk_clist_set_selectable (clist, row, selectable=TRUE)
 	Gtk::CList	clist
 	gint	row
 	gboolean	selectable
 
 void
-gtk_clist_set_use_drag_icons (clist, use_icons)
+gtk_clist_set_use_drag_icons (clist, use_icons=TRUE)
 	Gtk::CList	clist
 	gboolean	use_icons
 
@@ -214,6 +216,8 @@ void
 gtk_clist_unselect_all (clist)
 	Gtk::CList	clist
 
+ #ARG: ... list (additional arguments to the compare function)
+ #ARG: $handler subroutine (a compare subroutine that will get the text of the sort_column column of each of the rows being compared)
 void
 gtk_clist_set_compare_func (clist, handler, ...)
 	Gtk::CList	clist
@@ -227,5 +231,23 @@ gtk_clist_set_compare_func (clist, handler, ...)
 		gtk_object_set_data_full(GTK_OBJECT(clist), "_perl_sort_cb", args, destroy_handler);
 	}
 
+int
+focus_row (clist)
+	Gtk::CList clist
+	CODE:
+	RETVAL=clist->focus_row;
+	OUTPUT:
+	RETVAL
+
+
+void
+set_focus_row(clist, row)
+	Gtk::CList	clist
+	int		row
+	CODE:
+	if (row >= 0 && row < clist->rows)
+		clist->focus_row = row;
+	else
+		warn("incorrect row %d", row);
 
 #endif

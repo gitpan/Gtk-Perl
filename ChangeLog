@@ -1,3 +1,160 @@
+Wed, 16 Aug 2000 19:40:14 +0200
+
+	* Last minute bug fixes.
+	* Released version 0.7003.
+
+Wed, 16 Aug 2000 15:07:50 +0200 Paolo Molaro <lupus@debian.org>
+
+	* *.xs: many _usability_ improvements with default args.
+	Better documentation for some different-from-C behaviour.
+
+Wed,  9 Aug 2000 16:16:48 +0200 Paolo Molaro <lupus@linuxcare.com>
+
+	* Gtk/xs/GtkEditable.xs, Gtk/xs/GtkList.xs: applied patch from 
+	Sven Verdoolaege <skimo@kotnet.org>.
+	* Upped version number in preparation for release.
+
+Fri, 23 Jun 2000 15:13:32 +0200 Paolo Molaro <lupus@linuxcare.com>
+
+	* doc/*: added DTD and stylesheet for the documentation.
+
+Fri, 23 Jun 2000 15:06:41 +0200 Paolo Molaro <lupus@linuxcare.com>
+
+	* INSTALL, Gnome/xs/GnomeCanvasItem.xs: applied patch from 
+	Brian Warner <warner@lothar.com>.
+	* *.xs: more documentation fixups.
+	* */Makefile.PL: added gendoc target to makefiles.
+
+Mon, 19 Jun 2000 12:26:56 +0200 Paolo Molaro <lupus@linuxcare.com>
+
+	* Gtk/xs/Gtk.xs: avoid memory leaks setting fonts, pixmaps and GCs in styles.
+	* Gtk/xs/*.xs: More documentation fixups and fixes. Less memory leaks:-)
+	* Gtk/xs/GtkCTree.xs: added a $ctree->get_node_position($node) function to
+	retreive the (GtkCList) row number of a GtkCTreeNode.
+
+Fri, 16 Jun 2000 15:36:49 +0200 Paolo Molaro <lupus@linuxcare.com>
+
+	* Gnome/xs/GnomeDialog.xs: correct signature of append_buttons_with_pixmaps.
+	* Gtk/xs/Gtk.xs: more documentation. Fixed stupid draw_lines() method.
+	* Gtk/xs/GtkCTree.xs: documentation + more default values.
+	* Gtk/xs/GtkEditable.xs, GtkWidget.xs: use GTK_HVER instead of 
+	GTK_*_VERSION.
+	* GtkHTML/xs/GtkHTMLEmbedded.xs: small fix for new version.
+	* tools/gendoc.pl: improved doc generator, many fixes, outputs XML doc now.
+
+Mon,  5 Jun 2000 14:39:24 +0200 Paolo Molaro <lupus@linuxcare.com>
+
+	* Gnome/xs/ZvtTerm.xs: applied modifed patch from ZeroInk <support@zeroink.com>
+	to allow writing to the stdin of the running program and added a few
+	missing functions.
+	* tools/genext.pl: don't set values in structs mapping if it's a widget
+	and it's NULL.
+	* GnomePrint/*: first slightly incomplete version.
+
+Fri, 26 May 2000 17:47:14 +0200 Paolo Molaro <lupus@linuxcare.com>
+
+	* GdkPixbuf/pkg.defs, GdkPixbuf/xs/GdkPixbuf.xs: updates for version 0.8.0.
+	* Gtk/xs/Gtk.xs: more documentation.
+	* GtkHTML/xs/GtkHTML.xs: updates for newer version.
+
+Thu, 13 Apr 2000 17:40:40 +0200 Paolo Molaro <lupus@linuxcare.com>
+
+	* Gtk/xs/GtkCList-1.2.xs: check for correct row in set_focus_row.
+	
+Sun,  9 Apr 2000 18:04:55 +0200 Paolo Molaro <lupus@linuxcare.com>
+
+	* Gtk/xs/Gtk.xs: add Gtk::Gdk->event_new.
+	* Gtk/GdkTypes.c: more comprehensive event handling and bug fixes.
+	* Gtk/MiscTypes.c: alloc_temp zeroes the allocated space now.
+	* Gnome/xs/GtkPixmapMenuItem.xs: enable.
+	* *.xs: added default values for more functions.
+	* Gnome/xs/GnomeDialog.xs: add buttons accessor.
+
+Fri,  7 Apr 2000 17:28:32 +0200 Paolo Molaro <lupus@linuxcare.com>
+
+	* Gtk/xs/GtkBin.xs: allow NULL widget in child accessor and fix settor.
+	* Gtk/Gtk.pm: fix connect_object stuff.
+	* Gtk/GtkTypes.c: add GdkColor to supported boxed types in get/set arg.
+	* Gtk/gtk-1.3.defs: delete useless, buggy define-enum.
+	* Gnome/xs/GnomeFileEntry.xs: add accessor for file selection widget.
+	* GtkHTML/xs/GtkHTML.xs: use POPi instead of SvTRUE(POPs), update to
+	  latest cvs version.
+	* Gtk/MiscTypes.c: fix stupid thinko in handling flags.
+
+Wed,  1 Mar 2000 14:01:10 +0100 Paolo Molaro <lupus@linuxcare.com>
+	
+	* Gnome/pkg.defs: added support for GnomeCanvasPolygon.
+	* Makefile.PL, Gtk/xs/Gtk.xs: enable thread support if compiled with
+	  threaded perl.
+	* Gtk/samples/thread.pl: thread example.
+
+Mon, 28 Feb 2000 17:52:51 +0100 Paolo Molaro <lupus@linuxcare.com>
+
+	* GtkHTML/xs/GtkHTMLEmbeddable.xs: add accessors for classid and name.
+	* Gnome/xs/GnomeDialog.xs: missing functions bound.
+	* GtkHTML/*: updates to latest cvs version and bug fixes.
+	* GdkPixbuf/xs/*.xs: don't use PL_na anymore.
+
+Mon, 28 Feb 2000 09:06:59 +0100 Paolo Molaro <lupus@linuxcare.com>
+
+	* Gtk/samples/test.pl: added example for DnD within a CTree.
+	* GdkPixbuf/xs/GdkPixbuf.xs: accessors for pixel data.
+	* Gtk/xs/Gtk.xs: fix gdk_string_height() binding.
+
+Thu, 10 Feb 2000 20:30:58 +0100 Paolo Molaro <lupus@linuxcare.com>
+
+	* GdkPixbuf/*: initial support for gdk-pixbuf added.
+
+Thu, 10 Feb 2000 19:05:58 +0100 Paolo Molaro <lupus@linuxcare.com>
+
+	* Gtk/xs/GtkTreeItem.xs: added accessor for expanded
+	  (from pixel@mandrakesoft.com).
+	* Gtk-Perl.spec: spec file to build rpms from pixel@mandrakesoft.com.
+	* Gtk/xs/GtkWidget.xs: fixed flags settors so you can
+	  also unset flags.
+
+Sat, 29 Jan 2000 10:37:55 +0100 Paolo Molaro <lupus@debian.org>
+
+	* GtkHTML/*: updated to latest cvs version.
+	* Released version 0.7002.
+
+Fri, 28 Jan 2000 19:13:02 +0100 Paolo Molaro <lupus@debian.org>
+
+	* Glade/xs/GladeXML.xs: add new_from_memory so you can put
+	  your glade file in __DATA__, for example.
+	* Gtk/xs/GtkObject.xs: allow Gtk class names in new() to
+	  support old buggy code (use perl packages names, instead).
+	* Gnome/pkg.defs: a few parent class fixes by Brian Warner.
+	* Gnome/xs/Gnome.xs: fixed my silly mistake.
+	* GtkGLArea/Makefile.PL: allow also compilation with -lGL
+	  (ie true OpenGL or recent mesa packages).
+
+Sun, 23 Jan 2000 16:38:51 +0100 Paolo Molaro <lupus@debian.org>
+
+	* Gnome/xs/AppletWidget.xs: fixed panel support (partially
+	  patch from "Peter S. Housel" <housel@acm.org>).
+	* Gtk/Misctypes.c: fixed a segfault when using a number
+	  instead of a nickname for enums and flags.
+	  Workaround problem with dead POs at gtkobject destruction.
+	* Gtk/Gtk.pm: eliminate warning with autoload (thanks to
+	  Bodi Zoltan <zoltan.bodi@socgen.com>).
+	* Gtk/xs/GtkItemFactory.xs, Gtk/samples/testif.pl: patch from
+	  David Huggins-Daines <dhd@eradicator.org> that adds a per-item
+	  callback func.
+	* Gnome/xs/GnomeApp.xs, Gnome/xs/Gnome.xs, Gnome/pkg.defs: support 
+	  for GnomeUIInfo from David Huggins-Daines (code moved around a bit
+	  so it can be used also in GnomeMDI, Bonobo, etc.).
+	* tools/gendefs.pl: typeize() made more compatible with Gtk and
+	  Gnome maketypes.
+	* Gtk/gtk-1.2.defs: enable a couple of enums.
+	* Applied patch from Brian Warner to workaround bug in Makemaker 
+	  and chomp() the result of some x-config calls.
+	* Glade/xs/GladeXML.xs, Glade/samples/glade.pl: fixed custom widget 
+	  support (and updated example).
+	* Gtk/xs/GtkCtree.xs, GtkClist1-2.xs: additions from a patch 
+	  by brian@theory.org.
+	* Released version 0.7001.
+	
 Sun,  2 Jan 2000 18:02:51 +0100 Paolo Molaro <lupus@debian.org>
 
 	* Gtk/Gtk.pm: handle also readwrite flag.

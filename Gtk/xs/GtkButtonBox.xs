@@ -54,12 +54,12 @@ gtk_button_box_get_child_size_default (Class)
 	}
 
 void
-gtk_button_box_get_child_size(self)
-	Gtk::ButtonBox   self
+gtk_button_box_get_child_size(buttonbox)
+	Gtk::ButtonBox   buttonbox
 	PPCODE:
 	{
 		int min_width, min_height;
-		gtk_button_box_get_child_size(self, &min_width, &min_height);
+		gtk_button_box_get_child_size(buttonbox, &min_width, &min_height);
 		EXTEND(sp,2);
 		PUSHs(sv_2mortal(newSViv(min_width)));
 		PUSHs(sv_2mortal(newSViv(min_height)));
@@ -92,12 +92,12 @@ gtk_button_box_get_child_ipadding_default (Class)
 	}
 
 void
-gtk_button_box_get_child_ipadding(self)
-	Gtk::ButtonBox    self
+gtk_button_box_get_child_ipadding(buttonbox)
+	Gtk::ButtonBox    buttonbox
 	PPCODE:
 	{
 		int ipad_x, ipad_y;
-		gtk_button_box_get_child_ipadding(self, &ipad_x, &ipad_y);
+		gtk_button_box_get_child_ipadding(buttonbox, &ipad_x, &ipad_y);
 		EXTEND(sp,2);
 		PUSHs(sv_2mortal(newSViv(ipad_x)));
 		PUSHs(sv_2mortal(newSViv(ipad_y)));

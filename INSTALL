@@ -23,11 +23,14 @@ To install Gtk-Perl-0.7000:
    *** NOTE *** : The 'make install' step must be performed as user root.
 
  Repeat the above steps for each of the modules you wish to install on 
- your system. 
+ your system. Any necessary build options can be appended to the
+ "perl Makefile.PL" line. Currently recognized options are:
+
+ Gtk:   --lazy-load  :  reduce initial memory usage and loading time, unstable
+ Gnome: --with-panel :  turns on support for Gnome Panel applets.
 
   *** NOTE *** : GdkImlib MUST be compiled and installed BEFORE Gnome 
                  support may be installed. Please make sure you install 
                  GdkImlib first to make sure your Gnome support gets 
                  installed correctly.  
-
   

@@ -39,4 +39,6 @@ if ($term->forkpty(0) == 0) {
 	kill "KILL", $$;
 }
 
+$term->writechild("ls\n");
+
 main Gtk;

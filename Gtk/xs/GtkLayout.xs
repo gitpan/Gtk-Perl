@@ -20,88 +20,88 @@ new(Class, hadj=0, vadj=0)
 	RETVAL
 
 void
-gtk_layout_put(self, widget, x, y)
-	Gtk::Layout	self
+gtk_layout_put(layout, widget, x, y)
+	Gtk::Layout	layout
 	Gtk::Widget	widget
 	int		x
 	int		y
 
 void
-gtk_layout_move(self, widget, x, y)
-	Gtk::Layout	self
+gtk_layout_move(layout, widget, x, y)
+	Gtk::Layout	layout
 	Gtk::Widget	widget
 	int		x
 	int		y
 
 void
-gtk_layout_set_size(self, width, height)
-	Gtk::Layout	self
+gtk_layout_set_size(layout, width, height)
+	Gtk::Layout	layout
 	int		width
 	int		height
 
 Gtk::Adjustment
-gtk_layout_get_hadjustment(self)
-	Gtk::Layout	self
+gtk_layout_get_hadjustment(layout)
+	Gtk::Layout	layout
 
 Gtk::Adjustment
-gtk_layout_get_vadjustment(self)
-	Gtk::Layout	self
+gtk_layout_get_vadjustment(layout)
+	Gtk::Layout	layout
 
 void
-gtk_layout_set_hadjustment(self, hadj)
-	Gtk::Layout	self
+gtk_layout_set_hadjustment(layout, hadj)
+	Gtk::Layout	layout
 	Gtk::Adjustment_OrNULL	hadj
 
 void
-gtk_layout_set_vadjustment(self, vadj)
-	Gtk::Layout	self
+gtk_layout_set_vadjustment(layout, vadj)
+	Gtk::Layout	layout
 	Gtk::Adjustment_OrNULL	vadj
 
 void
-gtk_layout_freeze(self)
-	Gtk::Layout	self
+gtk_layout_freeze(layout)
+	Gtk::Layout	layout
 
 void
-gtk_layout_thaw(self)
-	Gtk::Layout	self
+gtk_layout_thaw(layout)
+	Gtk::Layout	layout
 
 Gtk::Gdk::Window
-bin_window (self)
-	Gtk::Layout	self
+bin_window (layout)
+	Gtk::Layout	layout
 	CODE:
-	RETVAL = self->bin_window;
+	RETVAL = layout->bin_window;
 	OUTPUT:
 	RETVAL
 
 guint
-width (self)
-	Gtk::Layout	self
+width (layout)
+	Gtk::Layout	layout
 	CODE:
-	RETVAL = self->width;
+	RETVAL = layout->width;
 	OUTPUT:
 	RETVAL
 
 guint
-height (self)
-	Gtk::Layout	self
+height (layout)
+	Gtk::Layout	layout
 	CODE:
-	RETVAL = self->height;
+	RETVAL = layout->height;
 	OUTPUT:
 	RETVAL
 
 guint
-xoffset (self)
-	Gtk::Layout	self
+xoffset (layout)
+	Gtk::Layout	layout
 	CODE:
-	RETVAL = self->xoffset;
+	RETVAL = layout->xoffset;
 	OUTPUT:
 	RETVAL
 
 guint
-yoffset (self)
-	Gtk::Layout	self
+yoffset (layout)
+	Gtk::Layout	layout
 	CODE:
-	RETVAL = self->yoffset;
+	RETVAL = layout->yoffset;
 	OUTPUT:
 	RETVAL
 

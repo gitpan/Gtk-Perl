@@ -10,7 +10,7 @@ MODULE = Gtk::VBox		PACKAGE = Gtk::VBox
 #ifdef GTK_VBOX
 
 Gtk::VBox_Sink
-new(Class, homogeneous, spacing)
+new(Class, homogeneous=FALSE, spacing=5)
 	SV *	Class
 	bool	homogeneous
 	int	spacing

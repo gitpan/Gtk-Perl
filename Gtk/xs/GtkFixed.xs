@@ -18,15 +18,15 @@ new(Class)
 	RETVAL
 
 void
-gtk_fixed_put(self, widget, x, y)
-	Gtk::Fixed	self
+gtk_fixed_put(fixed, widget, x, y)
+	Gtk::Fixed	fixed
 	Gtk::Widget	widget
 	int	x
 	int	y
 
 void
-gtk_fixed_move(self, widget, x, y)
-	Gtk::Fixed	self
+gtk_fixed_move(fixed, widget, x, y)
+	Gtk::Fixed	fixed
 	Gtk::Widget	widget
 	int	x
 	int	y

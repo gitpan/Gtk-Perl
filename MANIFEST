@@ -8,6 +8,13 @@ GdkImlib/pkg.pl
 GdkImlib/pkg.typemap
 GdkImlib/samples/gdkimlib.pl
 GdkImlib/xs/GdkImlib.xs
+GdkPixbuf/GdkPixbuf.pm
+GdkPixbuf/Makefile.PL
+GdkPixbuf/pkg.defs
+GdkPixbuf/pkg.typemap
+GdkPixbuf/samples/test.pl
+GdkPixbuf/xs/GdkPixbuf.xs
+GdkPixbuf/xs/GdkPixbufLoader.xs
 Glade/GladeXML.pm
 Glade/Makefile.PL
 Glade/pkg.defs
@@ -32,6 +39,7 @@ Gnome/pkg.defs
 Gnome/pkg.pl
 Gnome/pkg.typemap
 Gnome/samples/about.pl
+Gnome/samples/app-helper.pl
 Gnome/samples/applet.pl
 Gnome/samples/button.pl
 Gnome/samples/calculator.pl
@@ -43,6 +51,7 @@ Gnome/samples/gnome-dns.pl
 Gnome/samples/gspell.pl
 Gnome/samples/html.pl
 Gnome/samples/lamp.pl
+Gnome/samples/mdi.pl
 Gnome/samples/perl-zterm.pl
 Gnome/samples/save.xpm
 Gnome/xs/AppletWidget.xs
@@ -59,6 +68,7 @@ Gnome/xs/GnomeCanvasGroup.xs
 Gnome/xs/GnomeCanvasImage.xs
 Gnome/xs/GnomeCanvasItem.xs
 Gnome/xs/GnomeCanvasLine.xs
+Gnome/xs/GnomeCanvasPolygon.xs
 Gnome/xs/GnomeCanvasRE.xs
 Gnome/xs/GnomeCanvasRect.xs
 Gnome/xs/GnomeCanvasText.xs
@@ -173,6 +183,7 @@ Gtk/samples/testdnd.pl
 Gtk/samples/testgdk.pl
 Gtk/samples/testgtkrc
 Gtk/samples/testgtkrc2
+Gtk/samples/testif.pl
 Gtk/samples/testinput.pl
 Gtk/samples/testlog.pl
 Gtk/samples/testmf.pl
@@ -314,6 +325,7 @@ GtkHTML/pkg.defs
 GtkHTML/pkg.typemap
 GtkHTML/samples/test.pl
 GtkHTML/xs/GtkHTML.xs
+GtkHTML/xs/GtkHTMLEmbedded.xs
 GtkXmHTML/GXHTypes.c
 GtkXmHTML/GXHTypes.h
 GtkXmHTML/GtkXmHTML.pm

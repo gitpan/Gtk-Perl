@@ -17,18 +17,18 @@ new(Class)
 	RETVAL
 
 void
-gtk_color_selection_set_opacity(self, use_opacity)
-	Gtk::ColorSelection	self
+gtk_color_selection_set_opacity(color_selection, use_opacity)
+	Gtk::ColorSelection	color_selection
 	bool	use_opacity
 
 void
-gtk_color_selection_set_update_policy(self, policy)
-	Gtk::ColorSelection	self
+gtk_color_selection_set_update_policy(color_selection, policy)
+	Gtk::ColorSelection	color_selection
 	Gtk::UpdateType	policy
 
 void
-set_color(self, red, green, blue, opacity=0)
-	Gtk::ColorSelection	self
+set_color(color_selection, red, green, blue, opacity=0)
+	Gtk::ColorSelection	color_selection
 	double	red
 	double	green
 	double	blue
@@ -40,21 +40,21 @@ set_color(self, red, green, blue, opacity=0)
 		c[1] = green;
 		c[2] = blue;
 		c[3] = opacity;
-		gtk_color_selection_set_color(self, c);
+		gtk_color_selection_set_color(color_selection, c);
 	}
 
 void
-get_color(self)
-	Gtk::ColorSelection	self
+get_color(color_selection)
+	Gtk::ColorSelection	color_selection
 	PPCODE:
 	{
 		double c[4];
-		gtk_color_selection_get_color(self, c);
+		gtk_color_selection_get_color(color_selection, c);
 		EXTEND(sp,3);
 		PUSHs(sv_2mortal(newSVnv(c[0])));
 		PUSHs(sv_2mortal(newSVnv(c[1])));
 		PUSHs(sv_2mortal(newSVnv(c[2])));
-		if (self->use_opacity) {
+		if (color_selection->use_opacity) {
 			EXTEND(sp,1);
 			PUSHs(sv_2mortal(newSVnv(c[3])));
 		}

@@ -32,12 +32,12 @@ gnome_canvas_new_aa(Class)
 #endif
 
 Gnome::CanvasGroup
-gnome_canvas_root(self)
-	Gnome::Canvas	self
+gnome_canvas_root(canvas)
+	Gnome::Canvas	canvas
 
 void
-gnome_canvas_set_scroll_region(self, x1, y1, x2, y2)
-	Gnome::Canvas	self
+gnome_canvas_set_scroll_region(canvas, x1, y1, x2, y2)
+	Gnome::Canvas	canvas
 	double	x1
 	double	y1
 	double	x2
@@ -58,8 +58,8 @@ gnome_canvas_get_scroll_region (canvas)
 	}
 
 void
-gnome_canvas_set_pixels_per_unit(self, n)
-	Gnome::Canvas	self
+gnome_canvas_set_pixels_per_unit(canvas, n)
+	Gnome::Canvas	canvas
 	double	n
 
 #if 0
@@ -73,8 +73,8 @@ gnome_canvas_set_size(self, width, height)
 #endif
 
 void
-gnome_canvas_scroll_to(self, x, y)
-	Gnome::Canvas	self
+gnome_canvas_scroll_to(canvas, x, y)
+	Gnome::Canvas	canvas
 	int	x
 	int	y
 
@@ -91,8 +91,8 @@ gnome_canvas_get_scroll_offsets (canvas)
 	}
 
 void
-gnome_canvas_update_now(self)
-	Gnome::Canvas	self
+gnome_canvas_update_now(canvas)
+	Gnome::Canvas	canvas
 
 Gnome::CanvasItem_OrNULL
 gnome_canvas_get_item_at (canvas, x, y)
@@ -101,8 +101,8 @@ gnome_canvas_get_item_at (canvas, x, y)
 	double y
 
 void
-gnome_canvas_request_redraw(self, x1, y1, x2, y2)
-	Gnome::Canvas	self
+gnome_canvas_request_redraw(canvas, x1, y1, x2, y2)
+	Gnome::Canvas	canvas
 	int	x1
 	int	y1
 	int	x2
@@ -203,11 +203,11 @@ gnome_canvas_set_stipple_origin (canvas, gc)
 	Gtk::Gdk::GC	gc
 
 void
-gnome_canvas_set_close_enough(self, ce)
-	Gnome::Canvas	self
+gnome_canvas_set_close_enough(canvas, ce)
+	Gnome::Canvas	canvas
 	int		ce
 	CODE:
-	self->close_enough = ce;
+	canvas->close_enough = ce;
 
 #endif
 

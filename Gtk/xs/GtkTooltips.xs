@@ -18,28 +18,28 @@ new(Class)
 	RETVAL
 
 void
-gtk_tooltips_enable(self)
-	Gtk::Tooltips self
+gtk_tooltips_enable(tooltips)
+	Gtk::Tooltips tooltips
 
 void
-gtk_tooltips_disable(self)
-	Gtk::Tooltips self
+gtk_tooltips_disable(tooltips)
+	Gtk::Tooltips tooltips
 
 void
-gtk_tooltips_set_delay(self, delay)
-	Gtk::Tooltips self
+gtk_tooltips_set_delay(tooltips, delay)
+	Gtk::Tooltips tooltips
 	int delay
 
 void
-gtk_tooltips_set_tip(self, widget, tip_text, tip_private="")
-	Gtk::Tooltips self
+gtk_tooltips_set_tip(tooltips, widget, tip_text, tip_private="")
+	Gtk::Tooltips tooltips
 	Gtk::Widget widget
 	char* tip_text
 	char* tip_private
 
 void
-gtk_tooltips_set_colors(self, background, foreground)
-	Gtk::Tooltips self
+gtk_tooltips_set_colors(tooltips, background, foreground)
+	Gtk::Tooltips tooltips
 	Gtk::Gdk::Color background
 	Gtk::Gdk::Color foreground
 

@@ -28,6 +28,11 @@ and are under this copyright:
 The GNU public license is included with Perl, and with this distribution in
 the file "COPYING".
 
+Note that there is a mailing-list foir discussions about
+development of and with Gtk-Perl: gtk-perl-list@gnome.org.
+To subscribe to this list, send "subscribe" in the subject to
+gtk-perl-list-request@gnome.org.
+
 Starting with version 0.7000 of this package, each submodule must be compiled
 separately: this allows for greater flexibility and lower memory usage.
 Gnome requires GdkImlib support build first.

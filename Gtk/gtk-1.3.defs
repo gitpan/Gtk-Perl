@@ -4,11 +4,6 @@
   ( normal GDK_RGB_DITHER_NORMAL)
   ( max GDK_RGB_DITHER_MAX))
 
-(define-enum GtkFontMetricType
-  (ixels-metric GTK_FONT_METRIC_PIXELS)
-  (oints-metric GTK_FONT_METRIC_POINTS))
-
-
 (define-flags GtkObjectFlags
   (destroyed GTK_DESTROYED)
   (floating GTK_FLOATING)

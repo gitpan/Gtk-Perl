@@ -52,6 +52,21 @@ sub xsize {
 
 sub typeize {
 	local($_) = @_;
+	#my ($old) = $_;
+	#s/([A-Z])/_$1/g;
+	s/([A-Z][a-z])/_$1/g;
+	s/([a-z])([A-Z])/$1_$2/g;
+	$_ = uc $_;
+	s/_([A-Z])_/_$1/g;
+	s/^_GTK//;
+	# exceptions
+	#s/GNOME_MD_I/GNOME_MDI_/;
+	#warn "BOO: $_\n" if "GTK_TYPE$_" ne oldtypeize($old);
+	return "GTK_TYPE".$_;
+}
+
+sub oldtypeize {
+	local($_) = @_;
 	s/([a-z])([A-Z])/${1}_$2/g;
 	$_ = uc $_;
 	s/^GTK_/GTK_TYPE_/;
@@ -116,13 +131,13 @@ sub process_node {
 	my(@node) = @{$_[0]};
 
 	if ( !defined($node[0]) ) {
-		next;
+		return;
 	}
 	
 	if ($node[0] eq "set-directory") {
 		$directory = $node[1];
 		print "Dir |$directory|\n";
-		next;
+		return;
 	}
 
 	if ($node[0] eq "min-version") {
@@ -130,13 +145,13 @@ sub process_node {
 		$h = "0x$h" unless $h =~ /^0x/;
 		
 		if ($::gtk_hver < hex($h)) {
-			next;
+			return;
 		}
 		
 		foreach $node (@node[2..$#node]) {
 			process_node($node);
 		}
-		next;
+		return;
 	}
 
 	if ($node[0] eq "max-version") {
@@ -144,13 +159,13 @@ sub process_node {
 		$h = "0x$h" unless $h =~ /^0x/;
 		
 		if ($::gtk_hver > hex($h)) {
-			next;
+			return;
 		}
 		
 		foreach $node (@node[2..$#node]) {
 			process_node($node);
 		}
-		next;
+		return;
 	}
 
 	if ($node[0] eq "version") {
@@ -158,13 +173,13 @@ sub process_node {
 		$h = "0x$h" unless $h =~ /^0x/;
 		
 		if ($::gtk_hver != hex($h)) {
-			next;
+			return;
 		}
 		
 		foreach $node (@node[2..$#node]) {
 			process_node($node);
 		}
-		next;
+		return;
 	}
 	
 	if ($node[0] eq "define-enum") {
@@ -419,7 +434,7 @@ foreach (sort keys %enum) {
 	$enum_flags_code_init .= "\t\t$v->{typename} = gtk_type_register_enum(\"$_\", names_$_);\n";
 	$enum_flags_code_incl .= "extern GtkType $v->{typename};\n";
 	$enum_flags_code_decl .= "GtkType $v->{typename};\n";
-	$enum_flags_code_decl .= "static GtkEnumValue names_${_}[] = {\n";
+	$enum_flags_code_decl .= "static GtkEnumValue names_$_"."[] = {\n";
 	foreach $v (@{$enum{$_}->{'values'}}) {
 		 $enum_flags_code_decl .= "\t{$v->{constant}, \"$v->{constant}\", \"$v->{simple}\"},\n";
 	}
@@ -432,11 +447,11 @@ foreach (sort keys %flags) {
 	next if $flags{$_}->{export};
 	print "Exporting flags: $_\n";
 	$v = $flags{$_};
-	$enum_flags_code_init .= "if (!gtk_type_from_name(\"$_\"))\n";
+	$enum_flags_code_init .= "if (!($v->{typename}=gtk_type_from_name(\"$_\")))\n";
 	$enum_flags_code_init .= "\t\t$v->{typename} = gtk_type_register_flags(\"$_\", names_$_);\n";
 	$enum_flags_code_incl .= "extern GtkType $v->{typename};\n";
 	$enum_flags_code_decl .= "GtkType $v->{typename};\n";
-	$enum_flags_code_decl .= "static GtkEnumValue names_${_}[] = {\n";
+	$enum_flags_code_decl .= "static GtkEnumValue names_$_"."[] = {\n";
 	foreach $v (@{$flags{$_}->{'values'}}) {
 		$enum_flags_code_decl .= "\t{$v->{constant}, \"$v->{constant}\", \"$v->{simple}\"},\n";
 	}
@@ -836,9 +851,13 @@ EOT
 		my($name) = $member->{name};
 		my($type) = $member->{type};
 		if ($struct{$type}) {
-			print "	hv_store(h, \"",$name,"\", ",length($name),", newSV$member->{type}(&value->$name), 0);\n";
+			print "	hv_store(h, \"",$name,"\", ",length($name),", newSV$type(&value->$name), 0);\n";
 		} else {
-			print "	hv_store(h, \"",$name,"\", ",length($name),", newSV$member->{type}(value->$name), 0);\n";
+			if ($type ne "GtkWidget") {
+				print "	hv_store(h, \"",$name,"\", ",length($name),", newSV$type(value->$name), 0);\n";
+			} else {
+				print "	if (value->$name)\n \thv_store(h, \"",$name,"\", ",length($name),", newSV$type(value->$name), 0);\n";
+			}
 		}
 	}
 
@@ -867,10 +886,10 @@ EOT
 		my($type) = $member->{type};
 		if ($struct{$type}) {
 			print "	if ((s=hv_fetch(h, \"",$name,"\", ",length($name),", 0)) && SvOK(*s))\n";
-			print "		SvSet$member->{type}(*s, &dest->$name);\n";
+			print "		SvSet$type(*s, &dest->$name);\n";
 		} else {
 			print "	if ((s=hv_fetch(h, \"",$name,"\", ",length($name),", 0)) && SvOK(*s))\n";
-			print "		dest->$member->{name} = Sv$member->{type}(*s);\n";
+			print "		dest->$name = Sv$type(*s);\n";
 		}
 	}
 
@@ -1239,7 +1258,7 @@ foreach (sort keys %object) {
 	print "#ifdef $object{$_}->{cast}\n";
 #	print "\tadd_typecast(", $object{$_}->{prefix}, "_get_type(),	\"$object{$_}->{perlname}\");\n"
 #		;#unless /preview/i;
-	print "\tlink_types(\"$_\",	\"$object{$_}->{perlname}\", 0,	", $object{$_}->{prefix}, "_get_type, sizeof($_), sizeof(${_}Class));\n"
+	print "\tlink_types(\"$_\",	\"$object{$_}->{perlname}\", 0,	", $object{$_}->{prefix}, "_get_type, sizeof($_), sizeof($_"."Class));\n"
 		;#unless /preview/i;
 	print "#endif\n";
 }

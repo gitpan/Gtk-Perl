@@ -25,11 +25,11 @@ new(Class, string=0)
 	RETVAL
 
 void
-gtk_list_item_select(self)
-	Gtk::ListItem	self
+gtk_list_item_select(list_item)
+	Gtk::ListItem	list_item
 
 void
-gtk_list_item_deselect(self)
-	Gtk::ListItem	self
+gtk_list_item_deselect(list_item)
+	Gtk::ListItem	list_item
 
 #endif

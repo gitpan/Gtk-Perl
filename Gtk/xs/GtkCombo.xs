@@ -44,6 +44,7 @@ gtk_combo_set_item_string(combo, item, item_value)
 	Gtk::Item	item
 	char *	item_value
 
+ #ARG: ... list (strings to display in the popdown list)
 void
 gtk_combo_set_popdown_strings(combo, ...)
 	Gtk::Combo	combo

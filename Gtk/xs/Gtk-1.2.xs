@@ -178,7 +178,7 @@ gtk_drag_source_unset (widget)
 	Gtk::Widget	widget
 
 void
-gtk_drag_source_set_icon (widget, colormap, pixmap, mask)
+gtk_drag_source_set_icon (widget, colormap=NULL, pixmap=NULL, mask=NULL)
 	Gtk::Widget	widget
 	Gtk::Gdk::Colormap_OrNULL	colormap
 	Gtk::Gdk::Pixmap_OrNULL		pixmap
@@ -216,6 +216,7 @@ gdk_drag_context_unref (context)
 
 MODULE = Gtk12		PACKAGE = Gtk::Gdk::DragContext		PREFIX = gdk_drag_
 
+ #ARG: ... list (list of Gtk::Gdk::Atom)
 Gtk::Gdk::DragContext
 gdk_drag_begin (Class, window, ...)
 	SV *	Class
@@ -235,19 +236,19 @@ gdk_drag_begin (Class, window, ...)
 	RETVAL
 
 void
-gdk_drag_status (context, action, time)
+gdk_drag_status (context, action, time=GDK_CURRENT_TIME)
 	Gtk::Gdk::DragContext	context
 	Gtk::Gdk::DragAction	action
 	int	time
 
 void
-gdk_drop_reply (context, ok, time)
+gdk_drop_reply (context, ok, time=GDK_CURRENT_TIME)
 	Gtk::Gdk::DragContext	context
 	gboolean	ok
 	int	time
 
 void
-gdk_drop_finish (context, success, time)
+gdk_drop_finish (context, success, time=GDK_CURRENT_TIME)
 	Gtk::Gdk::DragContext	context
 	gboolean	success
 	int	time
@@ -286,7 +287,7 @@ gdk_drag_find_window (context, drag_window, x_root, y_root)
 	}
 
 gboolean
-gdk_drag_motion (context, dest_window, protocol, x_root, y_root, suggested_action, possible_action, time)
+gdk_drag_motion (context, dest_window, protocol, x_root, y_root, suggested_action, possible_action, time=GDK_CURRENT_TIME)
 	Gtk::Gdk::DragContext	context
 	Gtk::Gdk::Window	dest_window
 	Gtk::Gdk::DragProtocol	protocol
@@ -297,12 +298,12 @@ gdk_drag_motion (context, dest_window, protocol, x_root, y_root, suggested_actio
 	guint32	time
 
 void
-gdk_drag_drop (context, time)
+gdk_drag_drop (context, time=GDK_CURRENT_TIME)
 	Gtk::Gdk::DragContext	context
 	guint32	time
 
 void
-gdk_drag_abort (context, time)
+gdk_drag_abort (context, time=GDK_CURRENT_TIME)
 	Gtk::Gdk::DragContext	context
 	guint32	time
 
@@ -314,6 +315,8 @@ suggested_action (context)
 	OUTPUT:
 	RETVAL
 
+ #OUTPUT: list
+ #RETURNS: a list of targets (integers)
 void
 targets (context)
 	Gtk::Gdk::DragContext	context
@@ -330,7 +333,7 @@ targets (context)
 MODULE = Gtk12		PACKAGE = Gtk::Gdk::DragContext		PREFIX = gtk_drag_
 
 void
-gtk_drag_finish(context, success, del, time)
+gtk_drag_finish(context, success, del, time=GDK_CURRENT_TIME)
 	Gtk::Gdk::DragContext	context
 	gboolean	success
 	gboolean	del
@@ -675,6 +678,12 @@ gtk_widget_add_events (widget, events)
 
 MODULE = Gtk12		PACKAGE = Gtk::FontSelection	PREFIX = gtk_font_selection_
 
+ #ARG: $foundries reference (reference to an array of foundries; may be undef)
+ #ARG: $weights reference (reference to an array of weights; may be undef)
+ #ARG: $slants reference (reference to an array of slants; may be undef)
+ #ARG: $setwidths reference (reference to an array of setwidths; may be undef)
+ #ARG: $spacings reference (reference to an array of spacings; may be undef)
+ #ARG: $charsets reference (reference to an array of charsets; may be undef)
 void
 gtk_font_selection_set_filter (fsel, filter_type, font_type, foundries, weights, slants, setwidths, spacings, charsets)
 	Gtk::FontSelection	fsel
@@ -689,6 +698,12 @@ gtk_font_selection_set_filter (fsel, filter_type, font_type, foundries, weights,
 
 MODULE = Gtk12		PACKAGE = Gtk::FontSelectionDialog	PREFIX = gtk_font_selection_dialog_
 
+ #ARG: $foundries reference (reference to an array of foundries; may be undef)
+ #ARG: $weights reference (reference to an array of weights; may be undef)
+ #ARG: $slants reference (reference to an array of slants; may be undef)
+ #ARG: $setwidths reference (reference to an array of setwidths; may be undef)
+ #ARG: $spacings reference (reference to an array of spacings; may be undef)
+ #ARG: $charsets reference (reference to an array of charsets; may be undef)
 void
 gtk_font_selection_dialog_set_filter (fsel, filter_type, font_type, foundries, weights, slants, setwidths, spacings, charsets)
 	Gtk::FontSelectionDialog	fsel

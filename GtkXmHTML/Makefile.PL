@@ -113,6 +113,9 @@ Makefile: ' . join(' ',
 build/PerlGtkXmHTMLExt.h build/PerlGtkXmHTMLExt.c build/PerlGtkXmHTMLInt.h: build/GtkXmHTMLDefs.h ../tools/genext.pl
 	$(PERL) ../tools/genext.pl GtkXmHTML </dev/null
 
+gendoc:
+	../tools/gendoc.pl -t gtkxmkhtml $(XS_FILES)
+
 ';
 
 
