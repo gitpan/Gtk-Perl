@@ -22,7 +22,7 @@ SvGtkItemFactoryEntry(SV *data) {
 			(SvTYPE(SvRV(data)) != SVt_PVHV && SvTYPE(SvRV(data)) != SVt_PVAV))
 		return NULL;
 
-	e = alloc_temp(sizeof(GtkItemFactoryEntry));
+	e = pgtk_alloc_temp(sizeof(GtkItemFactoryEntry));
 	memset(e,0,sizeof(GtkItemFactoryEntry));
 
 	/* path, accelerator, callback_action, item_type */

@@ -30,106 +30,102 @@ static HV * ObjectCache = 0;
   */
 
 #define TRY_MM
-#if GTK_HVER >= 0x010200
-#define USE_TYPE_QUERY
-#endif
 #undef DEBUG_TYPES
 
-HV * gtname_by_ptname = 0;
-HV * ptname_by_gtname = 0;
-AV * ptname_by_gtnumber = 0;
-HV * gtnumber_by_ptname = 0;
-HV * gtinit_by_gtname = 0;
-HV * gtosize_by_gtname = 0;
-HV * gtcsize_by_gtname = 0;
+static GHashTable * gtname_by_ptname = NULL;
+static GHashTable * ptname_by_gtname = NULL;
+static GHashTable * ptname_by_gtnumber = NULL;
+static GHashTable * gtnumber_by_ptname = NULL;
+static GHashTable * gtinit_by_gtname = NULL;
 
-void complete_types(int gtkTypeNumber, char * perlTypeName, SV * svPerlTypeName)
+static void complete_types(int gtkTypeNumber, char * perlTypeName)
 {
 	dTHR;
 
-	SV ** result;
+	char* result;
+	/*SV * svPerlTypeName = NULL;*/
+	GtkType parent;
 	
 	if (!perlTypeName)
-		perlTypeName = SvPV(svPerlTypeName, PL_na);
-	
+		die("No perlname for %s\n", gtk_type_name(gtkTypeNumber));
+#if 0
 	if (!svPerlTypeName) {
 		char * gtkTypeName = gtk_type_name(gtkTypeNumber);
 	
-		result = hv_fetch(ptname_by_gtname, gtkTypeName, strlen(gtkTypeName), 0);
+		result = g_hash_table_lookup(ptname_by_gtname, gtkTypeName);
 		
-		if (!result || !SvOK(*result)) /* Weird */
+		if (!result) /* Weird */
 			return; 
 		
-		svPerlTypeName = *result;
+		svPerlTypeName = newSVpv(result, 0);
 	}
 
 	if (!ptname_by_gtnumber)
 		ptname_by_gtnumber = newAV();
-		
+
 	av_store(ptname_by_gtnumber, GTK_TYPE_SEQNO(gtkTypeNumber), svPerlTypeName);
-
-	if (!gtnumber_by_ptname)
-		gtnumber_by_ptname = newHV();
-
-	hv_store(gtnumber_by_ptname, perlTypeName, strlen(perlTypeName), newSViv(gtkTypeNumber), 0);
-
-#ifdef DEBUG_TYPES
-	printf("complete_types(%d, %s)\n", gtkTypeNumber, perlTypeName);
 #endif
 
+	if (!ptname_by_gtnumber)
+		ptname_by_gtnumber = g_hash_table_new(g_direct_hash, g_direct_equal);
+		
+	g_hash_table_insert(ptname_by_gtnumber, GUINT_TO_POINTER(GTK_TYPE_SEQNO(gtkTypeNumber)), perlTypeName);
+
+	if (!gtnumber_by_ptname)
+		gtnumber_by_ptname = g_hash_table_new(g_str_hash, g_str_equal);
+
+	g_hash_table_insert(gtnumber_by_ptname, perlTypeName, GUINT_TO_POINTER(gtkTypeNumber));
+	/* no more needed 
+	g_hash_table_remove(gtinit_by_gtname, gtk_type_name(gtkTypeNumber));*/
+
+#ifdef DEBUG_TYPES
+	printf("complete_types(%d, %s, %d)\n", gtkTypeNumber, perlTypeName, GTK_TYPE_SEQNO(gtkTypeNumber));
+#endif
+#if 0
+	parent = gtk_type_parent(gtkTypeNumber);
+	if (parent) {
+		char* parentname = ptname_for_gtnumber(parent);
+		if (parentname) {
+			char *isa_name = g_strdup_printf("%s::ISA", perlTypeName);
+			AV * isa = perl_get_av (isa_name, TRUE);
+			av_push (isa, newSVpv(parentname, 0));
+			g_free(isa_name);
+		} else {
+			warn("No perl parent for %s\n", perlTypeName);
+		}
+	}
+#endif
 }
 
-void link_types(char * gtkName, char * perlName, int gtkTypeNumber, gtkTypeInitFunc ifunc, int obj_size, int class_size)
+void pgtk_link_types(char * gtkName, char * perlName, int gtkTypeNumber, gtkTypeInitFunc ifunc)
 {
-	SV * perlnamesv = newSVpv(perlName, 0);
-	SV * gtknamesv = newSVpv(gtkName, 0);
+	/*SV * perlnamesv = newSVpv(perlName, 0);
+	SV * gtknamesv = newSVpv(gtkName, 0);*/
 	
 #ifdef DEBUG_TYPES
-	printf("link_types(%s, %s, %d,)\n", gtkName, perlName, gtkTypeNumber);
+	printf("link_types(%s, %s, %d)\n", gtkName, perlName, gtkTypeNumber);
 #endif
 
 	if (!gtname_by_ptname)
-		gtname_by_ptname = newHV();
-	hv_store(gtname_by_ptname, perlName, strlen(perlName), gtknamesv, 0);
+		gtname_by_ptname = g_hash_table_new(g_str_hash, g_str_equal);
+	g_hash_table_insert(gtname_by_ptname, perlName, gtkName);
 
 	if (!ptname_by_gtname)
-		ptname_by_gtname = newHV();
-	hv_store(ptname_by_gtname, gtkName, strlen(gtkName), perlnamesv, 0);
+		ptname_by_gtname = g_hash_table_new(g_str_hash, g_str_equal);
+	g_hash_table_insert(ptname_by_gtname, gtkName, perlName);
 	
 	if (gtkTypeNumber) {
-		complete_types(gtkTypeNumber, perlName, perlnamesv);
+		complete_types(gtkTypeNumber, perlName);
 	}
 	
 	if (!gtinit_by_gtname)
-		gtinit_by_gtname = newHV();
-	hv_store(gtinit_by_gtname, gtkName, strlen(gtkName), newSViv((long)ifunc), 0);
+		gtinit_by_gtname = g_hash_table_new(g_str_hash, g_str_equal);
+	g_hash_table_insert(gtinit_by_gtname, gtkName, ifunc);
 
-#ifndef USE_TYPE_QUERY
-	if (!gtosize_by_gtname)
-		gtosize_by_gtname = newHV();
-	hv_store(gtosize_by_gtname, gtkName, strlen(gtkName), newSViv(obj_size), 0);
-
-	if (!gtcsize_by_gtname)
-		gtcsize_by_gtname = newHV();
-	hv_store(gtcsize_by_gtname, gtkName, strlen(gtkName), newSViv(class_size), 0);
-#endif
 }
 
 int obj_size_for_gtname(char * gtkTypeName)
 {
-#ifndef USE_TYPE_QUERY
-	SV ** result;
-
-	if (!gtosize_by_gtname)
-		result = 0;
-	else
-		result = hv_fetch(gtosize_by_gtname, gtkTypeName, strlen(gtkTypeName), 0);
-	
-	if (!result || !SvOK(*result))
-		return 0;
-	else
-		return SvIV(*result);
-#else
 	GtkTypeQuery * q;
 	GtkType type;
 	gint size;
@@ -141,24 +137,10 @@ int obj_size_for_gtname(char * gtkTypeName)
 	size = q->object_size;
 	g_free(q);
 	return size;
-#endif
 }
 
 int class_size_for_gtname(char * gtkTypeName)
 {
-#ifndef USE_TYPE_QUERY
-	SV ** result;
-
-	if (!gtcsize_by_gtname)
-		result = 0;
-	else
-		result = hv_fetch(gtcsize_by_gtname, gtkTypeName, strlen(gtkTypeName), 0);
-	
-	if (!result || !SvOK(*result))
-		return 0;
-	else
-		return SvIV(*result);
-#else
 	GtkTypeQuery * q;
 	GtkType type;
 	gint size;
@@ -170,24 +152,17 @@ int class_size_for_gtname(char * gtkTypeName)
 	size = q->class_size;
 	g_free(q);
 	return size;
-#endif
 }
 
 char * ptname_for_gtname(char * gtkTypeName)
 {
-	dTHR;
-
 	char * perlTypeName = 0;
-	SV ** result;
 
 	if (!ptname_by_gtname)
-		result = 0;
+		return 0;
 	else
-		result = hv_fetch(ptname_by_gtname, gtkTypeName, strlen(gtkTypeName), 0);
+		perlTypeName = g_hash_table_lookup(ptname_by_gtname, gtkTypeName);
 	
-	if (result && SvOK(*result))
-		perlTypeName = SvPV(*result, PL_na);
-
 #ifdef DEBUG_TYPES
 	printf("ptname_for_gtname(%s) = %s\n", perlTypeName);
 #endif
@@ -197,19 +172,13 @@ char * ptname_for_gtname(char * gtkTypeName)
 
 char * gtname_for_ptname(char * perlTypeName)
 {
-	dTHR;
-	
 	char * gtkTypeName = 0;
-	SV ** result;
 
 	if (!gtname_by_ptname)
-		result = 0;
+		return 0;
 	else
-		result = hv_fetch(gtname_by_ptname, perlTypeName, strlen(perlTypeName), 0);
+		gtkTypeName = g_hash_table_lookup(gtname_by_ptname, perlTypeName);
 	
-	if (result && SvOK(*result))
-		gtkTypeName = SvPV(*result, PL_na);
-
 #ifdef DEBUG_TYPES
 	printf("gtname_for_ptname(%s) = %s\n", gtkTypeName);
 #endif
@@ -222,7 +191,7 @@ char * ptname_for_gtnumber(int gtkTypeNumber)
 {
 	dTHR;
 
-	SV ** result;
+	char * result;
 	char * perlTypeName;
 
 #ifdef DEBUG_TYPES
@@ -232,9 +201,10 @@ char * ptname_for_gtnumber(int gtkTypeNumber)
 	if (!ptname_by_gtnumber)
 		result = 0;
 	else
-		result = av_fetch(ptname_by_gtnumber, GTK_TYPE_SEQNO(gtkTypeNumber), 0);
+		/*result = av_fetch(ptname_by_gtnumber, GTK_TYPE_SEQNO(gtkTypeNumber), 0);*/
+		result = g_hash_table_lookup(ptname_by_gtnumber, GUINT_TO_POINTER(GTK_TYPE_SEQNO(gtkTypeNumber)));
 		
-	if (!result || !SvOK(*result)) {
+	if (!result /*|| !SvOK(*result)*/) {
 		char * gtkTypeName;
 
 		/* Type we haven't seen yet */
@@ -244,17 +214,16 @@ char * ptname_for_gtnumber(int gtkTypeNumber)
 
 		gtkTypeName = gtk_type_name(gtkTypeNumber);
 
-		result = hv_fetch(ptname_by_gtname, gtkTypeName, strlen(gtkTypeName), 0);
+		perlTypeName = g_hash_table_lookup(ptname_by_gtname, gtkTypeName);
 		
-		if (!result || !SvOK(*result)) /* Weird */
+		if (!perlTypeName) /* Weird */
 			return 0; 
 
-		perlTypeName = SvPV(*result, PL_na);
-
-		complete_types(gtkTypeNumber, 0, *result);
+		complete_types(gtkTypeNumber, perlTypeName);
 	
 	} else
-		perlTypeName = SvPV(*result, PL_na);
+		/*perlTypeName = SvPV(*result, PL_na);*/
+		perlTypeName = result;
 	
 #ifdef DEBUG_TYPES
 	printf("%s\n", perlTypeName);
@@ -265,22 +234,18 @@ char * ptname_for_gtnumber(int gtkTypeNumber)
 
 int gtnumber_for_ptname(char * perlTypeName)
 {
-	dTHR;
-
-	SV ** result;
 	int gtkTypeNumber;
 
 #ifdef DEBUG_TYPES
 	printf("gtnumber_for_ptname(%s) =", perlTypeName);
 #endif
 	
-	/*if (!ptname_by_gtnumber)*/
 	if (!gtnumber_by_ptname)
-		result = 0;
+		gtkTypeNumber = 0;
 	else
-		result = hv_fetch(gtnumber_by_ptname, perlTypeName, strlen(perlTypeName), 0);
+		gtkTypeNumber = GPOINTER_TO_UINT(g_hash_table_lookup(gtnumber_by_ptname, perlTypeName));
 
-	if (!result || !SvOK(*result)) {
+	if (!gtkTypeNumber) {
 		char * gtkTypeName;
 		gtkTypeInitFunc tif;
 
@@ -289,27 +254,24 @@ int gtnumber_for_ptname(char * perlTypeName)
 		if (!ptname_by_gtname || !gtinit_by_gtname) /* Weird */
 			return 0;
 		
-		result = hv_fetch(gtname_by_ptname, perlTypeName, strlen(perlTypeName), 0);
+		gtkTypeName = g_hash_table_lookup(gtname_by_ptname, perlTypeName);
 		
-		if (!result || !SvOK(*result)) /* Weird */
+		if (!gtkTypeName) /* Weird */
 			return 0; 
 		
-		gtkTypeName = SvPV(*result, PL_na);
+		tif = (gtkTypeInitFunc)g_hash_table_lookup(gtinit_by_gtname, gtkTypeName);
 		
-		result = hv_fetch(gtinit_by_gtname, gtkTypeName, strlen(gtkTypeName), 0);
-		
-		if (!result || !SvOK(*result)) /* Weird */
+		if (!tif) /* Weird */
 			return 0; 
 		
-		tif = (gtkTypeInitFunc)SvIV(*result);
+#ifdef DEBUG_TYPES
+	printf("creating C class for %s\n", perlTypeName);
+#endif
 
 		gtkTypeNumber = tif();
 
-		complete_types(gtkTypeNumber, perlTypeName, 0);
-		/* no more needed */
-		hv_delete(gtinit_by_gtname, gtkTypeName, strlen(gtkTypeName), G_DISCARD);
-	} else
-		gtkTypeNumber = SvIV(*result);
+		complete_types(gtkTypeNumber, perlTypeName);
+	}
 
 #ifdef DEBUG_TYPES
 	printf("%d\n", gtkTypeNumber);
@@ -320,7 +282,6 @@ int gtnumber_for_ptname(char * perlTypeName)
 
 int gtnumber_for_gtname(char * gtkTypeName)
 {
-	SV ** result;
 	int gtkTypeNumber;
 	
 #ifdef DEBUG_TYPES
@@ -338,21 +299,19 @@ int gtnumber_for_gtname(char * gtkTypeName)
 		if (!gtinit_by_gtname)
 			return 0;
 					
-		result = hv_fetch(gtinit_by_gtname, gtkTypeName, strlen(gtkTypeName), 0);
+		tif = (gtkTypeInitFunc)g_hash_table_lookup(gtinit_by_gtname, gtkTypeName);
 		
-		if (!result || !SvOK(*result)) /* Weird */
+		if (!tif) /* Weird */
 			return 0; 
-		
-		tif = (gtkTypeInitFunc)SvIV(*result);
 
 		gtkTypeNumber = tif();
 
-		result = hv_fetch(ptname_by_gtname, gtkTypeName, strlen(gtkTypeName), 0);
+		perlTypeName = g_hash_table_lookup(ptname_by_gtname, gtkTypeName);
 		
-		if (!result || !SvOK(*result)) /* Weird */
+		if (!perlTypeName) /* Weird */
 			return 0; 
 
-		complete_types(gtkTypeNumber, 0, *result);
+		complete_types(gtkTypeNumber, perlTypeName);
 
 	} 
 
@@ -704,7 +663,7 @@ GtkObject * SvGtkObjectRef(SV * o, char * name)
 	return (GtkObject*)SvIV(*r);
 }
 
-static void menu_callback (GtkWidget *widget, gpointer user_data)
+void pgtk_menu_callback (GtkWidget *widget, gpointer user_data)
 {
 	SV * handler = (SV*)user_data;
 	int i;
@@ -736,7 +695,7 @@ GtkMenuEntry * SvGtkMenuEntry(SV * data, GtkMenuEntry * e)
 		return 0;
 	
 	if (!e)
-		e = alloc_temp(sizeof(GtkMenuEntry));
+		e = pgtk_alloc_temp(sizeof(GtkMenuEntry));
 
 	h = (HV*)SvRV(data);
 	
@@ -756,7 +715,7 @@ GtkMenuEntry * SvGtkMenuEntry(SV * data, GtkMenuEntry * e)
 		e->widget = 0;
 		/*croak("menu entry must contain widget");*/
 	if ((s=hv_fetch(h, "callback", 8, 0)) && SvOK(*s)) {
-		e->callback = menu_callback;
+		e->callback = pgtk_menu_callback;
 		e->callback_data = newSVsv(*s);
 	}
 	else {
@@ -786,7 +745,7 @@ SV * newSVGtkMenuEntry(GtkMenuEntry * e)
 	hv_store(h, "accelerator", 11, e->accelerator ? newSVpv(e->accelerator,0) : newSVsv(&PL_sv_undef), 0);
 	hv_store(h, "widget", 6, e->widget ? newSVGtkObjectRef(GTK_OBJECT(e->widget), 0) : newSVsv(&PL_sv_undef), 0);
 	hv_store(h, "callback", 11, 
-		((e->callback == menu_callback) && e->callback_data) ?
+		((e->callback == pgtk_menu_callback) && e->callback_data) ?
 		newSVsv(e->callback_data) :
 		newSVsv(&PL_sv_undef)
 		, 0);
@@ -933,6 +892,23 @@ void AddTypeHelper(struct PerlGtkTypeHelper * n)
 	h->next = n;
 }
 
+#ifndef aTHX_
+#define aTHX_
+#endif
+
+#ifndef pTHX_
+#define pTHX_
+#endif
+
+static SV*
+Perl_newSVuv_pgtk(pTHX_ UV val) {
+	SV *res = newSViv(0);
+	Perl_sv_setuv(aTHX_ res, val);
+	return res;
+}
+
+#define newSVuv_pgtk(a) Perl_newSVuv_pgtk(aTHX_ a)
+
 SV * GtkGetArg(GtkArg * a)
 {
 	SV * result = 0;
@@ -940,9 +916,9 @@ SV * GtkGetArg(GtkArg * a)
 		case GTK_TYPE_CHAR:	result = newSViv(GTK_VALUE_CHAR(*a)); break;
 		case GTK_TYPE_BOOL:	result = newSViv(GTK_VALUE_BOOL(*a)); break;
 		case GTK_TYPE_INT:	result = newSViv(GTK_VALUE_INT(*a)); break;
-		case GTK_TYPE_UINT:	result = newSViv(GTK_VALUE_UINT(*a)); break;
+		case GTK_TYPE_UINT:	result = newSVuv_pgtk(GTK_VALUE_UINT(*a)); break;
 		case GTK_TYPE_LONG:	result = newSViv(GTK_VALUE_LONG(*a)); break;
-		case GTK_TYPE_ULONG:	result = newSViv(GTK_VALUE_ULONG(*a)); break;
+		case GTK_TYPE_ULONG:	result = newSVuv_pgtk(GTK_VALUE_ULONG(*a)); break;
 		case GTK_TYPE_FLOAT:	result = newSVnv(GTK_VALUE_FLOAT(*a)); break;	
 		case GTK_TYPE_DOUBLE:	result = newSVnv(GTK_VALUE_DOUBLE(*a)); break;	
 		case GTK_TYPE_STRING:	result = GTK_VALUE_STRING(*a) ? newSVpv(GTK_VALUE_STRING(*a),0) : newSVsv(&PL_sv_undef); break;
@@ -1041,9 +1017,9 @@ void GtkSetArg(GtkArg * a, SV * v, SV * Class, GtkObject * Object)
 		case GTK_TYPE_CHAR:		GTK_VALUE_CHAR(*a) = SvIV(v); break;
 		case GTK_TYPE_BOOL:		GTK_VALUE_BOOL(*a) = SvIV(v); break;
 		case GTK_TYPE_INT:		GTK_VALUE_INT(*a) = SvIV(v); break;
-		case GTK_TYPE_UINT:		GTK_VALUE_UINT(*a) = SvIV(v); break;
+		case GTK_TYPE_UINT:		GTK_VALUE_UINT(*a) = SvUV(v); break;
 		case GTK_TYPE_LONG:		GTK_VALUE_LONG(*a) = SvIV(v); break;
-		case GTK_TYPE_ULONG:	GTK_VALUE_ULONG(*a) = SvIV(v); break;
+		case GTK_TYPE_ULONG:	GTK_VALUE_ULONG(*a) = SvUV(v); break;
 		case GTK_TYPE_FLOAT:	GTK_VALUE_FLOAT(*a) = SvNV(v); break;	
 		case GTK_TYPE_DOUBLE:	GTK_VALUE_DOUBLE(*a) = SvNV(v); break;	
 		case GTK_TYPE_STRING:	GTK_VALUE_STRING(*a) = g_strdup(SvPV(v,PL_na)); break;
@@ -1158,9 +1134,9 @@ void GtkSetRetArg(GtkArg * a, SV * v, SV * Class, GtkObject * Object)
 		case GTK_TYPE_CHAR:		*GTK_RETLOC_CHAR(*a) = SvIV(v); break;
 		case GTK_TYPE_BOOL:		*GTK_RETLOC_BOOL(*a) = SvIV(v); break;
 		case GTK_TYPE_INT:		*GTK_RETLOC_INT(*a) = SvIV(v); break;
-		case GTK_TYPE_UINT:		*GTK_RETLOC_UINT(*a) = SvIV(v); break;
+		case GTK_TYPE_UINT:		*GTK_RETLOC_UINT(*a) = SvUV(v); break;
 		case GTK_TYPE_LONG:		*GTK_RETLOC_LONG(*a) = SvIV(v); break;
-		case GTK_TYPE_ULONG:	*GTK_RETLOC_ULONG(*a) = SvIV(v); break;
+		case GTK_TYPE_ULONG:	*GTK_RETLOC_ULONG(*a) = SvUV(v); break;
 		case GTK_TYPE_FLOAT:	*GTK_RETLOC_FLOAT(*a) = SvNV(v); break;	
 		case GTK_TYPE_DOUBLE:	*GTK_RETLOC_DOUBLE(*a) = SvNV(v); break;	
 		case GTK_TYPE_STRING:	*GTK_RETLOC_STRING(*a) = SvPV(v,PL_na); break;
@@ -1219,9 +1195,9 @@ SV * GtkGetRetArg(GtkArg * a)
 		case GTK_TYPE_CHAR:		result = newSViv(*GTK_RETLOC_CHAR(*a)); break;
 		case GTK_TYPE_BOOL:		result = newSViv(*GTK_RETLOC_BOOL(*a)); break;
 		case GTK_TYPE_INT:		result = newSViv(*GTK_RETLOC_INT(*a)); break;
-		case GTK_TYPE_UINT:		result = newSViv(*GTK_RETLOC_UINT(*a)); break;
+		case GTK_TYPE_UINT:		result = newSVuv_pgtk(*GTK_RETLOC_UINT(*a)); break;
 		case GTK_TYPE_LONG:		result = newSViv(*GTK_RETLOC_LONG(*a)); break;
-		case GTK_TYPE_ULONG:	result = newSViv(*GTK_RETLOC_ULONG(*a)); break;
+		case GTK_TYPE_ULONG:	result = newSVuv_pgtk(*GTK_RETLOC_ULONG(*a)); break;
 		case GTK_TYPE_FLOAT:	result = newSVnv(*GTK_RETLOC_FLOAT(*a)); break;	
 		case GTK_TYPE_DOUBLE:	result = newSVnv(*GTK_RETLOC_DOUBLE(*a)); break;	
 		case GTK_TYPE_STRING:	result = newSVpv(*GTK_RETLOC_STRING(*a),0); break;
@@ -1290,7 +1266,7 @@ GdkGeometry* SvGdkGeometry (SV* data) {
 		
 	h = (HV*)SvRV(data);
 
-	g = alloc_temp(sizeof(GdkGeometry));
+	g = pgtk_alloc_temp(sizeof(GdkGeometry));
 	memset(g, 0, sizeof(GdkGeometry));
 	/* FIXME */
 
@@ -1338,7 +1314,7 @@ SvGtkTargetEntry(SV * data) {
 	if ((!data) || (!SvOK(data)) || (!SvRV(data)) || 
 			(SvTYPE(SvRV(data)) != SVt_PVHV && SvTYPE(SvRV(data)) != SVt_PVAV))
 		return NULL;
-	e = alloc_temp(sizeof(GtkTargetEntry));
+	e = pgtk_alloc_temp(sizeof(GtkTargetEntry));
 	memset(e,0,sizeof(GtkTargetEntry));
 
 	if (SvTYPE(SvRV(data)) == SVt_PVHV) {

@@ -33,6 +33,10 @@ development of and with Gtk-Perl: gtk-perl-list@gnome.org.
 To subscribe to this list, send "subscribe" in the subject to
 gtk-perl-list-request@gnome.org.
 
+Starting with version 0.7005 the toplevel makefile will try to autodetect
+what sub-modules can be compiled on your system and do that automatically for you
+taking into account the dependencies of the modules.
+
 Starting with version 0.7000 of this package, each submodule must be compiled
 separately: this allows for greater flexibility and lower memory usage.
 Gnome requires GdkImlib support build first.
@@ -40,6 +44,7 @@ To compile each package, run "perl Makefile.PL; make; make install" in each subd
 starting from the base dir (the Gtk submodule, required by all the others).
 At the time of this writing the submodules supported are:
 ./ (Gtk), GdkImlib, Gnome, GtkXmHTML, GtkGLArea, Glade.
+
 See the INSTALL file for more details on installing this package.
 
 This setup may require changes in the source code of existing programs, ie

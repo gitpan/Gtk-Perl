@@ -1,49 +1,27 @@
 use ExtUtils::MakeMaker;
-use File::Basename;
-use blib '..';
-use Gtk::Install::Files;
+use blib '../Gtk';
 use Cwd;
 require '../Depends.pm';
-import ExtUtils::Depends;
 require '../tools/gendefs.pl';
 
-#eval {require '../build/IFiles.pm'};
-#warn ("Using installed Gtk\n"), require Gtk::Install::Files if $@;
-
-#$Gtk::Install::Files::CORE = cwd()."../build" unless $Gtk::Install::Files::CORE;
+$gpb = new ExtUtils::Depends('Gtk::Gdk::Pixbuf', 'Gtk');
 
 mkdir('build', 0777);
 
-$pm = {};
+$gpb->set_inc (`gdk-pixbuf-config --cflags`);
+$gpb->set_libs (`gdk-pixbuf-config --libs`);
 
-$inc = `gdk-pixbuf-config --cflags`;
-chomp($inc);
-$libs = `gdk-pixbuf-config --libs`;
-chomp($libs);
+$gpb->add_typemaps (cwd() . '/pkg.typemap', cwd().'/build/GdkPixbufTypemap');
+$gpb->add_headers (qw( <gdk-pixbuf/gdk-pixbuf-loader.h> ));
 
-@typemaps = @Gtk::Install::Files::typemaps;
-$typemaps = [cwd() . '/pkg.typemap', cwd().'/build/GdkPixbufTypemap'];
-@headers = ('"build/GdkPixbufTypes.h"');
+$gpb->save_config( 'build/Files.pm');
+$gpb->install( 'build/Files.pm');
 
-ExtUtils::Depends::save_config('Gtk::Gdk::Pixbuf', 'build/IFiles.pm', $inc, $libs, 
-	$typemaps, [keys %defs], [@defines], [@headers], $pm);
+$gpb->add_pm('GdkPixbuf.pm' => '$(INST_ARCHLIBDIR)/Pixbuf.pm');
 
-foreach (@typemaps) {
-	print "Add typemap: $Gtk::Install::Files::CORE/$_\n";
-	push(@$typemaps, cwd() .'/'.$Gtk::Install::Files::CORE . '/'. $_);
-}
-
-push(@defines, @Gtk::Install::Files::defines);
-push(@defines, "-I$Gtk::Install::Files::CORE");
-push(@defines, '-Ibuild');
-
-$pm->{'GdkPixbuf.pm'} = '$(INST_ARCHLIBDIR)/Pixbuf.pm';
-#$pm->{'GdkImlibTypes.h'} = '$(INST_ARCHLIBDIR)/ImlibImage/Install/'.'GdkImlibTypes.h';
-
-add_c('build/GdkPixbufDefs.c');
-add_defs('pkg.defs');
-add_raw_xs ('xs/GdkPixbuf.xs');
-add_headers (qw( <gdk-pixbuf/gdk-pixbuf-loader.h> ));
+$gpb->add_c('build/GdkPixbufDefs.c');
+$gpb->add_defs('pkg.defs');
+$gpb->add_xs ('xs/GdkPixbuf.xs');
 
 @a = ( '-f', 'GdkPixbuf',
 	'-p', 'Gtk=Gtk',
@@ -51,50 +29,37 @@ add_headers (qw( <gdk-pixbuf/gdk-pixbuf-loader.h> ));
 	'-p', 'Gdk=Gtk::Gdk',
 	'-m', 'Gtk::Gdk::Pixbuf');
 
-%defs = %ExtUtils::Depends::defs;
-%headers = %ExtUtils::Depends::headers;
-foreach (sort {$defs{$a} <=> $defs{$b}} keys %defs) {
+foreach ($gpb->get_defs) {
         push @a, '-d', $_;
 }
-foreach (sort {$headers{$a} <=> $headers{$b}} keys %headers) {
+foreach ($gpb->get_headers) {
         push @a, '-i', $_;
 }
 
-add_raw_xs(gendefs::gendefs(@a));
-
-($xfiles, $object, $ldfrom) = setup_xs();
+$gpb->add_xs(gendefs::gendefs(@a));
 
 $depend = { 'build/GdkPixbufDefs.c' => 'build/GdkPixbufDefs.h build/PerlGdkPixbufInt.h' };
 
-foreach (qw( build/GdkPixbufDefs.h build/PerlGdkPixbufInt.h)) {
-        $pm->{$_} = '$(INST_ARCHLIBDIR)/'. basename($_);
-}
+$gpb->install (qw( build/GdkPixbufDefs.h build/PerlGdkPixbufInt.h));
+$gpb->write_ext("build/extension.xsh");
 
-write_ext();
-
-@clean = qw(
-	build/IFiles.pm build/perl-gdkpixbuf-ref.pod
-);
-push(@clean, @ExtUtils::Depends::clean);
+$gpb->add_clean ( map {"build/$_"} qw(
+Files.pm	 GdkPixbufTypemap    PerlGdkPixbufInt.h  perl-gdkpixbuf-ds.pod
+GdkPixbufDefs.c  GdkPixbufTypes.pm   boxed.xsh		 perl-gdkpixbuf-ref.xml
+GdkPixbufDefs.h  PerlGdkPixbufExt.c  extension.xsh
+GdkPixbufDefs.o  PerlGdkPixbufExt.h  objects.xsh
+));
 
 # documentation
 gendefs::gen_doc('gdkpixbuf');
 system("../tools/gendoc.pl", "-t", 'gdkpixbuf', keys %ExtUtils::Depends::xs);
 
-
 WriteMakefile(
 	'NAME'      => 'Gtk::Gdk::Pixbuf',
 	'VERSION_FROM'	=> 'GdkPixbuf.pm',
-	'PM' => $pm,
-	'TYPEMAPS' => $typemaps,
-	'XS' => $xfiles,
 	'XSOPT' => '-noversioncheck',
-	'DEFINE'    => join(' ',@defines),
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
-	'INC' => $inc,
-	'LIBS' => [$libs],
-	'OBJECT' => $object,
-	'clean' => {FILES => join(' ', @clean) },
+	$gpb->get_makefile_vars,
 );
 
 sub MY::postamble {
@@ -114,7 +79,6 @@ gendoc:
 ';
 
 }
-
 
 sub MY::c_o {
 	package MY; # so that "SUPER" works right

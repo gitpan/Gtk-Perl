@@ -5,7 +5,7 @@
 
 #include "GtkDefs.h"
 
-void selection_handler(GtkWidget *widget, GtkSelectionData *selection_data,
+static void selection_handler(GtkWidget *widget, GtkSelectionData *selection_data,
 		       gpointer data)
 {
 	AV * args = (AV *)data;
@@ -24,7 +24,7 @@ void selection_handler(GtkWidget *widget, GtkSelectionData *selection_data,
 }
 
 
-void selection_handler_remove (gpointer data)
+static void selection_handler_remove (gpointer data)
 {
 	AV * args = (AV *)data;
 	SvREFCNT_dec(args);

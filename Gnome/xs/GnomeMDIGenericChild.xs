@@ -10,8 +10,8 @@
 
 /*#include "MiscTypes.h"*/
 
-extern void generic_handler(GtkObject * object, gpointer data, guint n_args, GtkArg * args);
-extern void destroy_handler(gpointer data);
+extern void pgtk_generic_handler(GtkObject * object, gpointer data, guint n_args, GtkArg * args);
+extern void pgtk_destroy_handler(gpointer data);
 
 MODULE = Gnome::MDIGenericChild		PACKAGE = Gnome::MDIGenericChild		PREFIX = gnome_mdi_generic_child_
 
@@ -37,7 +37,7 @@ gnome_mdi_generic_child_set_view_creator (mdi_child, handler, ...)
 		args = newAV();
 		PackCallbackST(args, 1);
 		gnome_mdi_generic_child_set_view_creator_full (mdi_child, NULL, 
-			generic_handler, (gpointer)args, destroy_handler);
+			pgtk_generic_handler, (gpointer)args, pgtk_destroy_handler);
 	}
 
 void
@@ -51,7 +51,7 @@ gnome_mdi_generic_child_set_menu_creator (mdi_child, handler, ...)
 		args = newAV();
 		PackCallbackST(args, 1);
 		gnome_mdi_generic_child_set_menu_creator_full (mdi_child, NULL, 
-			generic_handler, (gpointer)args, destroy_handler);
+			pgtk_generic_handler, (gpointer)args, pgtk_destroy_handler);
 	}
 
 void
@@ -65,7 +65,7 @@ gnome_mdi_generic_child_set_config_func (mdi_child, handler, ...)
 		args = newAV();
 		PackCallbackST(args, 1);
 		gnome_mdi_generic_child_set_config_func_full (mdi_child, NULL, 
-			generic_handler, (gpointer)args, destroy_handler);
+			pgtk_generic_handler, (gpointer)args, pgtk_destroy_handler);
 	}
 
 void
@@ -79,7 +79,7 @@ gnome_mdi_generic_child_set_label_func (mdi_child, handler, ...)
 		args = newAV();
 		PackCallbackST(args, 1);
 		gnome_mdi_generic_child_set_label_func_full (mdi_child, NULL, 
-			generic_handler, (gpointer)args, destroy_handler);
+			pgtk_generic_handler, (gpointer)args, pgtk_destroy_handler);
 	}
 
 

@@ -8,7 +8,6 @@ use Gtk::XmHTML;
 use LWP::UserAgent;
 
 init Gnome "html.pl";
-init Gtk::XmHTML;
 
 $start = shift || 'http://localhost/';
 print "start: $start\n";

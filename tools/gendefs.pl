@@ -39,6 +39,7 @@ sub perlize {
 #	s/^Gdk/Gtk::Gdk::/;
 	foreach $p (@prefix) {
 		my($f, $t) = @{$p};
+		next if /^${t}::/;
 		s/^$f/${t}::/;
 	}
 	$_;
@@ -74,6 +75,13 @@ sub oldtypeize {
 	s/^GDK_/GTK_TYPE_GDK_/;
 	$_;
 }
+
+%opt = ();
+%enum = ();
+%boxed = ();
+%flags = ();
+%struct = ();
+%object = ();
 
 # Record command line options
 for ($i=0;$i<@ARGV;$i++) {
@@ -113,6 +121,7 @@ $Lazy = $opt{'L'} || 0;
 
 # Read all supplied definition files
 foreach $file (@{$opt{"d"}}) {
+	warn "Loading $file\n";
 	if ($file =~ m!^(.*/)!) {
 		$_ .= "\n(set-directory \"$1\")\n";
 	}
@@ -567,9 +576,10 @@ foreach (sort keys %object) {
 #include "XSUB.h"
 
 EOT
-		if ($FilePrefix ne "Gtk") {
-			print "#include \"PerlGtkExt.h\"\n";
-		}
+		# this introduces pointer to functions and may generate crashes
+		#if ($FilePrefix ne "Gtk") {
+		#	print "#include \"PerlGtkExt.h\"\n";
+		#}
 
 		print <<"EOT";
 #include "Perl${FilePrefix}Int.h"
@@ -874,7 +884,7 @@ $_ * SvSet$_(SV * value, $_ * dest) {
 		return 0;
 	
 	if (!dest) {
-		dest = alloc_temp(sizeof($_));
+		dest = pgtk_alloc_temp(sizeof($_));
 	}
 
 	memset(dest, 0, sizeof($_));
@@ -1258,7 +1268,7 @@ foreach (sort keys %object) {
 	print "#ifdef $object{$_}->{cast}\n";
 #	print "\tadd_typecast(", $object{$_}->{prefix}, "_get_type(),	\"$object{$_}->{perlname}\");\n"
 #		;#unless /preview/i;
-	print "\tlink_types(\"$_\",	\"$object{$_}->{perlname}\", 0,	", $object{$_}->{prefix}, "_get_type, sizeof($_), sizeof($_"."Class));\n"
+	print "\tpgtk_link_types(\"$_\",	\"$object{$_}->{perlname}\", 0,	", $object{$_}->{prefix}, "_get_type);\n"
 		;#unless /preview/i;
 	print "#endif\n";
 }

@@ -40,12 +40,26 @@ $app->create_menus({type => 'subtree',
 		    label => '_Help',
 		    subtree => [{type => 'item', label => '_About'}]});
 
-$app->create_toolbar({type => 'item', label => 'Fred', callback => sub { Gtk->main_quit },
+#$app->create_toolbar(
+#			{type => 'item', label => 'Fred', callback => sub { Gtk->main_quit },
+#		      pixmap_type => 'stock', pixmap_info => 'Quit',
+#		      hint => "Click here to quit"},
+#		     {type => 'item', label => 'Wilma',
+#		      pixmap_type => 'stock', pixmap_info => 'Timer'},
+#		     ['item', 'Barney', undef, undef, 'stock', 'About']);
+
+my $toolbar = new Gtk::Toolbar('horizontal', 'text');
+$toolbar->set_style('text');
+$app->fill_toolbar($toolbar, undef, 
+			{type => 'item', label => 'Fred', callback => sub { Gtk->main_quit },
 		      pixmap_type => 'stock', pixmap_info => 'Quit',
 		      hint => "Click here to quit"},
 		     {type => 'item', label => 'Wilma',
 		      pixmap_type => 'stock', pixmap_info => 'Timer'},
+		     ['item', 'Save', undef, undef, 'filename', 'save.xpm'],
 		     ['item', 'Barney', undef, undef, 'stock', 'About']);
-
+my $button = $toolbar->append_item('icons', "boh", "bah", undef);
+$button->signal_connect('clicked', sub {$toolbar->set_style('icons')});
+$app->set_toolbar($toolbar);
 show_all $app;
 main Gtk;

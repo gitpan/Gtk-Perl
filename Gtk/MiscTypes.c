@@ -96,10 +96,11 @@ SV * newSVOpt(long value, char * optname, struct opts * o)
 
 SV * newSVMiscRef(void * object, char * classname, int * newref)
 {
-	HV * previous = RetrieveMisc(object);
+	HV * previous;
 	SV * result;
 	if (!object)
 		return newSVsv(&PL_sv_undef);
+	previous = RetrieveMisc(object);
 	if (previous) {
 		/*printf("Retriveing object %d as HV %d\n", object, previous);*/
 		result = newRV((SV*)previous);
@@ -110,11 +111,11 @@ SV * newSVMiscRef(void * object, char * classname, int * newref)
 		hv_store(h, "_gtk", 4, newSViv((long)object), 0);
 		result = newRV((SV*)h);
 		RegisterMisc(h, object);
-		/*printf("Storing object %d as HV %d\n", object, h);*/
 		sv_bless(result, gv_stashpv(classname, FALSE));
 		SvREFCNT_dec(h);
 		if (newref)
 			*newref = 1;
+		/*printf("Storing object %p (%s) as HV %p (refcount: %d, %d)\n", object, classname, h, SvREFCNT(h), SvREFCNT(result));*/
 	}
 	return result;
 }
@@ -449,7 +450,7 @@ void * SvMiscRef(SV * o, char * classname)
 	return (void*)SvIV(*s);
 }
 
-#undef USE_GHASH
+#define USE_GHASH
 #ifdef USE_GHASH
 static GHashTable * MiscCache = NULL;
 #else
@@ -458,10 +459,14 @@ static HV * MiscCache = 0;
 
 void UnregisterMisc(HV * hv_object, void * gtk_object)
 {
+	HV * old_hv = NULL;
 #ifdef USE_GHASH
 	if (!MiscCache)
-		MiscCache = g_hash_table_new(NULL, NULL);
+		MiscCache = g_hash_table_new(g_direct_hash, g_direct_equal);
+	old_hv = g_hash_table_lookup(MiscCache, gtk_object);
 	g_hash_table_remove(MiscCache, gtk_object);
+	/*if (old_hv != hv_object)
+			G_BREAKPOINT();*/
 #else
 	char buffer[40];
 	sprintf(buffer, "%lu", (unsigned long)gtk_object);
@@ -469,7 +474,7 @@ void UnregisterMisc(HV * hv_object, void * gtk_object)
 		MiscCache = newHV();
 	hv_delete(MiscCache, buffer, strlen(buffer), G_DISCARD);
 #endif
-	/*printf("Removing object %d, HV %d\n", gtk_object, hv_object);*/
+	/*printf("Removing object %p, HV %p\n", gtk_object, hv_object);*/
 	
 	hv_delete(hv_object, "_gtk", 4, G_DISCARD);
 }
@@ -478,7 +483,7 @@ void RegisterMisc(HV * hv_object, void * gtk_object)
 {
 #ifdef USE_GHASH
 	if (!MiscCache)
-		MiscCache = g_hash_table_new(NULL, NULL);
+		MiscCache = g_hash_table_new(g_direct_hash, g_direct_equal);
 	g_hash_table_insert(MiscCache, gtk_object, hv_object);
 #else
 	char buffer[40];
@@ -487,14 +492,18 @@ void RegisterMisc(HV * hv_object, void * gtk_object)
 		MiscCache = newHV();
 	hv_store(MiscCache, buffer, strlen(buffer), newSViv((long)hv_object), 0);
 #endif
+	/*printf("Registering object %p, HV %p (%d)\n", gtk_object, hv_object, SvREFCNT(hv_object));*/
 }
 
 HV * RetrieveMisc(void * gtk_object)
 {
+	HV * hv_object;
 #ifdef USE_GHASH
 	if (!MiscCache)
-		MiscCache = g_hash_table_new(NULL, NULL);
-	return g_hash_table_lookup(MiscCache, gtk_object);
+		MiscCache = g_hash_table_new(g_direct_hash, g_direct_equal);
+	hv_object = g_hash_table_lookup(MiscCache, gtk_object);
+	/*printf("Retreiving object %p, HV %p (%d)\n", gtk_object, hv_object, hv_object?SvREFCNT(hv_object):0);*/
+	return hv_object;
 #else
 	SV ** s;
 	char buffer[40];
@@ -509,7 +518,7 @@ HV * RetrieveMisc(void * gtk_object)
 #endif
 }
 
-void * alloc_temp(int size)
+void * pgtk_alloc_temp(int size)
 {
     dTHR;
 

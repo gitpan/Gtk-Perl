@@ -9,7 +9,7 @@ require AutoLoader;
 
 use Carp;
 
-$VERSION = "0.7004";
+$VERSION = "0.7005";
 
 @ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export
@@ -27,6 +27,11 @@ $VERSION = "0.7004";
 sub dl_load_flags {0x01}
 
 bootstrap Gtk::Gdk::Pixbuf;
+
+Gtk->mod_init_add('Gtk', sub {
+	init Gtk::Gdk::Rgb;
+	init Gtk::Gdk::Pixbuf;
+});
 
 1;
 __END__

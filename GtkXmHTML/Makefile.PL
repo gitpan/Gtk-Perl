@@ -1,45 +1,31 @@
 use ExtUtils::MakeMaker;
 use File::Basename;
 use blib '..';
-use Gtk::Install::Files;
 use Cwd;
 require '../Depends.pm';
-import ExtUtils::Depends;
-
 require '../tools/gendefs.pl';
+
+$xm = new ExtUtils::Depends('Gtk::XmHTML', 'Gtk');
 
 mkdir('build', 0777);
 
-$pm = {};
+$xm->set_inc (`gnome-config --cflags gnomeui`);
+$xm->set_libs (`gnome-config --libs gtkxmhtml`);
 
-$inc = `gnome-config --cflags gnomeui`;
-chomp($inc);
-$libs = `gnome-config --libs gtkxmhtml`;
-chomp($libs);
+$xm->add_typemaps (cwd() . '/pkg.typemap', cwd().'/build/GtkXmHTMLTypemap');
+#$xm->add_headers ('"GXHTypes.h"'); #, 'build/GtkXmHTMLDefs.h');
 
-@typemaps = @Gtk::Install::Files::typemaps;
-$typemaps = [cwd() . '/pkg.typemap', cwd().'/build/GtkXmHTMLTypemap'];
-@headers = ('GXHTypes.h', 'build/GtkXmHTMLDefs.h');
+$xm->save_config('build/Files.pm');
+$xm->install('build/Files.pm');
 
-ExtUtils::Depends::save_config('Gtk::XmHTML', 'build/IFiles.pm', $inc, $libs, 
-	$typemaps, [keys %defs], [@defines], [@headers], $pm);
+$xm->add_pm ('GtkXmHTML.pm' => '$(INST_ARCHLIBDIR)/XmHTML.pm',
+	'build/GtkXmHTMLTypes.pm' => '$(INST_ARCHLIBDIR)/XmHTML/Types.pm');
 
-foreach (@typemaps) {
-	print "Add typemap: $Gtk::Install::Files::CORE/$_\n";
-	push(@$typemaps, cwd() .'/'.$Gtk::Install::Files::CORE . '/'. $_);
-}
+$xm->add_c ('GXHTypes.c', 'build/GtkXmHTMLDefs.c');
+$xm->add_defs ('pkg.defs');
+$xm->add_headers (qw( <gtk-xmhtml/gtk-xmhtml.h> "GXHTypes.h"));
 
-push(@defines, @Gtk::Install::Files::defines);
-push(@defines, '-I../build', '-Ibuild', '-I.', '-I../Gtk');
-
-$pm->{'GtkXmHTML.pm'} = '$(INST_ARCHLIBDIR)/XmHTML.pm';
-$pm->{'build/GtkXmHTMLTypes.pm'} = '$(INST_ARCHLIBDIR)/XmHTML/Types.pm';
-
-add_c ('GXHTypes.c', 'build/GtkXmHTMLDefs.c');
-add_defs ('pkg.defs');
-add_headers (qw( <gtk-xmhtml/gtk-xmhtml.h> "GXHTypes.h"));
-
-add_raw_xs ('xs/GtkXmHTML.xs');
+$xm->add_xs ('xs/GtkXmHTML.xs');
 @a = (	'-f', 'GtkXmHTML', 
 		'-p', 'Gtk=Gtk',
 		'-p', 'GdkGL=Gtk::Gdk::GL',
@@ -49,37 +35,31 @@ add_raw_xs ('xs/GtkXmHTML.xs');
 		'-p', 'Panel=Gnome::Panel',
 		'-m', 'Gtk::XmHTML');
 
-add_headers (keys %Gtk::Install::files::headers);
 # FIXME: use defs and headers from ExtUtils::Depends....
-%defs = %ExtUtils::Depends::defs;
-%headers = %ExtUtils::Depends::headers;
-foreach (sort {$defs{$a} <=> $defs{$b}} keys %defs) {
+foreach ($xm->get_defs) {
 	push @a, '-d', $_;
 }
-foreach (sort {$headers{$a} <=> $headers{$b}} keys %headers) {
+foreach ($xm->get_headers) {
 	push @a, '-i', $_;
 }
 
-add_raw_xs(gendefs::gendefs(@a));
-
-($xfiles, $object, $ldfrom) = setup_xs();
+$xm->add_xs(gendefs::gendefs(@a));
 
 $depend = { 'build/GtkXmHTMLDefs.c' => 'build/GtkXmHTMLDefs.h build/PerlGtkXmHTMLInt.h' };
 
 foreach (qw(GXHTypes.h build/GtkXmHTMLDefs.h build/PerlGtkXmHTMLInt.h)) {
-	$pm->{$_} = '$(INST_ARCHLIBDIR)/'. basename($_);
+	$xm->add_pm($_ => '$(INST_ARCHLIBDIR)/XmHTML/Install/'. basename($_));
 }
 
-write_ext();
+$xm->write_ext('build/extension.xsh');
 
-@clean = qw(
-	build/IFiles.pm build/GtkXmHTMLDefs.c build/GtkXmHTMLDefs.h 
+$xm->add_clean ( qw(
+	build/Files.pm build/GtkXmHTMLDefs.c build/GtkXmHTMLDefs.h 
 	build/GtkXmHTMLDefs.o build/GtkXmHTMLTypemap build/GtkXmHTMLTypes.pm 
 	build/PerlGtkXmHTMLExt.c build/PerlGtkXmHTMLExt.h build/PerlGtkXmHTMLInt.h 
 	build/boxed.xsh build/extension.xsh build/objects.xsh
-	build/perl-gtkxmhtml-ds.pod  build/perl-gtkxmhtml-ref.pod
-);
-push(@clean, @ExtUtils::Depends::clean);
+	build/perl-gtkxmhtml-ds.pod  build/perl-gtkxmhtml-ref.xml
+));
 
 # documentation
 gendefs::gen_doc('gtkxmhtml');
@@ -88,37 +68,26 @@ system("../tools/gendoc.pl", "-t", 'gtkxmhtml', keys %ExtUtils::Depends::xs);
 WriteMakefile(
 	'NAME'      => 'Gtk::XmHTML',
 	'VERSION_FROM'	=> 'GtkXmHTML.pm',
-	'PM' => $pm,
-	'TYPEMAPS' => $typemaps,
-	'XS' => $xfiles,
 	'XSOPT' => '-noversioncheck',
-	'DEFINE'    => join(' ',@defines),
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
-	'INC' => $inc,
-	'LIBS' => [$libs],
-	'OBJECT' => $object,
-	'clean' => {FILES => join(' ', @clean) },
-	#'LDFROM' => $ldfrom,
-	'depend' => $depend,
+	$xm->get_makefile_vars,
 );
 
 sub MY::postamble {
 
 '
 Makefile: ' . join(' ',
-	sort {$defs{$a} <=> $defs{$b}} keys %defs,
-	<*/pkg*.pl>
+	$xm->get_defs,
+	<pkg*.pl>
 	) . '
 
 build/PerlGtkXmHTMLExt.h build/PerlGtkXmHTMLExt.c build/PerlGtkXmHTMLInt.h: build/GtkXmHTMLDefs.h ../tools/genext.pl
 	$(PERL) ../tools/genext.pl GtkXmHTML </dev/null
 
 gendoc:
-	../tools/gendoc.pl -t gtkxmkhtml $(XS_FILES)
+	../tools/gendoc.pl -t gtkxmhtml $(XS_FILES)
 
 ';
-
-
 
 }
 
@@ -139,4 +108,3 @@ sub MY::const_config
 	return $self->SUPER::const_config;
 }
 
-	

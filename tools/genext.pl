@@ -17,7 +17,6 @@ while (<>) {
 	next if /^\s*#/;
 	
 	#printf("$kind, $type, $name\n");
-	
 	if ($kind eq "Var") {
 		$div1 .= "\t\tPerl${Prefix}ExtFixupName(_p_$name);\t\t\t\\\n";
 		$div2 .= "#define $name (*(_p_$name))\n";

@@ -7,7 +7,7 @@
 
 /* XXX attach functions */
 
-void menu_pos_func (GtkMenu *menu, int *x, int *y, gpointer user_data)
+static void menu_pos_func (GtkMenu *menu, int *x, int *y, gpointer user_data)
 {
 	AV * args = (AV*)user_data;
 	SV * handler = *av_fetch(args, 0, 0);

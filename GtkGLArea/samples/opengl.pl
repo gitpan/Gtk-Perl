@@ -64,7 +64,6 @@ sub reshape {
 
 
 init Gtk;
-init Gtk::GLArea;
 
 if (!Gtk::Gdk::GL->query) {
 	die "OpenGL not supported";

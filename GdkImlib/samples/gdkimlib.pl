@@ -9,8 +9,6 @@ use Gtk;
 
 init Gtk;
 
-init Gtk::Gdk::ImlibImage;
-
 $file = shift;
 
 $sample = "../../Gtk/samples/xpm/marble.xpm";

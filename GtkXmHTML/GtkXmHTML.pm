@@ -7,7 +7,7 @@ require AutoLoader;
 
 use Carp;
 
-$VERSION = '0.7004';
+$VERSION = '0.7005';
 
 @ISA = (@ISA, qw(Exporter DynaLoader));
 # Items to export into callers namespace by default. Note: do not export
@@ -58,6 +58,9 @@ bootstrap Gtk::XmHTML;
 require Gtk::XmHTML::Types;
 
 # Autoload methods go after __END__, and are processed by the autosplit program.
+Gtk->mod_init_add('Gtk', sub {
+	init Gtk::XmHTML;
+});
 
 1;
 __END__

@@ -294,9 +294,13 @@ gtk_clist_append(clist, text, ...)
 	{
 		int num = items-1;
 		int i;
-		char** val = malloc(num*sizeof(char*));
-		for (i=1; i < items; ++i)
-			val[i-1] = SvPV(ST(i),PL_na);
+		char** val = malloc(clist->columns*sizeof(char*));
+		if (num > clist->columns)
+			num = clist->columns;
+		for (i=0; i < num; ++i)
+			val[i] = SvPV(ST(i+1),PL_na);
+		for(i=num; i < clist->columns; i++)
+			val[i] = "";
 		RETVAL = gtk_clist_append(clist, val);
 		free(val);
 	}
@@ -314,9 +318,13 @@ gtk_clist_insert(clist, row, text, ...)
 	{
 		int num = items-2;
 		int i;
-		char** val = malloc(num*sizeof(char*));
-		for (i=2; i < items; ++i)
-			val[i-2] = SvPV(ST(i),PL_na);
+		char** val = malloc(clist->columns*sizeof(char*));
+		if (num > clist->columns)
+			num = clist->columns;
+		for (i=0; i < num; ++i)
+			val[i] = SvPV(ST(i+2),PL_na);
+		for(i=num; i < clist->columns; i++)
+			val[i] = "";
 		gtk_clist_insert(clist, row, val);
 		free(val);
 	}

@@ -1,49 +1,37 @@
 use ExtUtils::MakeMaker;
-use File::Basename;
-use blib '..';
-use Gtk::Install::Files;
+use blib '../Gtk';
 use Cwd;
 require '../Depends.pm';
-import ExtUtils::Depends;
 
 require '../tools/gendefs.pl';
 
 mkdir('build', 0777);
 
-$pm = {};
+$gl = new ExtUtils::Depends ('Gtk::GLArea', 'Gtk');
 
-$inc = `gtk-config --cflags`;
-chomp($inc);
+$gl->set_inc (`gtk-config --cflags`);
 $libs = "-lgtkgl  -lMesaGL -lMesaGLU " . `gtk-config --libs`;
 chomp($libs);
 $nomesa = $libs;
 $nomesa =~ s/Mesa//g;
 
-@typemaps = @Gtk::Install::Files::typemaps;
-$typemaps = [cwd() . '/pkg.typemap', cwd().'/build/GtkGLAreaTypemap'];
-@headers = ( 'build/GtkGLAreaDefs.h', 'build/PerlGtkGLAreaInt.h');
+$gl->add_typemaps (cwd() . '/pkg.typemap', cwd().'/build/GtkGLAreaTypemap');
+$gl->add_headers ( '"build/GtkGLAreaDefs.h"', '"build/PerlGtkGLAreaInt.h"');
 
-add_boot ('Gtk::Gdk::GL', 'Gtk::GLArea::Constants');
+$gl->add_boot ('Gtk::Gdk::GL', 'Gtk::GLArea::Constants');
 
-ExtUtils::Depends::save_config('Gtk::GLArea', 'build/IFiles.pm', $inc, $libs, 
-	$typemaps, [keys %defs], [@defines], [@headers], $pm);
+$gl->save_config('build/Files.pm');
+$gl->install('build/Files.pm');
 
-foreach (@typemaps) {
-	print "Add typemap: $Gtk::Install::Files::CORE/$_\n";
-	push(@$typemaps, cwd() .'/'.$Gtk::Install::Files::CORE . '/'. $_);
-}
+$gl->add_pm(
+	'GtkGLArea.pm' => '$(INST_ARCHLIBDIR)/GLArea.pm',
+	'build/GtkGLAreaTypes.pm' => '$(INST_ARCHLIBDIR)/GLArea/Types.pm');
 
-push(@defines, @Gtk::Install::Files::defines);
-push(@defines, '-I../build', '-Ibuild', '-I.', '-I../Gtk');
+$gl->add_c ( 'build/GtkGLAreaDefs.c');
+$gl->add_defs ('pkg.defs');
+$gl->add_headers (qw( <gtkgl/gtkglarea.h> ));
 
-$pm->{'GtkGLArea.pm'} = '$(INST_ARCHLIBDIR)/GLArea.pm';
-$pm->{'build/GtkGLAreaTypes.pm'} = '$(INST_ARCHLIBDIR)/GLArea/Types.pm';
-
-add_c ( 'build/GtkGLAreaDefs.c');
-add_defs ('pkg.defs');
-add_headers (qw( <gtkgl/gtkglarea.h> ));
-
-add_raw_xs ('xs/GtkGdkGL.xs', 'xs/Constants.xs');
+$gl->add_xs ('xs/GtkGdkGL.xs', 'xs/Constants.xs');
 @a = (	'-f', 'GtkGLArea', 
 		'-p', 'Gtk=Gtk',
 		'-p', 'GdkGL=Gtk::Gdk::GL',
@@ -53,59 +41,43 @@ add_raw_xs ('xs/GtkGdkGL.xs', 'xs/Constants.xs');
 		'-p', 'Panel=Gnome::Panel',
 		'-m', 'Gtk::GLArea');
 
-add_headers (keys %Gtk::Install::files::headers);
-# FIXME: use defs and headers from ExtUtils::Depends....
-%defs = %ExtUtils::Depends::defs;
-%headers = %ExtUtils::Depends::headers;
-foreach (sort {$defs{$a} <=> $defs{$b}} keys %defs) {
+foreach ($gl->get_defs) {
 	push @a, '-d', $_;
 }
-foreach (sort {$headers{$a} <=> $headers{$b}} keys %headers) {
+foreach ($gl->get_headers) {
 	push @a, '-i', $_;
 }
 
-add_raw_xs(gendefs::gendefs(@a));
-
-($xfiles, $object, $ldfrom) = setup_xs();
+$gl->add_xs(gendefs::gendefs(@a));
 
 $depend = { 'build/GtkGLAreaDefs.c' => 'build/GtkGLAreaDefs.h build/PerlGtkGLAreaInt.h' };
 
-foreach (qw( build/GtkGLAreaDefs.h build/PerlGtkGLAreaInt.h)) {
-	$pm->{$_} = '$(INST_ARCHLIBDIR)/GLArea/Install/'. basename($_);
-}
-$pm->{ 'Constants.pm' }  = '$(INST_LIBDIR)/GLArea/Constants.pm';
-$pm->{	'Glut.pm'} = '$(INST_LIBDIR)/GLArea/Glut.pm';
+$gl->install (qw( build/GtkGLAreaDefs.h build/PerlGtkGLAreaInt.h));
+$gl->add_pm('Constants.pm' => '$(INST_LIBDIR)/GLArea/Constants.pm',
+	'Glut.pm' => '$(INST_LIBDIR)/GLArea/Glut.pm');
 
-write_ext();
+$gl->write_ext('build/extension.xsh');
 
-@clean = qw(
-	build/IFiles.pm build/GtkGLAreaDefs.c build/GtkGLAreaDefs.h 
+$gl->add_clean ( qw(
+	build/Files.pm build/GtkGLAreaDefs.c build/GtkGLAreaDefs.h 
 	build/GtkGLAreaDefs.o build/GtkGLAreaTypemap build/GtkGLAreaTypes.pm 
 	build/PerlGtkGLAreaExt.c build/PerlGtkGLAreaExt.h build/PerlGtkGLAreaInt.h 
 	build/boxed.xsh build/extension.xsh build/objects.xsh
-	build/perl-gtkglarea-ds.pod  build/perl-gtkglarea-ref.pod
-);
-push(@clean, @ExtUtils::Depends::clean);
+	build/perl-gtkglarea-ds.pod  build/perl-gtkglarea-ref.xml
+));
 
 # documentation
 gendefs::gen_doc('gtkglarea');
-system("../tools/gendoc.pl", "-t", 'gtkglarea', keys %ExtUtils::Depends::xs);
+system("../tools/gendoc.pl", "-t", 'gtkglarea', $gl->get_xs);
 
 WriteMakefile(
 	'NAME'      => 'Gtk::GLArea',
 	'VERSION_FROM'	=> 'GtkGLArea.pm',
-	'PM' => $pm,
-	'TYPEMAPS' => $typemaps,
-	'XS' => $xfiles,
 	'XSOPT' => '-noversioncheck',
-	'DEFINE'    => join(' ',@defines),
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
-	'INC' => $inc,
-	'LIBS' => [$nomesa, $libs],
-	'OBJECT' => $object,
-	'clean' => {FILES => join(' ', @clean) },
-	#'LDFROM' => $ldfrom,
 	'depend' => $depend,
+	$gl->get_makefile_vars,
+	'LIBS' => [$nomesa, $libs],
 );
 
 sub MY::postamble {

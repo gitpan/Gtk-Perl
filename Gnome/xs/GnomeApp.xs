@@ -8,6 +8,18 @@
 
 /* XXX Add dock, etc */
 
+#define fill_uiinfo(index, count, infos) \
+		count = items - index; \
+		infos = pgtk_alloc_temp(sizeof(GnomeUIInfo) * (count+1)); \
+		memset(infos, 0, sizeof(GnomeUIInfo) * (count+1)); \
+		/* Because we accept a list rather than an array, we \
+                   have to unroll the outer layer of recursion */ \
+		for (i = 0; i < count; i++) { \
+			SvGnomeUIInfo(ST(i+index), infos + i); \
+		} \
+		infos[count].type = GNOME_APP_UI_ENDOFINFO; \
+
+
 MODULE = Gnome::App		PACKAGE = Gnome::App		PREFIX = gnome_app_
 
 #ifdef GNOME_APP
@@ -37,19 +49,42 @@ gnome_app_create_menus(app, info, ...)
 		int i, count;
 		GnomeUIInfo *infos;
 
-		count = items - 1;
-		infos = alloc_temp(sizeof(GnomeUIInfo) * (count+1));
-		memset(infos, 0, sizeof(GnomeUIInfo) * (count+1));
-		/* Because we accept a list rather than an array, we
-                   have to unroll the outer layer of recursion */
-		for (i = 0; i < count; i++) {
-			SvGnomeUIInfo(ST(i+1), infos + i);
-		}
-		infos[count].type = GNOME_APP_UI_ENDOFINFO;
+		fill_uiinfo(1, count, infos);
 		if (ix == 1)
 			gnome_app_create_toolbar(app, infos);
 		else
 			gnome_app_create_menus(app, infos);
+	}
+
+
+void
+gnome_app_fill_menu (Class, menu_shell, uiinfo, accel_group, uline_accels, pos, ...)
+	SV *	Class
+	Gtk::MenuShell	menu_shell
+	Gtk::AccelGroup_OrNULL	accel_group
+	bool	uline_accels
+	int	pos
+	CODE:
+	{
+		int i, count;
+		GnomeUIInfo *infos;
+
+		fill_uiinfo(6, count, infos);
+		gnome_app_fill_menu (menu_shell, infos, accel_group, uline_accels, pos);
+	}
+
+void
+gnome_app_fill_toolbar (Class, toolbar, accel_group, ...)
+	SV *	Class
+	Gtk::Toolbar	toolbar
+	Gtk::AccelGroup_OrNULL	accel_group
+	CODE:
+	{
+		int i, count;
+		GnomeUIInfo *infos;
+
+		fill_uiinfo(3, count, infos);
+		gnome_app_fill_toolbar (toolbar, infos, accel_group);
 	}
 
 void

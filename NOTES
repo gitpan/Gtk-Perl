@@ -8,6 +8,24 @@
 
 Revision notes:
 
+New with release 0.7005.
+
+* GnomePrint support added.
+* Experimental Bonobo support added.
+* Experimental Mozilla support added.
+* No longer required to call the init method on most of the submodules.
+* Updated support for GtkHTML (added a Gtk::HTML::Simple package that handles
+  all the http connections for you using LWP).
+* Added a perl variable change event source for the gtk mainloop.
+* Simpler support for building your own submodules.
+* The toplevel Makefile will compile all the submodules for you (if you have
+  the requires libraries installed).
+* Moved the Applet code to its own submodule.
+* Documentation updates (including a brand-new Gtk::cookbook!).
+* Many fixes, cleanups and other small enhancements here and there.
+
+Old stuff follows...
+
 	As of public release 0.7000, the submodules in Perl/Gtk need to be
 	built separately as outlined in the INSTALL file. This may change
 	in a future point release if there is demand for compiling all the 

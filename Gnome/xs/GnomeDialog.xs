@@ -24,7 +24,7 @@ new(Class, title, ...)
 		for(i=0;i<count;i++)
 			b[i] = SvPV(ST(i+2), PL_na);
 		b[i] = 0;
-#ifdef NEW_GNOME
+#if GNOME_HVER >= 0x010200
 		RETVAL = GNOME_DIALOG(gnome_dialog_newv(title, b));
 #else
 		/* I don't think this is right... */

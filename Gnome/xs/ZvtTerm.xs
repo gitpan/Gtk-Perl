@@ -36,7 +36,7 @@ zvt_term_reset (term, hard)
 	int	hard
 
 
-#ifdef NEW_GNOME
+#if GNOME_HVER >= 0x010200
 
 void
 zvt_term_feed(term, text, len)

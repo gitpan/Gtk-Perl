@@ -3,7 +3,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include "PerlGtkExt.h"
 #include "PerlGdkPixbufInt.h"
 
 #include "GdkPixbufDefs.h"

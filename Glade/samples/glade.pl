@@ -10,10 +10,8 @@ eval {
 	require Gtk::Gdk::ImlibImage;
 	require Gnome;
 	init Gnome('glade.pl');
-	init Gtk::Gdk::ImlibImage;
 };
 init Gtk if $@;
-Gtk::GladeXML->init;
 
 print STDERR "Glade inited\n";
 

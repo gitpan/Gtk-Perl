@@ -1,3 +1,152 @@
+Mon Feb 19 20:25:04 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/cookbook.pod: add recipe from Pat Eyler <pate@gnu.org>.
+	* Released version 0.7005.
+
+Mon Feb 19 18:59:05 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/GdkTypes.c: correct error message and drop unused code.
+	* Gtk/MiscTypes.c: use a GHashTable instead of an HV for misc objects.
+	* */Makefile.PL: cleanups.
+	* Gtk/GdkTypes.c: applied patch by Pixel <pixel@mandrakesoft.com> to
+	prevent segfault in gdk_event_copy().
+	* Gtk/xs/GtkCTree.xs: applied patch by Pixel <pixel@mandrakesoft.com>
+	to add $tree->pre_recursive() and allow for undef nodes in some methods.
+	* Gtk/xs/GtkCTree-1.1.1.xs: removed, it is no longer compiled in.
+	* Gtk/cookbook.pod: updates from Pat Eyler <pate@gnu.org>.
+
+Sun Feb 11 23:40:05 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/GtkToolbar.xs: DWIM in new Gtk::Toolbar.
+	* Gtk/gtk-0.99.defs.opl: use correct unref function for pixmap and bitmap.
+	* INSTALL, README: updated documentation.
+
+Sun Feb 11 18:27:49 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gnome/xs/GnomeApp.xs: added fill_toolbar() and fill_menu() functions that
+	make use of the Gnome::UIInfo stuff.
+
+Sat Feb 10 19:03:58 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/GtkTypes.c: should work also with older perls.
+
+Thu Feb  8 22:53:44 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Bonobo/*: support the printing interface. Compile with new bonobo version.
+
+Wed Feb  7 06:03:22 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* MANIFEST: include new stuff.
+	* Bonobo/Bonobo.pm: use namespace.
+	* Bonobo/samples/activate.pl: use Bonobo->main and update for new CORBA::ORBit.
+	* Bonobo/xs/Bonobo.xs: interface is optional in get_object.
+	* Bonobo/xs/BonoboEmbeddable.xs: fixes to make it work correctly.
+	* Gtk/GtkTypes.c: do not remove init functions for now, need to track down the 
+	real problem.
+	* Bonobo/corba-orbit.diff: new diff against orbit-perl HEAD.
+	* Bonobo/samples/*: new embeddable sample.
+	* Gtk/cookbook.pod: cookbook documentation.
+
+Sun Feb  4 03:19:47 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/Gtk.xs, Gnome/xs/Gnome.xs: added facility for initializing sub-modules
+	at the main module init time: there is no more need to call the init method
+	on most of the sub-modules (it's still required for Gtk, Gnome, Bonobo, AppletWidget,
+	mostly because they require params or fiddle with @ARGV). Changed the sample to work
+	accordingly.
+	* Bonobo/*: more updates to support latest released version, popt arguments,
+	embeddable class binding, properties...
+	* Gtk/Gtk.pm: simple doc.
+	* Gtk/xs/GtkWidget.xs: make size_request() work.
+
+Sat Jan 27 13:13:32 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/GtkTypes.c: fix to compile also with a threaded perl.
+	* Mozilla/README: explain hack to make it work with network connections.
+
+Sat Jan 27 12:09:20 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Mozilla/*: added code to set preferences. Fiddled with library linking
+	order. Shut up cvs.
+
+Thu Jan 25 20:30:55 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* GnomePrint/xs/GnomePrintContext.xs: fixed leak in set_dashes().
+	Add support for printing images and using the texline interface.
+
+Wed Jan 24 13:30:57 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/GtkTypes.c: fixed handling of GTK_TYPE_UINT and GTK_TYPE_ULONG types.
+
+Mon Jan 22 18:02:14 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Mozilla: added binding for gtkmozembed.
+
+Sun Jan 21 17:35:29 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Makefile.PL, GtkHTML/*: changes to support GtkHTML version 0.8 only.
+
+Wed Jan 10 21:48:49 CET 2001 Paolo Molaro <lupus@helixcode.com>
+
+	* Gnome/xs/Gnome.xs: added long due support for letting popt
+	parse the arguments or make popt leave them alone and using Getopt::Long.
+	See Gnome/samples/druid.pl for example usage.
+	* Bonobo/xs/*: more updates.
+	* GnomePrint/xs/*: more updates.
+
+Sun Jan  7 18:27:21 CET 2001 Paolo Molaro <lupus@helixcode.com>
+
+	* Gtk/xs/Gtk.xs: forgot to add watch_remove() as well.
+	* GnomePrint/*: added some missing stuff.
+	* Gtk/LWP.pm, Gtk/io.pm, Gtk/http.pm: stuff to integrate
+	libwww-perl nicely (ie, non-blobking) in a Gtk application.
+	* GtkHTML/Simple.pm: package to make using an HTTP-connection
+	enabled Gtk::HTML trivial (uses Gtk::LWP).
+	* GtkHTML/xs/GtkHTML.xs: updated.
+
+Fri Jan  5 20:31:26 CET 2001 Paolo Molaro <lupus@helixcode.com>
+
+	* Gtk/xs/Gtk.xs, Gtk/samples/watchvar.pl: added perl var changes
+	event source: you can now get a callback when the value of a
+	perl variable changes.
+
+Wed Jan  3 19:03:49 CET 2001 Paolo Molaro <lupus@helixcode.com>
+
+	* Cleaned up the namespace a little for exported functions.
+	* Applet/*: moved here support for panel applets and added support
+	for capplets to the same submodule (Note that the API changed a little bit).
+	* Makefile.PL: fixed some detection handling and added applets support.
+	* GnomePrint/xs/GnomeFont.xs: removed old functions.
+	* Gtk/GtkTypes.c: optmized perlname <-> gtkname mapping (uses less memory).
+	* tools/gendefs.pl, *xs/*.xs: disable inclusion of PerlGtkExt.h (causes weird segv).
+	* */.cvsignore: shut up cvs.
+
+Thu Dec 28 19:52:43 CET 2000 Paolo Molaro <lupus@helixcode.com>
+
+	* Makefile.PL, GnomePrint/*: got GnomePrint mostly up to date
+	and added autodetection.
+	* Gtk/GtkTypes.*, tools/gendefs.pl: do not require a sizeof(Gtkobject)
+	to work, since we use gtk_type_query() anyway.
+
+Sat Dec 23 13:18:42 CET 2000 Paolo Molaro <lupus@helixcode.com>
+
+	* GladeXML/GladeXML.pm: applied patch from Tim Peoples <tep@colltech.com>
+	to allow a blessed reference instead of a package name in
+	signal_autoconnect_from_package().
+	* Gtk/xs/Gtk.xs: fixed idle_add_priority().
+	* Makefile.PL, GdkXmHTML/*: enables XmHTML detection.
+	* Bonobo/*: current bonobo binding (unfinished).
+
+Mon Dec 18 20:00:16 CET 2000 Paolo Molaro <lupus@helixcode.com>
+
+	* Gtk/xs/GtkCList.xs: make $clist->{insert,append} work if
+	the numer of args is different from the number of columns.
+	* Gtk/xs/GtkToggleButton.xs: fix typo in arg name.
+	* Depends.pm, Makefile.PL, */Makefile.PL: new build system.
+	* Bonobo/xs/Gnome*.xs: removed old bonobo binding and added 
+	bits of the new one.
+	* Preparation for new release.
+
 Fri Oct 20 18:32:19 CEST 2000 Paolo Molaro <lupus@debian.org>
 
 	* Released 0.7004.

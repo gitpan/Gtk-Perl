@@ -1,12 +1,10 @@
 use ExtUtils::MakeMaker;
-use File::Basename;
-use blib '..';
-use Gtk::Install::Files;
+use blib '../Gtk';
 use Cwd;
 require '../Depends.pm';
-import ExtUtils::Depends;
-
 require '../tools/gendefs.pl';
+
+$glade = new ExtUtils::Depends('Gtk::GladeXML', 'Gtk');
 
 mkdir('build', 0777);
 
@@ -16,36 +14,24 @@ if (defined(`libglade-config --libs gnome`)) {
 	$gnome = '';
 }
 
-$pm = {};
+$glade->set_inc (`libglade-config --cflags $gnome`);
+$glade->set_libs (`libglade-config --libs $gnome`);
 
-$inc = `libglade-config --cflags $gnome`;
-chomp($inc);
-$libs = `libglade-config --libs $gnome`;
-chomp($libs);
+$glade->add_typemaps (cwd() . '/pkg.typemap', cwd().'/build/GtkGladeXMLTypemap');
+#$glade->add_headers ('"GtkGladeXMLDefs.h"');
 
-@typemaps = @Gtk::Install::Files::typemaps;
-$typemaps = [cwd() . '/pkg.typemap', cwd().'/build/GtkGladeXMLTypemap'];
-@headers = ('build/GtkGladeXMLDefs.h');
+$glade->save_config('build/Files.pm');
+$glade->install('build/Files.pm');
 
-ExtUtils::Depends::save_config('Gtk::GladeXML', 'build/IFiles.pm', $inc, $libs, 
-	$typemaps, [keys %defs], [@defines], [@headers], $pm);
+$glade->add_pm ('GladeXML.pm' => '$(INST_ARCHLIBDIR)/GladeXML.pm',
+	'build/GtkGladeXMLTypes.pm' => '$(INST_ARCHLIBDIR)/GladeXML/Types.pm');
 
-foreach (@typemaps) {
-	print "Add typemap: $Gtk::Install::Files::CORE/$_\n";
-	push(@$typemaps, cwd() .'/'.$Gtk::Install::Files::CORE . '/'. $_);
-}
+$glade->add_c ('build/GtkGladeXMLDefs.c');
+$glade->add_defs ('pkg.defs');
+$glade->add_headers (qw( <glade/glade.h> ));
 
-push(@defines, @Gtk::Install::Files::defines);
-push(@defines, '-I../build', '-Ibuild', '-I.', '-I../Gtk');
+$glade->add_xs ('xs/GladeXML.xs');
 
-$pm->{'GladeXML.pm'} = '$(INST_ARCHLIBDIR)/GladeXML.pm';
-$pm->{'build/GtkGladeXMLTypes.pm'} = '$(INST_ARCHLIBDIR)/GladeXML/Types.pm';
-
-add_c ('build/GtkGladeXMLDefs.c');
-add_defs ('pkg.defs');
-add_headers (qw( <glade/glade.h> ));
-
-add_raw_xs ('xs/GladeXML.xs');
 @a = (	'-f', 'GtkGladeXML', 
 		'-p', 'Gtk=Gtk',
 		'-p', 'GdkGL=Gtk::Gdk::GL',
@@ -55,39 +41,30 @@ add_raw_xs ('xs/GladeXML.xs');
 		'-p', 'Panel=Gnome::Panel',
 		'-m', 'Gtk::GladeXML');
 
-add_headers (keys %Gtk::Install::files::headers);
-# FIXME: use defs and headers from ExtUtils::Depends....
-%defs = %ExtUtils::Depends::defs;
-%headers = %ExtUtils::Depends::headers;
-foreach (sort {$defs{$a} <=> $defs{$b}} keys %defs) {
+foreach ($glade->get_defs) {
 	push @a, '-d', $_;
 }
-foreach (sort {$headers{$a} <=> $headers{$b}} keys %headers) {
+foreach ($glade->get_headers) {
 	push @a, '-i', $_;
 }
 
-add_raw_xs(gendefs::gendefs(@a));
-
-($xfiles, $object, $ldfrom) = setup_xs();
+$glade->add_xs(gendefs::gendefs(@a));
 
 $depend = { 'build/GtkGladeXMLDefs.c' => 'build/GtkGladeXMLDefs.h build/PerlGtkGladeXMLInt.h' };
 
-foreach (qw(build/GtkGladeXMLDefs.h build/PerlGtkGladeXMLInt.h)) {
-	$pm->{$_} = '$(INST_ARCHLIBDIR)/GladeXML/Install/'. basename($_);
-}
+$glade->install (qw(build/GtkGladeXMLDefs.h build/PerlGtkGladeXMLInt.h));
 
-write_ext();
+$glade->write_ext('build/extension.xsh');
 
-push(@defines, '-DGNOME_HVER=defined') if $gnome;
+$glade->add_defines('-DGNOME_HVER=defined') if $gnome;
 
-@clean = qw(
-	build/IFiles.pm build/GtkGladeXMLDefs.c build/GtkGladeXMLDefs.h 
+$glade->add_clean( qw(
+	build/Files.pm build/GtkGladeXMLDefs.c build/GtkGladeXMLDefs.h 
 	build/GtkGladeXMLDefs.o build/GtkGladeXMLTypemap build/GtkGladeXMLTypes.pm 
 	build/PerlGtkGladeXMLExt.c build/PerlGtkGladeXMLExt.h 
-	build/PerlGtkGladeXMLInt.h build/perl-glade-ds.pod build/perl-glade-ref.pod
+	build/PerlGtkGladeXMLInt.h build/perl-glade-ds.pod build/perl-glade-ref.xml
 	build/boxed.xsh build/extension.xsh build/objects.xsh
-);
-push(@clean, @ExtUtils::Depends::clean);
+));
 
 # documentation
 gendefs::gen_doc('glade');
@@ -96,19 +73,9 @@ system("../tools/gendoc.pl", "-t", 'glade', keys %ExtUtils::Depends::xs);
 WriteMakefile(
 	'NAME'      => 'Gtk::GladeXML',
 	'VERSION_FROM'	=> 'GladeXML.pm',
-	'PM' => $pm,
-	'TYPEMAPS' => $typemaps,
-	'XS' => $xfiles,
 	'XSOPT' => '-noversioncheck',
-	'DEFINE'    => join(' ',@defines),
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
-	'INC' => $inc,
-	'LIBS' => [$libs],
-	'OBJECT' => $object,
-	'OPTIMIZE' => '-O2 -g',
-	'clean' => {FILES => join(' ', @clean) },
-	#'LDFROM' => $ldfrom,
-	'depend' => $depend,
+	$glade->get_makefile_vars,
 );
 
 sub MY::postamble {
@@ -126,8 +93,6 @@ gendoc:
 	../tools/gendoc.pl -t glade $(XS_FILES)
 
 ';
-
-
 
 }
 
@@ -148,4 +113,3 @@ sub MY::const_config
 	return $self->SUPER::const_config;
 }
 
-	

@@ -124,7 +124,7 @@ gnome_client_set_discard_command(client, ...)
 		free(a);
 	}
 
-#ifdef NEW_GNOME
+#if GNOME_HVER >= 0x010200
 
 void
 gnome_client_set_environment(client, name, value)

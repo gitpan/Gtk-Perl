@@ -48,8 +48,8 @@ PerlGtkDeclareFunc(void, GtkSetArg)(GtkArg * a, SV * v, SV * Class, GtkObject * 
 PerlGtkDeclareFunc(void, GtkSetRetArg)(GtkArg * a, SV * v, SV * Class, GtkObject * Object);
 PerlGtkDeclareFunc(SV *, GtkGetRetArg)(GtkArg * a);
 
-PerlGtkDeclareVar(int, did_we_init_gdk);
-PerlGtkDeclareVar(int, did_we_init_gtk);
+PerlGtkDeclareVar(int, pgtk_did_we_init_gdk);
+PerlGtkDeclareVar(int, pgtk_did_we_init_gtk);
 PerlGtkDeclareFunc(void, GtkInit_internal)(void);
 
 typedef GtkMenuFactory * Gtk__MenuFactory;
@@ -86,7 +86,7 @@ PerlGtkDeclareFunc(void, FreeHVObject)(HV * hv_object);
 
 typedef guint (*gtkTypeInitFunc)(void);
 
-PerlGtkDeclareFunc(void, link_types)(char * gtkName, char * perlName, int gtkTypeNumber, gtkTypeInitFunc init, int obj_size, int class_size);
+PerlGtkDeclareFunc(void, pgtk_link_types)(char * gtkName, char * perlName, int gtkTypeNumber, gtkTypeInitFunc init);
 PerlGtkDeclareFunc(int, gtnumber_for_ptname)(char * name);
 PerlGtkDeclareFunc(int, gtnumber_for_gtname)(char * name);
 PerlGtkDeclareFunc(char *, ptname_for_gtnumber)(int number);

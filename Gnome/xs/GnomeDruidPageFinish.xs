@@ -7,6 +7,7 @@
 
 #include "GtkDefs.h"
 #include "GnomeDefs.h"
+#include "GdkImlibTypes.h"
 
 
 MODULE = Gnome::DruidPageFinish		PACKAGE = Gnome::DruidPageFinish		PREFIX = gnome_druid_page_finish_

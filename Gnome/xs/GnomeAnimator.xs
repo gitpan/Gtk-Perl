@@ -7,6 +7,7 @@
 
 #include "GtkDefs.h"
 #include "GnomeDefs.h"
+#include "GdkImlibTypes.h"
 
 MODULE = Gnome::Animator		PACKAGE = Gnome::Animator		PREFIX = gnome_animator_
 

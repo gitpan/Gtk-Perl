@@ -50,8 +50,8 @@ gtk_toggle_button_toggled(toggle_button)
 #if GTK_HVER >= 0x010200
 
 gboolean
-gtk_toggle_button_get_active (toggle_botton)
-	Gtk::ToggleButton	toggle_botton
+gtk_toggle_button_get_active (toggle_button)
+	Gtk::ToggleButton	toggle_button
 
 #endif
 

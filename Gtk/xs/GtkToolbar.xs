@@ -10,7 +10,7 @@ MODULE = Gtk::Toolbar		PACKAGE = Gtk::Toolbar		PREFIX = gtk_toolbar_
 
 
 Gtk::Toolbar_Sink
-new(Class, orientation, style)
+new(Class, orientation=GTK_ORIENTATION_HORIZONTAL, style=GTK_TOOLBAR_BOTH)
 	SV *	Class
 	Gtk::Orientation	orientation
 	Gtk::ToolbarStyle	style

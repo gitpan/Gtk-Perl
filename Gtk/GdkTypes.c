@@ -110,7 +110,7 @@ GdkRectangle * SvGdkRectangle(SV * data, GdkRectangle * rect)
 		croak("rectangle must have four elements");
 
 	if (!rect)
-		rect = alloc_temp(sizeof(GdkRectangle));
+		rect = pgtk_alloc_temp(sizeof(GdkRectangle));
 	
 	rect->x = SvIV(*av_fetch(a, 0, 0));
 	rect->y = SvIV(*av_fetch(a, 1, 0));
@@ -165,7 +165,7 @@ GdkGCValues * SvGdkGCValues(SV * data, GdkGCValues * v, GdkGCValuesMask * m)
 	h = (HV*)SvRV(data);
 
 	if (!v)
-		v = alloc_temp(sizeof(GdkGCValues));
+		v = pgtk_alloc_temp(sizeof(GdkGCValues));
 	
 	memset(v,0,sizeof(GdkGCValues));
 
@@ -316,6 +316,9 @@ SV * newSVGdkEvent(GdkEvent * e)
 	
 	if (!e)
 		return newSVsv(&PL_sv_undef);
+	/* gdk_event_copy() will segfault otherwise */
+	if (!e->any.window)
+		return newSVsv(&PL_sv_undef);
  
  
         h = newHV();
@@ -458,7 +461,7 @@ GdkEvent * SvSetGdkEvent(SV * data, GdkEvent * e)
                 return 0;
         
         if (!e)
-        	e = alloc_temp(sizeof(GdkEvent));
+        	e = pgtk_alloc_temp(sizeof(GdkEvent));
         
         s = hv_fetch(h, "_ptr", 4, 0);
         if (!s || !SvIV(*s))
@@ -494,7 +497,7 @@ GdkEvent * SvSetGdkEvent(SV * data, GdkEvent * e)
 		if ((s=hv_fetch(h, "state", 5, 0)))
 			e->visibility.state = SvGdkVisibilityState(*s);
 		else
-			croak("event must contain count");
+			croak("event must contain state");
 	case GDK_MOTION_NOTIFY:
 		if ((s=hv_fetch(h, "x", 1, 0)))
 			e->motion.x = SvNV(*s);
@@ -628,10 +631,6 @@ GdkEvent * SvSetGdkEvent(SV * data, GdkEvent * e)
 		break;
 	case GDK_ENTER_NOTIFY:
 	case GDK_LEAVE_NOTIFY:
-		if ((s=hv_fetch(h, "window", 6, 0)))
-			e->crossing.window = SvGdkWindow(*s);
-		else
-			croak("event must contain window");
 		if ((s=hv_fetch(h, "subwindow", 9, 0)))
 			e->crossing.subwindow = SvGdkWindow(*s);
 		else
@@ -799,7 +798,7 @@ GdkWindowAttr * SvGdkWindowAttr(SV * data, GdkWindowAttr * attr, gint * mask)
 		return 0;
 	
 	if (!attr)
-		attr = alloc_temp(sizeof(GdkWindowAttr));
+		attr = pgtk_alloc_temp(sizeof(GdkWindowAttr));
 	
 	memset(attr, 0, sizeof(GdkWindowAttr));
 	

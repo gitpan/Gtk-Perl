@@ -1,45 +1,40 @@
 use ExtUtils::MakeMaker;
-use File::Basename;
-use blib '..';
-use Gtk::Install::Files;
 use Cwd;
+use blib '..';
 require '../Depends.pm';
-import ExtUtils::Depends;
 
 require '../tools/gendefs.pl';
 
 mkdir('build', 0777);
 
-$pm = {};
+$html = new ExtUtils::Depends('Gtk::HTML', 'Gtk');
 
-$inc = `gnome-config --cflags gdk_pixbuf gnomeui print`;
-chomp($inc);
-$libs = "-lgtkhtml ".`gnome-config --libs gdk_pixbuf gnomeui print`;
-chomp($libs);
+$html->add_typemaps(cwd() . '/pkg.typemap', cwd().'/build/GtkHTMLTypemap');
 
-@typemaps = @Gtk::Install::Files::typemaps;
-$typemaps = [cwd() . '/pkg.typemap', cwd().'/build/GtkHTMLTypemap'];
-@headers = ('build/GtkHTMLDefs.h');
+$html->set_inc(`gnome-config --cflags gtkhtml`);
+$html->set_libs(`gnome-config --libs gtkhtml`);
+$html->save_config('build/Files.pm');
+$html->install('build/Files.pm');
 
-ExtUtils::Depends::save_config('Gtk::HTML', 'build/IFiles.pm', $inc, $libs, 
-	$typemaps, [keys %defs], [@defines], [@headers], $pm);
-
-foreach (@typemaps) {
-	print "Add typemap: $Gtk::Install::Files::CORE/$_\n";
-	push(@$typemaps, cwd() .'/'.$Gtk::Install::Files::CORE . '/'. $_);
+my $version = `gnome-config --modversion gtkhtml`;
+warn "GOT $version";
+if ($version =~ /-(\d+)\.(\d+)(\.(\d+))?/) {
+	$version = sprintf("0x%02x%02x%02x", $1, $2, $4 || 0);
+} else {
+	$version = "0x000800";
 }
+$html->add_defines("-DGTKHTML_HVER=$version");
+# push(@defines, '-Ibuild', '-I.');
 
-push(@defines, @Gtk::Install::Files::defines);
-push(@defines, '-I../build', '-Ibuild', '-I.', '-I../Gtk');
+$html->add_pm('GtkHTML.pm' => '$(INST_ARCHLIBDIR)/HTML.pm',
+	'Simple.pm' => '$(INST_ARCHLIBDIR)/HTML/Simple.pm',
+	'build/GtkHTMLTypes.pm' => '$(INST_ARCHLIBDIR)/HTML/Types.pm');
 
-$pm->{'GtkHTML.pm'} = '$(INST_ARCHLIBDIR)/HTML.pm';
-$pm->{'build/GtkHTMLTypes.pm'} = '$(INST_ARCHLIBDIR)/HTML/Types.pm';
+$html->add_c ('build/GtkHTMLDefs.c');
+$html->add_defs ('pkg.defs');
+$html->add_headers (qw( <gtkhtml/gtkhtml.h> ));
 
-add_c ('build/GtkHTMLDefs.c');
-add_defs ('pkg.defs');
-add_headers (qw( <gtkhtml/gtkhtml.h> ));
-
-add_raw_xs ('xs/GtkHTML.xs');
+$html->add_xs ('xs/GtkHTML.xs');
 @a = (	'-f', 'GtkHTML', 
 		'-p', 'Gtk=Gtk',
 		'-p', 'GdkGL=Gtk::Gdk::GL',
@@ -49,57 +44,42 @@ add_raw_xs ('xs/GtkHTML.xs');
 		'-p', 'Panel=Gnome::Panel',
 		'-m', 'Gtk::HTML');
 
-add_headers (keys %Gtk::Install::files::headers);
-# FIXME: use defs and headers from ExtUtils::Depends....
-%defs = %ExtUtils::Depends::defs;
-%headers = %ExtUtils::Depends::headers;
-foreach (sort {$defs{$a} <=> $defs{$b}} keys %defs) {
+foreach ($html->get_defs) {
 	push @a, '-d', $_;
 }
-foreach (sort {$headers{$a} <=> $headers{$b}} keys %headers) {
+foreach ($html->get_headers) {
 	push @a, '-i', $_;
 }
-
-add_raw_xs(gendefs::gendefs(@a));
-
-($xfiles, $object, $ldfrom) = setup_xs();
+#warn "Running gendefs with [@a]\n";
+@a = gendefs::gendefs(@a);
+#warn "Result was: @a in ",cwd(),"\n";
+$html->add_xs(@a);
 
 $depend = { 'build/GtkHTMLDefs.c' => 'build/GtkHTMLDefs.h build/PerlGtkHTMLInt.h' };
 
-foreach (qw( build/GtkHTMLDefs.h build/PerlGtkHTMLInt.h)) {
-	$pm->{$_} = '$(INST_ARCHLIBDIR)/'. basename($_);
-}
+$html->install (qw( build/GtkHTMLDefs.h build/PerlGtkHTMLInt.h));
 
-write_ext();
-
-@clean = qw(
-	build/IFiles.pm build/GtkHTMLDefs.c build/GtkHTMLDefs.h 
+$html->add_clean ( qw(
+	build/Files.pm build/GtkHTMLDefs.c build/GtkHTMLDefs.h 
 	build/GtkHTMLDefs.o build/GtkHTMLTypemap build/GtkHTMLTypes.pm 
 	build/PerlGtkHTMLExt.c build/PerlGtkHTMLExt.h build/PerlGtkHTMLInt.h 
 	build/boxed.xsh build/extension.xsh build/objects.xsh
-	build/perl-gtkhtml-ds.pod  build/perl-gtkhtml-ref.pod
-);
-push(@clean, @ExtUtils::Depends::clean);
+	build/perl-gtkhtml-ds.pod  build/perl-gtkhtml-ref.xml
+));
 
 # documentation
 gendefs::gen_doc('gtkhtml');
 system("../tools/gendoc.pl", "-t", 'gtkhtml', keys %ExtUtils::Depends::xs);
 
+$html->write_ext("build/extension.xsh");
+
 WriteMakefile(
 	'NAME'      => 'Gtk::HTML',
 	'VERSION_FROM'	=> 'GtkHTML.pm',
-	'PM' => $pm,
-	'TYPEMAPS' => $typemaps,
-	'XS' => $xfiles,
 	'XSOPT' => '-noversioncheck',
-	'DEFINE'    => join(' ',@defines),
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
-	'INC' => $inc,
-	'LIBS' => [$libs],
-	'OBJECT' => $object,
-	'clean' => {FILES => join(' ', @clean) },
-	#'LDFROM' => $ldfrom,
-	'depend' => $depend,
+	$html->get_makefile_vars,
+	#'depend' => $depend,
 );
 
 sub MY::postamble {
@@ -117,9 +97,6 @@ gendoc:
 	../tools/gendoc.pl -t gtkhtml $(XS_FILES)
 
 ';
-
-
-
 }
 
 sub MY::c_o {
@@ -139,4 +116,3 @@ sub MY::const_config
 	return $self->SUPER::const_config;
 }
 
-	

@@ -161,6 +161,7 @@ T_SimpleVal
     	croak("failed to return mandatory object of type @{[grep {s/://g,s/^GtkGdk/Gdk/,1} $ntype]}");
     } else*/
 		$arg = newSV@{[grep {s/://g,s/^GtkGdk/Gdk/,1} $ntype]}($var);
+		/*sv_setsv($arg, newSV@{[grep {s/://g,s/^GtkGdk/Gdk/,1} $ntype]}($var));*/
 
 T_SimpleValOrNULL
 	$arg = $var ? newSV@{[grep {s/://g,s/^GtkGdk/Gdk/,s/_OrNULL$//,1} $ntype]}($var) : newSVsv(&PL_sv_undef);

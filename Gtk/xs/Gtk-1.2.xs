@@ -30,7 +30,7 @@ XS_unpack_charPtrPtr (SV * sv) {
 	if (!sv || !SvROK(sv) || SvTYPE(SvRV(sv)) != SVt_PVAV)
 		return NULL;
 	av = (AV*)SvRV(sv);
-	result = alloc_temp(sizeof(char*)*(av_len(av)+1));
+	result = pgtk_alloc_temp(sizeof(char*)*(av_len(av)+1));
 	for (i=0; i < av_len(av); ++i)
 		result[i] = SvPV(*av_fetch(av, i, 0), PL_na);
 	result[i] = NULL;
@@ -475,9 +475,16 @@ gtk_widget_size_allocate (widget, allocation)
 	Gtk::Allocation	allocation
 
 void
-gtk_widget_size_request (widget, request)
+gtk_widget_size_request (widget, request=0)
 	Gtk::Widget	widget
 	Gtk::Requisition	request
+	PPCODE:
+	{
+		gtk_widget_size_request (widget, request);
+		EXTEND(SP, 2);
+		PUSHs(sv_2mortal(newSViv(request->width)));
+		PUSHs(sv_2mortal(newSViv(request->height)));
+	}
 
 void
 gtk_widget_unlock_accelerators (widget)

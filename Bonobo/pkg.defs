@@ -1,0 +1,38 @@
+; defs for the bonobo interface
+
+(define-object BonoboWidget (GtkBin))
+(define-object BonoboObject (GtkObject))
+(define-object BonoboObjectClient (BonoboObject))
+(define-object BonoboItemContainer (BonoboObject))
+(define-object BonoboUIContainer (BonoboObject) (cast BONOBO_UI_CONTAINER))
+(define-object BonoboUIComponent (BonoboObject) (cast BONOBO_UI_COMPONENT))
+(define-object BonoboClientSite (BonoboObject))
+(define-object BonoboControl (BonoboObject))
+(define-object BonoboView (BonoboControl))
+(define-object BonoboViewFrame (BonoboView))
+(define-object BonoboControlFrame (BonoboObject))
+(define-object BonoboPropertyBag (BonoboObject))
+(define-object BonoboMoniker (BonoboObject))
+(define-object BonoboEmbeddable (BonoboObject))
+(define-object BonoboGenericFactory (BonoboObject))
+(define-object BonoboCanvasItem (GnomeCanvasItem))
+(define-object BonoboCanvasComponent (BonoboObject))
+(define-object BonoboActivationContext (BonoboObject))
+
+(define-object BonoboWindow (GtkWindow))
+(define-object BonoboSelector (GnomeDialog))
+(define-object BonoboSelectorWidget (GtkVbox))
+
+(define-object BonoboPersistStream (BonoboPersist))
+(define-object BonoboPersist (BonoboObject))
+(define-object BonoboStorage (BonoboObject))
+(define-object BonoboStream (BonoboObject))
+(define-object BonoboStreamMem (BonoboStream))
+(define-object BonoboPrint (BonoboObject))
+
+(define-enum BonoboUIError
+  (ok BONOBO_UI_ERROR_OK)
+  (bad-param BONOBO_UI_ERROR_BAD_PARAM)
+  (invalid-path BONOBO_UI_ERROR_INVALID_PATH)
+  (invalid-xml BONOBO_UI_ERROR_INVALID_XML))
+

@@ -7,6 +7,7 @@
 
 #include "GtkDefs.h"
 #include "GnomeDefs.h"
+#include "GdkImlibTypes.h"
 
 
 MODULE = Gnome::DruidPageStart		PACKAGE = Gnome::DruidPageStart		PREFIX = gnome_druid_page_start_

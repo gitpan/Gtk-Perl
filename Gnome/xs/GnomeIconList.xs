@@ -5,6 +5,7 @@
 
 #include "GtkDefs.h"
 #include "GnomeDefs.h"
+#include "GdkImlibTypes.h"
 
 
 MODULE = Gnome::IconList		PACKAGE = Gnome::IconList		PREFIX = gnome_icon_list_

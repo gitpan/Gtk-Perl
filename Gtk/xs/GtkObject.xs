@@ -11,10 +11,6 @@
 #define GTK_HAVE_SIGNAL_EMITV
 #endif
 
-void destroy_handler(gpointer data);
-void generic_handler(GtkObject * object, gpointer data, guint n_args, GtkArg * args);
-void generic_handler_wo(GtkObject * object, gpointer data, guint n_args, GtkArg * args);
-
 static void generic_perl_gtk_signal_marshaller(GtkObject * object, GtkSignalFunc func, gpointer func_data, GtkArg * args)
 {
 	croak("Unable to marshal C signals from Gtk class defined in Perl");
@@ -586,10 +582,11 @@ _object_size(object)
 		{
 			GtkObject * o = SvGtkObjectRef(object, 0);
 			int type;
-			if (o)
+			if (o) {
 				type = o->klass->type;
-			else
+			} else {
 				type = gtnumber_for_ptname(SvPV(object, PL_na));
+			}
 			RETVAL = obj_size_for_gtname(gtk_type_name(type));
 		}
 		OUTPUT:
@@ -610,6 +607,28 @@ _class_size(object)
 		}
 		OUTPUT:
 		RETVAL
+
+char*
+_register (Class, perlname, addr)
+	SV *	Class
+	char *	perlname
+	IV	addr
+	CODE:
+	{
+		GtkType (*get_type_func)(void) = (GtkType (*)(void))addr;
+		GtkType parent, t;
+
+		if (!addr)
+			croak("Need a function address");
+		t = get_type_func();
+		if (!t)
+			croak("Cannot init type");
+		parent = gtk_type_parent(t);
+		RETVAL = ptname_for_gtnumber(parent);
+		pgtk_link_types(gtk_type_name(t), g_strdup(perlname), t, 0);
+	}
+	OUTPUT:
+	RETVAL
 
 int
 register_subtype(parentClass, perlClass, ...)
@@ -746,7 +765,7 @@ register_subtype(parentClass, perlClass, ...)
 #ifdef DEBUG_TYPES	
 		printf("New type = %d\n", RETVAL);
 #endif
-		link_types(SvPV(gtkName, PL_na), SvPV(perlClass,PL_na), RETVAL, 0, info.object_size, info.class_size);
+		pgtk_link_types(SvPV(gtkName, PL_na), SvPV(perlClass,PL_na), RETVAL, 0);
 
 	}
 	OUTPUT:

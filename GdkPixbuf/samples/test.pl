@@ -3,12 +3,9 @@
 #TITLE: GdkPixbuf
 #REQUIRES: Gtk GdkPixbuf
 
-use Gtk;
 use Gtk::Gdk::Pixbuf;
 
 init Gtk;
-init Gtk::Gdk::Rgb;
-init Gtk::Gdk::Pixbuf;
 
 $file = shift || '../../Gtk/samples/xpm/marble.xpm';
 

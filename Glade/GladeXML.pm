@@ -10,7 +10,7 @@ require AutoLoader;
 use Carp;
 use strict;
 
-$Gtk::GladeXML::VERSION = '0.7004';
+$Gtk::GladeXML::VERSION = '0.7005';
 
 @Gtk::GladeXML::ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export
@@ -53,7 +53,12 @@ sub _autoconnect_helper {
 	
 	no strict qw/refs/;
 
-	$handler = $package ."::". $handler_name if ($package && $handler !~ /::/);
+	if (ref $package) {
+		$handler = sub { $package->$handler_name(@_) };
+	} else {
+		$handler = $package ."::". $handler_name
+			if ($package && $handler !~ /::/);
+	}
 
 	if ($connect_object) {
 		my ($func) = $after? "signal_connect_object_after" : "signal_connect_object";
@@ -77,6 +82,10 @@ sub signal_autoconnect_from_package {
 	($package, undef, undef) = caller() unless $package;
 	$self->signal_autoconnect_full(\&_autoconnect_helper, $package);
 }
+
+Gtk->mod_init_add('Gtk', sub {
+	init Gtk::GladeXML;
+});
 
 1;
 __END__

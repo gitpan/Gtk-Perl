@@ -101,8 +101,6 @@ sub frame {
 
 init Gtk;
 
-init Gtk::XmHTML;
-
 $window = new Gtk::Window -toplevel;
 
 $file = shift;

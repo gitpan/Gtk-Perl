@@ -40,7 +40,7 @@ PerlGtkDeclareFunc (long, SvDefFlagsHash)(GtkType type, SV *name);
 PerlGtkDeclareVar(int, pgtk_use_minus);
 PerlGtkDeclareVar(int, pgtk_use_array);
 
-PerlGtkDeclareFunc(void *, alloc_temp)(int length);
+PerlGtkDeclareFunc(void *, pgtk_alloc_temp)(int length);
 
 
 #define PackCallbackST(av, first)							\

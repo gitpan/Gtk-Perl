@@ -1,27 +1,19 @@
 use ExtUtils::MakeMaker;
-use File::Basename;
-use blib '..';
+use blib '../Gtk';
 use blib '../GdkImlib';
-use Gtk::Install::Files;
-use Gtk::Gdk::ImlibImage::Install::Files;
 use Cwd;
 require '../Depends.pm';
-import ExtUtils::Depends;
-
 require '../tools/gendefs.pl';
 
 mkdir('build', 0777);
 
-$pm = {};
+$gnome = new ExtUtils::Depends('Gnome', 'Gtk', 'Gtk::Gdk::ImlibImage');
 
-$inc = `gnome-config --cflags gnomeui zvt`;
-chomp($inc);
-$libs = `gnome-config --libs gnomeui zvt`;
-chomp($libs);
+$gnome->set_inc (`gnome-config --cflags gnomeui zvt`);
+$gnome->set_libs (`gnome-config --libs gnomeui zvt`);
 
-@typemaps = @Gtk::Install::Files::typemaps;
-$typemaps = [cwd() . '/pkg.typemap', cwd().'/build/GnomeTypemap'];
-@headers = qw("GnomeDefs.h");
+$gnome->add_typemaps (cwd() . '/pkg.typemap', cwd().'/build/GnomeTypemap');
+#$gnome->add_headers (qw("GnomeDefs.h"));
 
 $gnome_version = `gnome-config --version`;
 if ( $gnome_version =~ /(\d+)\.(\d+)\.(\d+)/) {
@@ -35,37 +27,24 @@ if ( $gnome_version =~ /(\d+)\.(\d+)\.(\d+)/) {
 $gnome_hverstr = sprintf("0x%02x%02x%02x", $gnome_major, $gnome_minor, $gnome_micro);
 if ($gnome_major > 1 || ($gnome_major == 1 && $gnome_minor >= 1) || ($gnome_major == 1 && $gnome_micro >= 50)) {
 	print "Using october gnome release\n";
-	add_defs ('gnome-october.defs');
+	$gnome->add_defs ('gnome-october.defs');
 }
 
 if (grep {/--with-panel/} @ARGV) {
 	do 'pkg-panel.pl';
 }
-push @defines, "-DGNOME_HVER=$gnome_hverstr";
-ExtUtils::Depends::save_config('Gnome', 'build/IFiles.pm', $inc, $libs, 
-	$typemaps, [keys %defs], [@defines], [@headers], $pm);
+$gnome->add_defines("-DGNOME_HVER=$gnome_hverstr");
+$gnome->save_config('build/Files.pm');
+$gnome->install('build/Files.pm');
 
-foreach (@typemaps) {
-	print "Add typemap: $Gtk::Install::Files::CORE/$_\n";
-	push(@$typemaps, cwd() .'/'.$Gtk::Install::Files::CORE . '/'. $_);
-}
-foreach (@Gtk::Gdk::ImlibImage::Install::Files::typemaps) {
-	print "Add typemap: $Gtk::Gdk::ImlibImage::Install::Files::CORE/$_\n";
-	push(@$typemaps, cwd() .'/'.$Gtk::Gdk::ImlibImage::Install::Files::CORE . '/'. $_);
-}
-push(@defines, @Gtk::Install::Files::defines, @Gtk::Gdk::ImlibImage::Install::Files::defines);
-#push(@defines, '-I../build', '-Ibuild', '-I.', '-I../Gtk');
-push(@defines, "-I$Gtk::Gdk::ImlibImage::Install::Files::CORE");
-push(@defines, '-Ibuild', '-I.', "-I$Gtk::Install::Files::CORE");
+$gnome->add_pm ('Gnome.pm' => '$(INST_ARCHLIBDIR)/Gnome.pm',
+	'build/GnomeTypes.pm' => '$(INST_ARCHLIBDIR)/Gnome/Types.pm');
 
-$pm->{'Gnome.pm'} = '$(INST_ARCHLIBDIR)/Gnome.pm';
-$pm->{'build/GnomeTypes.pm'} = '$(INST_ARCHLIBDIR)/Gnome/Types.pm';
+$gnome->add_c ('build/GnomeDefs.c');
+$gnome->add_defs ('pkg.defs', 'pkg-zvt.defs');
+$gnome->add_headers (qw( <zvt/zvtterm.h> <libgnome/libgnome.h> <libgnomeui/libgnomeui.h> "GnomeTypes.h" ));
 
-add_c ('build/GnomeDefs.c');
-add_defs ('pkg.defs', 'pkg-zvt.defs');
-add_headers (qw( <zvt/zvtterm.h> <libgnome/libgnome.h> <libgnomeui/libgnomeui.h> "GnomeTypes.h" ));
-
-add_raw_xs ('xs/Gnome.xs', 'xs/GnomeDialogUtil.xs', 'xs/GnomeDNS.xs', 
+$gnome->add_xs ('xs/Gnome.xs', 'xs/GnomeDialogUtil.xs', 'xs/GnomeDNS.xs', 
 	'xs/GnomeGeometry.xs', 'xs/GnomeICE.xs');
 
 @a = (	'-f', 'Gnome', 
@@ -77,38 +56,27 @@ add_raw_xs ('xs/Gnome.xs', 'xs/GnomeDialogUtil.xs', 'xs/GnomeDNS.xs',
 		'-p', 'Panel=Gnome::Panel',
 		'-m', 'Gnome');
 
-add_headers (@Gtk::Install::Files::headers);
-add_headers (@Gtk::Gdk::ImlibImage::Install::Files::headers);
-# FIXME: use defs and headers from ExtUtils::Depends....
-%defs = %ExtUtils::Depends::defs;
-%headers = %ExtUtils::Depends::headers;
-foreach (sort {$defs{$a} <=> $defs{$b}} keys %defs) {
+foreach ($gnome->get_defs) {
 	push @a, '-d', $_;
 }
-foreach (sort {$headers{$a} <=> $headers{$b}} keys %headers) {
+foreach ($gnome->get_headers) {
 	push @a, '-i', $_;
 }
 
-add_raw_xs(gendefs::gendefs(@a));
-
-($xfiles, $object, $ldfrom) = setup_xs();
+$gnome->add_xs(gendefs::gendefs(@a));
 
 $depend = { 'build/GnomeDefs.c' => 'build/GnomeDefs.h build/PerlGnomeInt.h' };
 
-foreach (qw(build/GnomeDefs.h build/PerlGnomeInt.h)) {
-	$pm->{$_} = '$(INST_ARCHLIBDIR)/Gnome/Install/'. basename($_);
-}
+$gnome->install (qw(build/GnomeDefs.h build/PerlGnomeInt.h));
+$gnome->write_ext('build/extension.xsh');
 
-write_ext();
-
-@clean = qw(
-	build/IFiles.pm build/GnomeDefs.c build/GnomeDefs.h build/GnomeDefs.o 
+$gnome->add_clean ( qw(
+	build/Files.pm build/GnomeDefs.c build/GnomeDefs.h build/GnomeDefs.o 
 	build/GnomeTypemap build/GnomeTypes.pm build/PerlGnomeExt.c 
 	build/PerlGnomeExt.h build/PerlGnomeInt.h build/boxed.xsh 
 	build/extension.xsh build/objects.xsh build/perl-gnome-ds.pod 
-	build/perl-gnome-ref.pod
-);
-push(@clean, @ExtUtils::Depends::clean);
+	build/perl-gnome-ref.xml
+));
 
 # documentation
 gendefs::gen_doc('gnome');
@@ -117,19 +85,12 @@ system("../tools/gendoc.pl", "-t", 'gnome', keys %ExtUtils::Depends::xs);
 WriteMakefile(
 	'NAME'      => 'Gnome',
 	'VERSION_FROM'	=> 'Gnome.pm',
-	'PM' => $pm,
-	'TYPEMAPS' => $typemaps,
-	'XS' => $xfiles,
 	'XSOPT' => '-noversioncheck',
 	'DEFINE'    => join(' ',@defines),
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
-	'INC' => $inc,
-	'LIBS' => [$libs],
-	'OBJECT' => $object,
-	'clean' => {FILES => join(' ', @clean) },
 	'OPTIMIZE' => '-O2 -g',
-	#'LDFROM' => $ldfrom,
 	'depend' => $depend,
+	$gnome->get_makefile_vars,
 );
 
 sub MY::postamble {

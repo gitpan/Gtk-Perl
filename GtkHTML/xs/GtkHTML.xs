@@ -93,6 +93,11 @@ gtk_html_new (Class)
 	OUTPUT:
 	RETVAL
 
+void
+gtk_html_set_iframe_parent (html, parent)
+	Gtk::HTML	html
+	Gtk::Widget	parent
+
 gulong
 gtk_html_begin (html)
 	Gtk::HTML	html
@@ -133,9 +138,10 @@ gtk_html_allow_selection (html, allow)
 	Gtk::HTML	html
 	bool	allow
 
-void
-gtk_html_request_paste (html, time)
+int
+gtk_html_request_paste (html, type, time)
 	Gtk::HTML	html
+	int	type
 	int	time
 
 void

@@ -9,7 +9,6 @@ use OpenGL qw(:all !:glutconstants !:glutfunctions);
 use Gtk::GLArea;
 use Gtk::GLArea::Glut qw(:all);
 init Gtk;
-init Gtk::GLArea;
 
 use Data::Dumper;
 

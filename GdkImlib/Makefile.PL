@@ -1,72 +1,39 @@
 use ExtUtils::MakeMaker;
-use blib '..';
-use Gtk::Install::Files;
 use Cwd;
+use blib '../Gtk';
 require '../Depends.pm';
-import ExtUtils::Depends;
 
-#eval {require '../build/IFiles.pm'};
-#warn ("Using installed Gtk\n"), require Gtk::Install::Files if $@;
-
-#$Gtk::Install::Files::CORE = cwd()."../build" unless $Gtk::Install::Files::CORE;
+$imlib = new ExtUtils::Depends ('Gtk::Gdk::ImlibImage', 'Gtk');
 
 mkdir('build', 0777);
 
-$pm = {};
+$imlib->set_inc(`imlib-config --cflags-gdk`);
+$imlib->set_libs(`imlib-config --libs-gdk`);
+$imlib->add_typemaps (cwd() . '/pkg.typemap');
+$imlib->add_headers ('"GdkImlibTypes.h"');
+$imlib->add_xs ('xs/GdkImlib.xs');
 
-$inc = `imlib-config --cflags-gdk`;
-chomp($inc);
-$libs = `imlib-config --libs-gdk`;
-chomp($libs);
+$imlib->save_config('build/IFiles.pm');
 
-@typemaps = @Gtk::Install::Files::typemaps;
-$typemaps = [cwd() . '/pkg.typemap'];
-@headers = ('"GdkImlibTypes.h"');
+$imlib->add_pm(
+	'build/IFiles.pm' => '$(INST_ARCHLIBDIR)/ImlibImage/Install/Files.pm', 
+	'GdkImlibImage.pm' => '$(INST_ARCHLIBDIR)/ImlibImage.pm');
 
-ExtUtils::Depends::save_config('Gtk::Gdk::ImlibImage', 'build/IFiles.pm', $inc, $libs, 
-	$typemaps, [keys %defs], [@defines], [@headers], $pm);
-
-foreach (@typemaps) {
-	print "Add typemap: $Gtk::Install::Files::CORE/$_\n";
-	push(@$typemaps, cwd() .'/'.$Gtk::Install::Files::CORE . '/'. $_);
-}
-
-push(@defines, @Gtk::Install::Files::defines);
-push(@defines, "-I$Gtk::Install::Files::CORE");
-#push(@defines, '-I../build', '-I../Gtk');
-
-$pm->{'GdkImlibImage.pm'} = '$(INST_ARCHLIBDIR)/ImlibImage.pm';
-$pm->{'GdkImlibTypes.h'} = '$(INST_ARCHLIBDIR)/ImlibImage/Install/'.'GdkImlibTypes.h';
-
-add_raw_xs ('xs/GdkImlib.xs');
-
-($xfiles, $object, $ldfrom) = setup_xs();
-
-@clean = qw(
-	build/IFiles.pm build/perl-gdkimlib-ref.pod
-);
-push(@clean, @ExtUtils::Depends::clean);
+$imlib->add_clean( qw(
+	build/IFiles.pm  build/perl-gdkimlib-ref.xml
+));
 
 # documentation
 #gendefs::gen_doc('gdkimlib');
-system("../tools/gendoc.pl", "-t", 'gdkimlib', keys %ExtUtils::Depends::xs);
-
+system("../tools/gendoc.pl", "-t", 'gdkimlib', $imlib->get_xs);
 
 WriteMakefile(
 	'NAME'      => 'Gtk::Gdk::ImlibImage',
 	'VERSION_FROM'	=> 'GdkImlibImage.pm',
-	'PM' => $pm,
-	'TYPEMAPS' => $typemaps,
-	'XS' => $xfiles,
 	'XSOPT' => '-noversioncheck',
-	'DEFINE'    => join(' ',"-I.", @defines),
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
-	'INC' => $inc,
-	'LIBS' => [$libs],
-	'OBJECT' => $object,
-	'clean' => {FILES => join(' ', @clean) },
+	$imlib->get_makefile_vars,
 );
-
 
 sub MY::c_o {
 	package MY; # so that "SUPER" works right

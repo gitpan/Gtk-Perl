@@ -7,7 +7,7 @@
 
 /* This CTree implementation is only suitable for Gtk+ 1.1.1 and later. */
 
-void ctree_func_handler (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
+static void ctree_func_handler (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
 {
 	AV * perlargs = (AV*)data;
 	SV * perlhandler = *av_fetch(perlargs, 1, 0);
@@ -532,7 +532,7 @@ gtk_ctree_remove_node(ctree, node)
 void
 gtk_ctree_post_recursive(ctree, node, func, ...)
 	Gtk::CTree	ctree
-	Gtk::CTreeNode	node
+	Gtk::CTreeNode_OrNULL node
 	SV *		func
 	CODE:
 	{
@@ -544,6 +544,25 @@ gtk_ctree_post_recursive(ctree, node, func, ...)
 		PackCallbackST(args, 2);
 
 		gtk_ctree_post_recursive(ctree, node, ctree_func_handler, args);
+
+		SvREFCNT_dec(args);
+	}
+
+void
+gtk_ctree_pre_recursive(ctree, node, func, ...)
+	Gtk::CTree	ctree
+	Gtk::CTreeNode_OrNULL node
+	SV *		func
+	CODE:
+	{
+		AV * args;
+		SV * arg;
+
+		args = newAV();
+		av_push(args, newRV_inc(SvRV(ST(0))));
+		PackCallbackST(args, 2);
+
+		gtk_ctree_pre_recursive(ctree, node, ctree_func_handler, args);
 
 		SvREFCNT_dec(args);
 	}

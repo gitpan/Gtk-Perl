@@ -230,12 +230,17 @@ sub my_compare {
 
 sub output_package_xml {
 	my ($p) = shift;
-	my (@c, @parent);
+	my (@c, @parent, $ref);
 
-	$writer->startTag('package', name => $p, id => "main-$p");
+	$ref = uc($p);
+	$ref =~ s/:/-/g;
+	$writer->startTag('package', name => $p, id => $ref);
 	@parent = eval "\@${p}::ISA";
 	if (@parent) {
-		$writer->startTag('parent', name => shift(@parent));
+		$p = shift @parent;
+		$ref = uc($p);
+		$ref =~ s/:/-/g;
+		$writer->startTag('parent', name => $p, idref => $ref);
 		$writer->endTag('parent');
 	}
 	# output description

@@ -137,7 +137,7 @@ void AddSignalHelper(struct PerlGtkSignalHelper * h)
 	}
 }
 
-void marshal_signal (GtkObject *object, gpointer data, guint nparams, GtkArg * args, GtkType * arg_types, GtkType return_type)
+static void marshal_signal (GtkObject *object, gpointer data, guint nparams, GtkArg * args, GtkType * arg_types, GtkType return_type)
 {
 	AV * perlargs = (AV*)data;
 	SV * perlhandler = *av_fetch(perlargs, 3, 0);
@@ -233,17 +233,17 @@ repacked:
 	
 }
 
-void destroy_signal (gpointer data)
+static void destroy_signal (gpointer data)
 {
 	AV * perlargs = (AV*)data;
 	SvREFCNT_dec(perlargs);
 }
 
-void destroy_handler(gpointer data) {
+void pgtk_destroy_handler(gpointer data) {
 	SvREFCNT_dec((AV*)data);
 }
 
-void generic_handler(GtkObject * object, gpointer data, guint n_args, GtkArg * args) {
+void pgtk_generic_handler(GtkObject * object, gpointer data, guint n_args, GtkArg * args) {
 	AV * stuff;
 	SV * handler;
 	SV * result;
@@ -289,7 +289,7 @@ void generic_handler(GtkObject * object, gpointer data, guint n_args, GtkArg * a
 
 }
 
-int init_handler(gpointer data) {
+static int init_handler(gpointer data) {
 	AV * args = (AV*)data;
 	SV * handler = *av_fetch(args, 0, 0);
 	int i;
@@ -306,7 +306,7 @@ int init_handler(gpointer data) {
 	return 0;
 }
 
-int snoop_handler(GtkWidget * grab_widget, GdkEventKey * event, gpointer data) {
+static int snoop_handler(GtkWidget * grab_widget, GdkEventKey * event, gpointer data) {
 	AV * args = (AV*)data;
 	SV * handler = *av_fetch(args, 0, 0);
 	int i;
@@ -338,7 +338,7 @@ int snoop_handler(GtkWidget * grab_widget, GdkEventKey * event, gpointer data) {
 
 /*static AV * input_handlers = 0;*/
 
-void input_handler(gpointer data, gint source, GdkInputCondition condition) {
+static void input_handler(gpointer data, gint source, GdkInputCondition condition) {
 	AV * args = (AV*)data;
 	SV * handler = *av_fetch(args, 0, 0);
 	int i;
@@ -371,7 +371,7 @@ void input_handler(gpointer data, gint source, GdkInputCondition condition) {
 
 }
 
-void menu_callback (GtkWidget *widget, gpointer user_data)
+static void menu_callback (GtkWidget *widget, gpointer user_data)
 {
 	SV * handler = (SV*)user_data;
 	int i;
@@ -400,11 +400,11 @@ static void     callXS (void (*subaddr)(CV* cv), CV *cv, SV **mark)
 	PUTBACK;  /* Forget the return values */
 }
 
-int did_we_init_gtk = 0;
-int did_we_init_gdk = 0;
+int pgtk_did_we_init_gtk = 0;
+int pgtk_did_we_init_gdk = 0;
 
 #if GTK_HVER < 0x010103
-void g_error_handler(char * msg) {
+static void g_error_handler(char * msg) {
 	int i;
 	if (msg && (i=strlen(msg)) && (i>0) && (msg[i-1] == '\n'))
 		croak("Gtk error: %s ", msg);
@@ -412,7 +412,7 @@ void g_error_handler(char * msg) {
 		croak("Gtk error: %s", msg);
 }
 
-void g_warning_handler(char * msg) {
+static void g_warning_handler(char * msg) {
 	int i;
 	if (msg && (i=strlen(msg)) && (i>0) && (msg[i-1] == '\n'))
 		warn("Gtk warning: %s ", msg);
@@ -497,6 +497,34 @@ static void log_handler(const char * log_domain, GLogLevelFlags log_level, const
 }
 
 #endif
+
+static GSList * mod_init_handlers = NULL;
+typedef struct {
+	GQuark module;
+	gpointer data;
+} ModInit;
+
+static void
+mod_init_add (char * module, gpointer data) {
+	ModInit * mi = g_new0(ModInit, 1);
+	mi->module = g_quark_from_string(module);
+	mi->data = data;
+	mod_init_handlers = g_slist_append(mod_init_handlers, mi);
+}
+
+void
+pgtk_exec_init (char * module) {
+	GQuark mod = g_quark_from_string(module);
+	GSList * tmp = mod_init_handlers;
+	ModInit * mi;
+	
+	for (;tmp; tmp = tmp->next) {
+		mi = (ModInit*)tmp->data;
+		if (mi->module != mod)
+			continue;
+		init_handler(mi->data);
+	}
+}
 
 void GdkInit_internal() {
 				
@@ -697,7 +725,109 @@ void GtkInit_internal() {
 				  , 0};
 			AddSignalHelperParts(gtk_widget_get_type(), names, fixup_widget_u, 0);
 		}
+		pgtk_exec_init("Gtk");
+}
 
+/* Add magic to watch perl variables... */
+#define WATCH_VAR_ID 19283745
+
+typedef struct {
+	int id;
+	SV *sv;
+	AV *args;
+	int changed;
+} watch_var_data;
+
+static gboolean 
+watch_var_prepare (gpointer source_data, GTimeVal *current_time, gint *timeout, gpointer user_data) {
+	watch_var_data *wvd = (watch_var_data*)source_data;
+	*timeout = -1;
+	return wvd->changed;
+}
+
+static gboolean 
+watch_var_check (gpointer source_data, GTimeVal *current_time, gpointer user_data) {
+	watch_var_data *wvd = (watch_var_data*)source_data;
+	return wvd->changed;
+}
+
+static gboolean 
+watch_var_dispatch (gpointer source_data, GTimeVal *current_time, gpointer user_data) {
+	watch_var_data *wvd = (watch_var_data*)source_data;
+	AV * args = (AV*)wvd->args;
+	SV * handler = *av_fetch(args, 0, 0);
+	int i;
+	SV * s;
+	dSP;
+
+	wvd->changed = 0;
+
+#ifdef PGTK_THREADS
+	gdk_threads_enter();
+#endif
+
+	ENTER;
+	SAVETMPS;
+	
+	PUSHMARK(sp);
+	XPUSHs(sv_2mortal(newSVsv(wvd->sv)));
+	for (i=1;i<=av_len(args);i++)
+		XPUSHs(sv_2mortal(newSVsv(*av_fetch(args, i, 0))));
+	PUTBACK;
+
+	perl_call_sv(handler, G_SCALAR);
+
+	if (i!=1)
+		croak("watch handler failed");
+
+	i = POPi;
+
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+	
+#ifdef PGTK_THREADS
+	gdk_threads_leave();
+#endif
+
+	return i;
+}
+
+static void
+watch_var_free (gpointer data) {
+	g_free(data);
+}
+
+static GSourceFuncs watch_var_funcs = {
+	watch_var_prepare,
+	watch_var_check,
+	watch_var_dispatch,
+	watch_var_free
+};
+
+static I32
+watch_var_val (IV ix, SV *sv) {
+	if (!SvPOK(sv) && SvPOKp(sv))
+		SvPOK_on(sv);
+	if (!SvNOK(sv) && SvNOKp(sv))
+		SvNOK_on(sv);
+	if (!SvIOK(sv) && SvIOKp(sv))
+		SvIOK_on(sv);
+	return 0;
+}
+
+static I32
+watch_var_set (IV ix, SV *sv) {
+	watch_var_data *wvd = (watch_var_data*)ix;
+	if (!SvPOK(sv) && SvPOKp(sv))
+		SvPOK_on(sv);
+	if (!SvNOK(sv) && SvNOKp(sv))
+		SvNOK_on(sv);
+	if (!SvIOK(sv) && SvIOKp(sv))
+		SvIOK_on(sv);
+	if (wvd && wvd->id == WATCH_VAR_ID)
+		wvd->changed = 1;
+	return 0;
 }
 
 MODULE = Gtk		PACKAGE = Gtk		PREFIX = gtk_
@@ -737,7 +867,7 @@ init(Class)
 	SV * ARGV0;
 	int i;
 
-	if (did_we_init_gtk)
+	if (pgtk_did_we_init_gtk)
 		return;
 #ifdef PGTK_THREADS
 			g_thread_init(NULL); /* should probably check the perl thread implementation... */
@@ -755,7 +885,7 @@ init(Class)
 			ARGV = perl_get_av("ARGV", FALSE);
 			ARGV0 = perl_get_sv("0", FALSE);
 			
-			if (did_we_init_gdk)
+			if (pgtk_did_we_init_gdk)
 				croak("GTK cannot be initalized after GDK has been initialized");
 			
 			argc = av_len(ARGV)+2;
@@ -781,8 +911,8 @@ init(Class)
 #endif
 			XPUSHs(sv_2mortal(newSViv(1)));
 
-			did_we_init_gtk = 1;
-			did_we_init_gdk = 1;
+			pgtk_did_we_init_gtk = 1;
+			pgtk_did_we_init_gdk = 1;
 			
 			while(argc<i--)
 				av_shift(ARGV);
@@ -864,7 +994,7 @@ gtk_grab_get_current(Class)
 
  #DESC: Quit the main loop.
 void
-main_quit(Class)
+main_quit(Class=0, ...)
 	SV *	Class
 	CODE:
 	gtk_main_quit();
@@ -975,11 +1105,72 @@ timeout_add(Class, interval, handler, ...)
 		PackCallbackST(args, 2);
 		
 		RETVAL = gtk_timeout_add_full(interval, 0,
-			generic_handler, (gpointer)args, destroy_handler);
+			pgtk_generic_handler, (gpointer)args, pgtk_destroy_handler);
 		
 	}
 	OUTPUT:
 	RETVAL
+
+int
+watch_add(Class, sv, priority, handler, ...)
+	SV * Class
+	SV * sv
+	int priority
+	SV *	handler
+	CODE:
+	{
+		AV * args;
+		SV * arg;
+		int i,j;
+		int type;
+		struct ufuncs *ufp;
+		watch_var_data *wdata;
+		MAGIC **mgp;
+		MAGIC *mg;
+		MAGIC *mg_list;
+		
+		/* code basically stolen from perl-tk */
+		if (SvTHINKFIRST(sv) && SvREADONLY(sv))
+			croak("Cannot trace readonly variable");
+		if (!SvUPGRADE(sv, SVt_PVMG))
+			croak("Cannot upgrade variable");
+		mg_list = SvMAGIC(sv);
+		SvMAGIC(sv) = NULL;
+		sv_magic(sv, 0, 'U', 0, 0);
+		wdata = g_new0(watch_var_data, 1);
+		wdata->id = WATCH_VAR_ID;
+		ufp = g_new0(struct ufuncs, 1);
+		ufp->uf_val = watch_var_val;
+		ufp->uf_set = watch_var_set;
+		ufp->uf_index = (IV)wdata;
+		
+		mg = SvMAGIC(sv);
+		mg->mg_ptr = (char *) ufp;
+		mg->mg_len = sizeof(struct ufuncs);
+		SvMAGIC(sv) = mg_list;
+		mgp = &SvMAGIC(sv);
+		while ((mg_list = *mgp))
+			mgp = &mg_list->mg_moremagic;
+		*mgp = mg;
+		
+		args = newAV();
+		
+		PackCallbackST(args, 3);
+		
+		wdata->sv = sv;
+		wdata->args = args;
+		RETVAL = g_source_add(priority, TRUE, &watch_var_funcs, wdata,
+			NULL, NULL);
+		
+	}
+	OUTPUT:
+	RETVAL
+
+void
+watch_remove(Class, tag)
+	int	tag
+	CODE:
+	g_source_remove(tag);
 
  #DESC: Remove a timeout handler identified by tag.
 void
@@ -1011,7 +1202,7 @@ idle_add(Class, handler, ...)
 		PackCallbackST(args, 1);
 		
 		RETVAL = gtk_idle_add_full(GTK_PRIORITY_DEFAULT, NULL, 
-				generic_handler, (gpointer)args, destroy_handler);
+				pgtk_generic_handler, (gpointer)args, pgtk_destroy_handler);
 		
 	}
 	OUTPUT:
@@ -1039,10 +1230,10 @@ idle_add_priority (Class, priority, handler, ...)
 		int type;
 		args = newAV();
 		
-		PackCallbackST(args, 1);
+		PackCallbackST(args, 2);
 		
 		RETVAL = gtk_idle_add_full(priority, NULL, 
-				generic_handler, (gpointer)args, destroy_handler);
+				pgtk_generic_handler, (gpointer)args, pgtk_destroy_handler);
 		
 	}
 	OUTPUT:
@@ -1076,6 +1267,21 @@ init_add(Class, handler, ...)
 		gtk_init_add(init_handler, (gpointer)args);
 	}
 
+void
+mod_init_add(Class, module, handler, ...)
+	SV *	Class
+	char *	module
+	SV *	handler
+	CODE:
+	{
+		AV * args;
+		args = newAV();
+		
+		PackCallbackST(args, 2);
+		
+		mod_init_add(module, (gpointer)args);
+	}
+
  #DESC: Add an handler to be called when the main loop of level
  #main_level quits.
  #ARG: $handler subroutine (generic subroutine)
@@ -1095,7 +1301,7 @@ quit_add(Class, main_level, handler, ...)
 		PackCallbackST(args, 2);
 		
 		RETVAL = gtk_quit_add_full(main_level, 0,
-			generic_handler, (gpointer)args, destroy_handler);
+			pgtk_generic_handler, (gpointer)args, pgtk_destroy_handler);
 	}
 	OUTPUT:
 	RETVAL
@@ -2016,7 +2222,7 @@ init(Class)
 		Gtk::Gdk::init_check = 1
 	PPCODE:
 	{
-		if (!did_we_init_gdk && !did_we_init_gtk) {
+		if (!pgtk_did_we_init_gdk && !pgtk_did_we_init_gtk) {
 			int argc;
 			char ** argv = 0;
 			AV * ARGV = perl_get_av("ARGV", FALSE);
@@ -2046,7 +2252,7 @@ init(Class)
 #endif
 			XPUSHs(sv_2mortal(newSViv(1)));
 
-			did_we_init_gdk = 1;
+			pgtk_did_we_init_gdk = 1;
 			
 			while(argc<i--)
 				av_shift(ARGV);
@@ -2236,7 +2442,7 @@ input_add(Class, source, condition, handler, ...)
 		
 		PackCallbackST(args, 3);
 
-		RETVAL = gdk_input_add_full(source, condition, input_handler, (gpointer)args, destroy_handler);		
+		RETVAL = gdk_input_add_full(source, condition, input_handler, (gpointer)args, pgtk_destroy_handler);		
 	}
 	OUTPUT:
 	RETVAL
@@ -4424,8 +4630,8 @@ gdk_regions_xor (region, regionb)
 	Gtk::Gdk::Region region
 	Gtk::Gdk::Region regionb
 
-INCLUDE: ../../build/boxed.xsh
+INCLUDE: ../build/boxed.xsh
 
-INCLUDE: ../../build/objects.xsh
+INCLUDE: ../build/objects.xsh
 
-INCLUDE: ../../build/extension.xsh
+INCLUDE: ../build/extension.xsh

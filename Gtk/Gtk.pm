@@ -1,12 +1,46 @@
 package Gtk;
 
+=pod
+
+=head1 NAME
+
+Gtk - Perl module for the Gimp Toolkit library
+
+=head1 SYNOPSIS
+
+	use Gtk '-init';
+	my $window = new Gtk::Window;
+	my $button = new Gtk::Button("Quit");
+	$button->signal_connect("clicked", sub {Gtk->main_quit});
+	$window->add($button);
+	$window->show_all;
+	Gtk->main;
+	
+=head1 DESCRIPTION
+
+The Gtk module allows Perl access to the Gtk+ graphical user interface
+library. You can find more information about Gtk+ on http://www.gtk.org.
+The Perl binding tries to follow the C interface as much as possible,
+providing at the same time a fully object oriented interface and
+Perl-style calling conventions.
+
+=head1 AUTHOR
+
+Kenneth Albanowski, Paolo Molaro
+
+=head1 SEE ALSO
+
+perl(1)
+
+=cut
+
 require Exporter;
 require DynaLoader;
 require AutoLoader;
 
 use Carp;
 
-$VERSION = '0.7004';
+$VERSION = '0.7005';
 
 @ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export
@@ -212,6 +246,27 @@ sub insert_node_defaults {
 package Gtk;
 
 require Gtk::Types;
+
+sub getopt_options {
+	my $dummy;
+	return (
+		"gdk-debug=s"	=> \$dummy,
+		"gdk-no-debug=s"	=> \$dummy,
+		"display=s"	=> \$dummy,
+		"sync"	=> \$dummy,
+		"no-xshm"	=> \$dummy,
+		"name=s"	=> \$dummy,
+		"class=s"	=> \$dummy,
+		"gxid_host=s"	=> \$dummy,
+		"gxid_port=s"	=> \$dummy,
+		"xim-preedit=s"	=> \$dummy,
+		"xim-status=s"	=> \$dummy,
+		"gtk-debug=s"	=> \$dummy,
+		"gtk-no-debug=s"	=> \$dummy,
+		"g-fatal-warnings"	=> \$dummy,
+		"gtk-module=s"	=> \$dummy,
+	);
+}
 
 # Autoload methods go after __END__, and are processed by the autosplit program.
 

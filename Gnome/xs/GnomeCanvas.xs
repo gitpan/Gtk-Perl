@@ -19,7 +19,7 @@ gnome_canvas_new(Class)
 	OUTPUT:
 	RETVAL
 
-#ifdef NEW_GNOME
+#if GNOME_HVER >= 0x010200
 
 Gnome::Canvas_Sink
 gnome_canvas_new_aa(Class)

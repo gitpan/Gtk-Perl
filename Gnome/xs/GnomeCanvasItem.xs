@@ -175,7 +175,7 @@ gnome_canvas_item_move(item, dx, dy)
 	double	dx
 	double	dy
 
-#ifdef NEW_GNOME
+#if GNOME_HVER >= 0x010200
 
 void
 gnome_canvas_item_affine_relative (item, aff0, aff1, aff2, aff3, aff4, aff5)

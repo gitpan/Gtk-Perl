@@ -10,7 +10,6 @@ use Gtk::Gdk::ImlibImage;
 use Gnome;
 #init Gtk;
 init Gnome "canvas.pl";
-init Gtk::Gdk::ImlibImage;
 
 #DnD target data
 @target_table = (

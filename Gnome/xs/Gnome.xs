@@ -7,10 +7,10 @@
 #include "GnomeDefs.h"
 
 static GnomeUIInfo * svrv_to_uiinfo_tree(SV *data);
-extern void menu_callback(GtkWidget *w, gpointer data);
+extern void pgtk_menu_callback(GtkWidget *w, gpointer data);
 
-extern int did_we_init_gdk, did_we_init_gtk;
-int did_we_init_gnome = 0;
+extern int pgtk_did_we_init_gdk, pgtk_did_we_init_gtk;
+int pgtk_did_we_init_gnome = 0;
 
 #define sp (*_sp)
 
@@ -39,7 +39,7 @@ static int fixup_druid(SV ** * _sp, int match, GtkObject * object, char * signam
  * This needs ANSI
  */
 #define MAYBE(str) if(!strcmp(name,#str)) {return GNOME_STOCK_BUTTON_##str;}
-char *gnome_perl_stock_button(const char *name) 
+static char *gnome_perl_stock_button(const char *name) 
 {
 #ifdef GNOME_STOCK_BUTTON_OK
 	MAYBE(OK)
@@ -163,10 +163,128 @@ static void     callXS (void (*subaddr)(CV* cv), CV *cv, SV **mark)
     PUTBACK;  /* Forget the return values */
 }
 
-void GnomeInit_internal(char * app_id, char * app_version)
+/* popt is buggy! */
+static void
+pgtk_popt_callback_void (poptContext ctx,
+           enum poptCallbackReason reason,
+           const struct poptOption *opt,
+           const char *arg, void *data) {}
+
+static void
+pgtk_popt_callback (poptContext ctx,
+           enum poptCallbackReason reason,
+           const struct poptOption *opt,
+           const char *arg, void *data) {
+	dSP;
+	if (!data)
+		return;
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(SP);
+	XPUSHs(sv_2mortal(newSVpv(opt->longName, strlen(opt->longName))));
+	if (arg && opt->argInfo != POPT_ARG_NONE)
+		XPUSHs(sv_2mortal(newSVpv(arg, strlen(arg))));
+	PUTBACK;
+	perl_call_sv((SV*)data, G_DISCARD|G_EVAL);
+	FREETMPS;
+	LEAVE;
+}
+
+static void
+free_options (struct poptOption* o) {
+	int i;
+	if (!o)
+		return;
+	for (i=0; o[i].longName; ++i)
+		g_free(o[i].longName);
+	g_free(o);
+}
+
+static struct poptOption*
+get_options (SV *options, int *remove) {
+	HV *hv;
+	AV *av = NULL;
+	SV *handler = NULL;
+	SV **sv;
+	int n, i;
+	struct poptOption* res = NULL;
+
+	if ((!SvOK(options)) || (!SvRV(options)))
+		croak("Options must be an array or hash reference");
+	if (SvTYPE(SvRV(options)) == SVt_PVHV) {
+		hv = (HV*)SvRV(options);
+
+		if ((sv=hv_fetch(hv, "callback", 8, 0)) && SvOK(*sv))
+			handler = *sv;
+		if ((sv=hv_fetch(hv, "remove", 6, 0)) && SvOK(*sv))
+			*remove = SvTRUE(*sv);
+		if ((sv=hv_fetch(hv, "options", 7, 0)) && SvOK(*sv) && SvRV(*sv) && SvTYPE(SvRV(*sv)) == SVt_PVAV)
+			av = (AV*)SvRV(*sv);
+		else
+			croak("Options should have an 'options' key that is an array ref");
+	} else if (SvTYPE(SvRV(options)) == SVt_PVAV) {
+		av = (AV*)SvRV(options);
+		handler = NULL;
+	} else {
+		handler = NULL; /* arguments will be parsed later by Getopt::Long or something else ..*/
+	}
+	
+	n = av_len(av)+1;
+	if (n % 2)
+		croak("options should be an array ref containing argname, argdescription couples");
+	
+	res = g_new0(struct poptOption, n/2 + 2);
+	res[0].argInfo = POPT_ARG_CALLBACK;
+	res[0].arg = handler?pgtk_popt_callback:pgtk_popt_callback_void;
+	res[0].descrip = (char*)handler;
+	for (i=0; i < n; i+=2) {
+		char *p = NULL;
+		char *longopt = NULL;
+		char *end;
+		struct poptOption * o = &res[1+i/2];
+		SV **s;
+
+		o->argInfo = POPT_ARG_NONE;
+		if ((s=av_fetch(av, i, 0)) && SvOK(*s))
+			longopt = o->longName = g_strdup(SvPV(*s, PL_na));
+		if (longopt && (p=strchr(longopt, '|'))) { /* short option */
+			*p++ = 0;
+			o->shortName = *p;
+		} else {
+			p = longopt;
+		}
+		end = p;
+		if (p && (p=strchr(p, '='))) { /* type: s or i for string or integer */
+			*p++ = 0;
+			if (*p == 's' || *p == 'f')
+				o->argInfo = POPT_ARG_STRING;
+			else if (*p == 'i')
+				o->argInfo = POPT_ARG_LONG;
+			else
+				warn("Unknown option type %c", *p);
+		} else {
+			p = end;
+		}
+		end = p;
+		if (p && (p=strchr(p, '+'))) /* skip flags used in Getopt::Long */
+			*p = 0;
+		else
+			p = end;
+		end = p;
+		if (p && (p=strchr(p, '!')))
+			*p = 0;
+		else
+			p = end;
+		if ((s=av_fetch(av, i+1, 0)) && SvOK(*s))
+			o->descrip = SvPV(*s, PL_na);
+	}
+	return res;
+}
+
+static void GnomeInit_internal(char * app_id, char * app_version, SV * options)
 {
 	dTHR;
-		if (!did_we_init_gdk && !did_we_init_gtk && !did_we_init_gnome) {
+		if (!pgtk_did_we_init_gdk && !pgtk_did_we_init_gtk && !pgtk_did_we_init_gnome) {
 			int argc;
 			char ** argv = 0;
 			AV * ARGV = perl_get_av("ARGV", FALSE);
@@ -176,34 +294,58 @@ void GnomeInit_internal(char * app_id, char * app_version)
 			argc = av_len(ARGV)+2;
 			if (argc) {
 				argv = malloc(sizeof(char*)*argc);
-				argv[0] = SvPV(ARGV0, PL_na);
+				argv[0] = g_strdup(SvPV(ARGV0, PL_na));
 				for(i=0;i<=av_len(ARGV);i++)
-					argv[i+1] = SvPV(*av_fetch(ARGV, i, 0), PL_na);
+					argv[i+1] = g_strdup(SvPV(*av_fetch(ARGV, i, 0), PL_na));
 			}
 
 			i = argc;
-#ifdef NEW_GNOME
-			gnome_init(app_id, app_version, argc, argv);
+#if GNOME_HVER >= 0x010200
+			if (options) {
+				int remove = 0;
+				struct poptOption * my_options = get_options (options, &remove);
+				poptContext pctx;
+				char **args;
+				gnome_init_with_popt_table(app_id, app_version, argc, argv,
+					my_options, 0, &pctx);
+				args = poptGetArgs(pctx);
+				if (remove && args) {
+					av_clear(ARGV);
+					while (*args) {
+						av_push(ARGV, newSVpv(*args, 0));
+						++args;
+					}
+				}
+				free_options(my_options);
+				poptFreeContext(pctx);
+			} else {
+				gnome_init(app_id, app_version, argc, argv);
+			}
 #else
 			gnome_init(app_id, NULL, argc, argv, 0, &i); 
 #endif
 
-			did_we_init_gdk = 1;
-			did_we_init_gtk = 1;
-			did_we_init_gnome = 1;
+			pgtk_did_we_init_gdk = 1;
+			pgtk_did_we_init_gtk = 1;
+			pgtk_did_we_init_gnome = 1;
 
 			/* Shouldn't ... */
 			/*while (i--)
 				av_shift(ARGV);*/
 
-			if (argv)
+			if (argv) {
+				for (i=0; i < argc; ++i)
+					g_free(argv[i]);
 				free(argv);
+			}
 				
 			GtkInit_internal();
 
 			Gnome_InstallTypedefs();
 
 			Gnome_InstallObjects();
+
+			pgtk_exec_init("Gnome");
 
 			/*printf("Init gnome\n");*/
 			{
@@ -234,7 +376,7 @@ svrv_to_uiinfo_tree(SV* data)
 
 	a = (AV*)SvRV(data);
 	count = av_len(a) + 1;
-	infos = alloc_temp(sizeof(GnomeUIInfo) * (count+1));
+	infos = pgtk_alloc_temp(sizeof(GnomeUIInfo) * (count+1));
 	memset(infos, 0, sizeof(GnomeUIInfo) * (count+1));
 	for (i = 0; i < count; i++) {
 		SV** s = av_fetch(a, i, 0);
@@ -339,7 +481,7 @@ SvGnomeUIInfo(SV *data, GnomeUIInfo *info)
 			/* Build a callback */
 			info->user_data = info->moreinfo;
 			SvREFCNT_inc(info->user_data); /* XXX: memory leak? */
-			info->moreinfo = &menu_callback; /* might as well reuse this */
+			info->moreinfo = pgtk_menu_callback; /* might as well reuse this */
 		}
 		break;
 
@@ -363,12 +505,13 @@ SvGnomeUIInfo(SV *data, GnomeUIInfo *info)
 MODULE = Gnome		PACKAGE = Gnome		PREFIX = gnome_
 
 void
-init(Class, app_id, app_version="X.X")
+init(Class, app_id, app_version="X.X", options=NULL)
 	char *  app_id
 	char *  app_version
+	SV *	options
 	CODE:
 	{
-		GnomeInit_internal(app_id, app_version);
+		GnomeInit_internal(app_id, app_version, options);
 	}
 
 Gtk::Button_Sink

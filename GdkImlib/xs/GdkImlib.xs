@@ -52,7 +52,7 @@ GdkImlibColorModifier * SvGdkImlibColorModifier(SV * data)
 		
 	h = (HV*)SvRV(data);
 
-	m = alloc_temp(sizeof(GdkImlibColorModifier));
+	m = pgtk_alloc_temp(sizeof(GdkImlibColorModifier));
 	
 	memset(m,0,sizeof(GdkImlibColorModifier));
 
@@ -99,7 +99,7 @@ GdkImlibSaveInfo * SvGdkImlibSaveInfo(SV * data)
 		
 	h = (HV*)SvRV(data);
 
-	m = alloc_temp(sizeof(GdkImlibSaveInfo));
+	m = pgtk_alloc_temp(sizeof(GdkImlibSaveInfo));
 	
 	memset(m,0,sizeof(GdkImlibSaveInfo));
 
