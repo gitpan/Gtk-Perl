@@ -1,0 +1,510 @@
+Mon Apr 19 18:41:06 EDT 1999   Kenneth Albanowski <kjahds@kjahds.com>
+	* Point release Gtk-Perl-0.5121.tar.gz
+
+Mon Apr 19 17:16:36 EDT 1999   Kenneth Albanowski <kjahds@kjahds.com>
+	* Added Ben Kohn's patches for threading support.
+	* Turned Gnome::CanvasItem::Set() back on.
+
+Sun Apr  4 14:28:46 EST 1999   Tuomas J. Lukka <lukka@iki.fi>
+	* Change canvas demo to use canvas_item_move instead of
+	  set(x,y). This seems to work, interestingly. It shouldn't
+	  make a difference.
+
+Sat Apr  3 20:53:16 EST 1999  Kenneth Albanowski <kjahds@kjahds.com>
+	* Replaced Tuomas's Rgb code with my own.
+
+Sat Apr  3 13:47:35 EST 1999  Kenneth Albanowski <kjahds@kjahds.com>
+	* Made 1.2 defs work (not crosschecked against 1.3 defs).
+	* PERLIO #redefs to work around messy collision between
+	  Perl defines, the Gtk headers, and gcc's "attribute"
+	  mechanism. (This is not a good long-term solution.
+	  Better solution might be to move gtk includes before
+	  Perl includes.)
+	* Changed type helper code to allow for Free function.
+	* Gnome/xs/GnomeCanvasItem.xs hack for "points" argument
+	  type changed to use type helpers.
+	* Got Gtk/samples/widget.pl slightly more running.
+	  (Still needs to translate new type names into old names for
+	  older Gtk versions.)
+	* ppport.h upgraded to version 1.0007.
+
+Thu Apr  1 09:17:38 EST 1999  Tuomas J. Lukka <lukka@iki.fi>
+	* GdkRGB
+	* Fix 1.2 defs not being taken (someone should check
+ 	  if this works on 1.2 still - the defs contained some
+	  veeery strange bits which I fixed in 1.3.defs
+	* add .cvsignore entry for the 1.2 CList
+
+Thu Mar 25 13:34:15 EST 1999  Tuomas J. Lukka <lukka@iki.fi>
+	* Again
+
+Thu Mar 25 13:34:15 EST 1999  Tuomas J. Lukka <lukka@iki.fi>
+	* update canvas.pl
+
+Thu Mar 25 10:27:37 EST 1999 Tuomas J. Lukka <lukka@iki.fi>
+	* Add Gnome/samples/canvas.pl and make GnomeCanvasItem.xs
+ 	  work again
+
+Sun Mar 21 22:18:39 EST 1999
+	* Patches to ppport.h to work with Perl 5.004_05.
+	* Gtk::_exit added, to make fork() easier to use.
+	* Gtk::signal_unblock fixed.
+
+Wed Mar 10 19:12:10 EST 1999
+	* Quick-and-dirty 0.5120 release (only on CPAN).
+	* Coverted Pollution.h over to ppport.h (from Devel::PPPort).
+	  Gtk/Pollution.h is now obsolete. (Report bugs in ppport.h
+	  to kjahds@kjahds.com.)
+	* ColorSelectButton fixed to use an init method.
+	
+Tue, 9 Mar 1999 12:55:49 +0100 Paolo Molaro <lupus@debian.org>
+	* Saner library dependency handling: modules should use the
+	proper module-config --libs stuff. Makefile.PL does the
+	required reordering to keep order right and link lines
+	shorter.
+	* Added $gdkwindow->XWINDOW() to get X window ID.
+	* Added Gtk/samples/gslide.pl: a slide-show maker
+	(with an example embedded in).
+
+Sun Mar  7 22:53:55 EST 1999 Mandrake <mandrake@mandrake.net>
+	* 1.3 gtk accepted from cvs now.
+	* zvt should work again.
+	* Makefile.PL will detect gnome 1.0 now, also
+
+Sun Feb 28 09:00:00 CST 1999 Seth Burgess <sjburges@gimp.org>
+	* edited Gtk/pkg.pl to accept gtk+ 1.2.x 
+
+Sun Feb 21 13:28:09 EST 1999 Mandrake <mandrake@mandrake.net>
+	* fixed Gnome/pkg-panel.pl to no longer require applet-lib.h
+	* fixed GdkImlib/pkg.pl to use dynamic gdk_imlib libraries.
+	  (SHOULD use imlib-config --libs-gdk, but I didn't do that yet)
+
+Tue, 9 Feb 1999 15:45:58 +0100 Paolo Molaro <lupus@debian.org>
+
+	* GtkEditable.xs: added missing functions (get_position,
+	set_position, set_editable).
+
+Fri Feb  5 17:07:06 EST 1999 Kenneth Albanowski <kjahds@kjahds.com>
+
+	* Added new names of all common deprecated functions described in
+	  gtkcompat.h (as of Gtk+-1.1.14). I might have some of the version
+	  timing off by one (which would break that code for onr particular
+	  version.)
+	* Repaired test to use set_active, with a boolean.
+	  (Yes, boolean takes 1/0.)
+	* Not implemented: It might be nice to let Gtk::CList::set_reorderable
+	  work even on older vesions, by invoking gtk_ctree_set_reorderable, if
+	  any old if the argument really is a ctree.
+
+Fri Feb  5 16:56:50 EST 1999 Kenneth Albanowski <kjahds@kjahds.com>
+
+	* Fixed Button parent, and added missing child accessor.
+
+Fri Feb  5 16:53:54 EST 1999 Kenneth Albanowski <kjahds@kjahds.com>
+
+	* GtkGLArea/Glut.pm, GtkGLArea/pkg.pl, GtkGLArea/samples/glut.pl,
+	  GtkGLArea/xs/GtkGLArea.xs: Half-finished attempt at Glut
+	  implementation in Perl. Half-functional, half-tested, etc.
+
+Wed Feb  3 10:34:42 EST 1999 Tuomas J. Lukka <lukka@iki.fi>
+
+	* Fix the previous patch (oops)
+
+Wed Feb  3 01:33:38 EST 1999 Tuomas J. Lukka <lukka@iki.fi>
+
+	* add patch to GtkWindow.xs from Marin Purgar - PMC <pmc@iskon.hr>
+
+Tue Feb  2 11:49:07 EST 1999 Tuomas J. Lukka <lukka@iki.fi>
+
+	* fixing Gtk/samples/test.pl CTree to work
+
+Tue Feb  2 09:31:33 EST 1999 Tuomas J. Lukka <lukka@iki.fi>
+
+	* Oops - fixed the previous change - I had wrong Gtk version installed
+
+Mon Feb  1 23:05:14 EST 1999 Tuomas J. Lukka <lukka@iki.fi>
+
+	* CheckMenuItem change for newest gtk+
+
+Mon Jan 25 11:42:21 EST 1999 Mandrake <mandrake@mandrake.net>
+
+	Made --with-gnome-panel work again (even under make test)
+
+Sun Jan 24 18:30:25 EST 1999 Mandrake <mandrake@mandrake.net>
+
+	Made gtkxmhtml module work again (even under make test)
+
+Sun Jan 24 17:00:35 EST 1999 Mandrake <mandrake@mandrake.net>
+
+	* Makefile.PL: gnome-config doesn't output the -I for --include-dir
+	so we'll put it there.
+
+Sun Jan 24 16:16:07 EST 1999 Mandrake <mandrake@mandrake.net>
+
+	* Gnome/samples/perl-zterm.pl : updated to new format.
+
+Sun Jan 24 16:08:32 EST 1999 Mandrake <mandrake@mandrake.net>
+
+	* s/gtk_check_menu_item_set_state/gtk_check_menu_item_set_active/
+	in GtkCheckMenuItem.xs
+	* Gnome/xs/ZvtTerm.xs - made this actually work :)
+
+	also various fixes to make make test work again.
+
+Thu Jan 21 20:58:09 PST 1999 Manish Singh <yosh@gimp.org>
+
+	* GtkCList-1.2.xs: added gtk_clist_set_shadow_type
+
+	* GtkCList.xs: deprecated gtk_clist_set_border
+
+	* GtkContainer.xs: deprecated gtk_continer_{need,block,unblock}_resize
+
+	* GtkPreview.xs: deprecated gtk_preview_put_row
+
+Wed Jan 20 12:33:27 EST 1999 Mandrake <mandrake@mandrake.net>
+	* gnome_dialog_run_and_destroy, gnome_dialog_set_modal,
+	gnome_dialog_run_modal, gnome_dialog_run_and_hide,
+	gnome_canvas_set_size seem depricated (causes make test
+	to fail) - removed from Gnome/xs/GnomeDialog.xs and 
+	Gnome/xs/GnomeCanvas.xs (#if 0'd out, not deleted)
+	make test should work now (in all forms)
+
+Wed Jan 20 11:49:59 EST 1999 Mandrake <mandrake@mandrake.net>
+	* fixed the NEW_GNOME declarations in Makefile.PL
+
+01-16-99 Tuomas J. Lukka <lukka@iki.fi> 
+	* Add Gnome::Canvas::new_aa
+
+01-15-99 Kenneth J. Albanowski <kjahds@kjahds.com>
+	* This marks the 0.5000 point release of the Perl/Gtk module.
+	* Fixed gdkimlib example to point to a real image.
+	* Makefile.PL punctuation.
+
+01-13-99 Tuomas J. Lukka <lukka@iki.fi> 
+	* Makefile.PL fix - get gnome libs correctly
+
+01-13-99 Kenneth Albanowski <kjahds@kjahds.com>
+	* Merged my changes for lazy loading, and Perl 5.003/5.005 support.
+	* Miscellaneous repairs for error trapping, etc.
+	* GtkGLArea usable (with separate OpenGL module).
+	* Fixed Tuomas' ChangeLog entries to be in the right year. :-)
+	
+01-12-99 Tuomas J. Lukka <lukka@iki.fi> 
+	* Small change to let Makefile.PL check for gdkimlib and
+	gnome automatically and take them automatically if they exist.
+	For the sake of tired sysadmins who have gnome and from whom
+	someone requests gnome-perl ;)
+
+Tue Jan 12 14:06:51 EST 1999 Mandrake <mandrake@mandrake.net>
+	* removed a bunch of auto-generated files from cvs, and added 
+	.cvsignores appropriately (sorry about Gnome/pkg.pl - don't know
+	how that got committed like that)
+
+01-12-99 Tuomas J. Lukka <lukka@iki.fi> 
+	* Got back some of earlier changes for new gnome compatibility
+
+01-11-99 Tuomas J. Lukka <lukka@iki.fi>
+
+	* fixed Gnome/pkg.pl syntax
+
+Mon Jan 11 15:34:55 EST 1999 Mandrake <mandrake@mandrake.net>
+
+	Applied patch from Franklin Belew <frb@umr.edu>
+	* Makefile.PL, Gnome/pkg.pl: now uses gnome-config and sets NEW_GNOME
+	environment variable if appropriate (should cause systems that 
+	previously would not build the Gnome module to build again)
+
+12-29-98 Kenneth Albanowski <kjahds@kjahds.com>
+
+	Major rearrangement, to stick Gtk & Gnome back together into a single
+	build environment. Many more Gtk+ versions should be properly supported
+	now, roughly from 0.99.10 to 1.1.9. Gnome, XmHTML, GdkImlib, and Zvt
+	have been tested. Gnome-panel and Gtk-tty have not. Some Gnome
+	functionality has been reverted to match the 0.30 release -- define
+	NEW_GNOME to get the new stuff back.
+	
+	ColorSelectButton (and other Perl widgets) is broken at the moment, due
+	to an init problem I've not solved yet. Look at NOTES for more
+	information on this and other things.
+	
+	0.5000 point release expected soon.
+
+12-26-98 Tuomas J. Lukka  <lukka@iki.fi>
+
+	* Made gnome work -- removed deprecated ColorSelector
+
+12-26-98 Tuomas J. Lukka  <lukka@iki.fi>
+
+	* Gnome should now work from other directories than default.
+
+12-23-98 Tuomas J. Lukka  <lukka@iki.fi>
+
+	* Integrated more of 0.4, specifically genext stuff
+
+Tue Dec 22 13:16:26 EST 1998 Mandrake <mandrake@mandrake.net>
+
+	* took out references to argp (they weren't necessary anyways)
+	- also I see in the ChangeLog that Tuomas J. Lukka  <lukka@iki.fi>
+	is the one who made it use the gnome and imlib stuff by default.
+	I'm going to write some tester functions to check to see if you
+	have this stuff before it compiles it.  I want it buildable on
+	a gtk-only system, too, without any mods.
+
+Mon Dec 21 20:23:20 EST 1998 Mandrake <mandrake@mandrake.net>
+
+	* we compile again.  there are still some problems where it's
+	force-requiring gnome when I didn't tell it to specifically use
+	gnome (it should also compile with JUST Gtk+) but I'll work on
+	that later.  I needed gnome-perl to work again :)
+
+1998-12-14  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* GnomeCanvas.xs: Removed gnome_canvas_set_size().
+
+12-4-98  Tuomas J. Lukka  <lukka@iki.fi>
+
+	* Various patches from Marin Purgar <pmc@iskon.hr>
+
+Wed Dec  2 21:54:03 PST 1998 Manish Singh <yosh@gimp.org>
+
+	* sync with GTK+ 1.1.6.
+
+Tue Nov 24 20:50:33 PST 1998 Manish Singh <yosh@gimp.org>
+
+	* config/pkg-gtk-1.1.defs: GTK+ 1.1.5 redefs
+
+Mon Nov 23 05:47:53 PST 1998 Manish Singh <yosh@gimp.org>
+
+	* sync for GTK+ 1.1.5. I #if 0'd some stuff out, added
+	add_with_viewport to GtkScrolledWindow, set_snap_to_ticks for
+	GtkSpinButton, and made test.pl use em.
+
+11-21-98  Tuomas J. Lukka  <lukka@iki.fi>
+	* CTree small functions continued
+	* Table small functions
+	* GtkContainer::check_resize
+
+11-21-98  Tuomas J. Lukka  <lukka@iki.fi>
+	* Small patch from Marin Purgar <pmc@iskon.hr>
+
+11-21-98  Tuomas J. Lukka  <lukka@iki.fi>
+	* CList column function additions
+
+11-20-98  Tuomas J. Lukka  <lukka@iki.fi>
+	* Import more stuff (CTree)  from newer versions
+	* get new defs file including CTree &c.
+
+11-18-98  Tuomas J. Lukka  <lukka@iki.fi>
+	* Add GtkLayout.c to .cvsignore
+	* Add Gnome::Pixmap::file
+
+11-17-98  Tuomas J. Lukka  <lukka@iki.fi>
+	* Add method vbox to GnomeDialog.xs
+	* Fix stock button error message
+
+
+11-17-98  Tuomas J. Lukka  <lukka@iki.fi>
+	* Add test scripts from Gnome-0.3000
+	* Add support for stock buttons and menuitems
+	* Add gnome-test/dialog.pl to test the stock buttons and dialogs.
+
+
+11-17-98  Tuomas J. Lukka <lukka@iki.fi>
+	* Gtk::Gnome:: -> Gnome:: everywhere (as perl Kenneth Albanowski's version 0.4)
+	  NOTE: THIS BREAKS ALL APPLICATIONS THAT USE ANY SYMBOLS IN THE Gtk::Gnome NAMESPACE.
+
+		  perl -p -i.bak 's/Gtk::Gnome/Gnome/g' *
+
+	  will work wonders, unless you have binary files.
+
+	  I'm going to continue getting the CVS version up to 0.3000 and 0.4 level in 
+	  Kenneth Albanowski's distributions.
+
+	* Make --with-gnome and --with-gdkimlib the default when compiling
+
+11-17-98  Tuomas J. Lukka <lukka@iki.fi>
+	* retrofit a GnomeAbout.xs fix from Gnome-0.3000
+	* retrofit BEGIN{} in Gnome.pm
+
+11-17-98  Tuomas J. Lukka <lukka@iki.fi>
+	* take gnome-config, not gtk-config
+
+Tue Nov 10 11:10:53 EST 1998 Mandrake <mandrake@mandrake.net>
+	* new --all option
+	* everything should compile again. (we hope)
+	* applied patch from Göran Thyni <goran@kirra.net>
+
+Mon Oct 12 21:48:50 CDT 1998 Frank Belew <frb@umr.edu>
+
+	* removed all references to gtktty
+	* fixed pkg-gnome.pl to use gnome-config
+	* fixed pkg-gtkxmhtml.pl
+	* removed gnomeConf.sh stuff from Makefile.PL and fixed typo
+
+Mon Oct 12 19:48:17 PDT 1998 Manish Singh <yosh@gimp.org>
+
+	* Makefile.PL: recognize GTK_CONFIG in %ENV
+
+Sat Sep 19 20:28:50 EDT 1998 Mandrake <mandrake@mandrake.net>
+
+	attempting to update gnome-perl in cvs to something a little more
+	recent.  Incidentally - it was not raster that did the gnome-perl
+	work :)  Amazing how raster gets credit for everything *grin*
+
+0.3			Sun Aug 16, 1998	Kenneth Albanowski
+
+	Uses gtk+-1.0.5 or gtk+-1.1.1 (with glib-1.1.2).
+	
+	Duplication of Rasterman's gnome-perl work for Gtk-1.1.1 support.  This
+	was not done by directly merging his code, so I may have left some
+	things out, and I've not tested the result with every possible package.
+	
+	Integrated some of PMC's patches.
+	
+	Configuration mechanism cleaned up quite a bit, so that separate
+	packages are quite modular, to the point that gtk-1.0 and gtk-1.1 are
+	treated as separate packages on top of the base "gtk" package.
+	
+	Version number sequence changed, yet again. Sigh.
+	
+0.2_04		Sat Aug  1, 1998	Kenneth Albanowski
+
+	Uses gtk+-1.0.5.
+	
+	Added Marin Purgar's <pmc@iskon.hr> patches and test.pl improvements.
+	
+	Added test.pl support for scrolling (buggy, though), mainloop, etc.
+	
+	Added Brian Warner's patch for notebook test.
+	
+0.2_03		Sun Jun  7, 1998	Kenneth Albanowski
+
+	Uses gtk+-1.0.4.
+	
+	Started to add support for sensible struct types, as opposed to boxed
+	types. (Basic idea is pass-by-value as opposed to pass-by-refernce.)
+	
+	Version numbering changed to trip up less code. (Hopefully.)
+	
+	Added some colormap & color support.
+	
+	Added testpdl.pl program to demonstrate very crude use of PDL with
+	previews.  (Thanks to Marc Lehmann for the idea.)
+	
+	Modified GtkColorSelectButton widget to prepend all internal variables
+	with underscore.
+
+0.2.2		Wed May 27, 1998	Kenneth Albanowski
+
+	Uses gtk+-1.0.3 (may also work with 1.0.1 & 1.0.2)
+
+	Added Gtk::Object->new_from_pointer and $GtkObject->_return_pointer
+	methods that allow raw GtkObject* values (expressed as integers),
+	including GtkWidget* and other descendant types, to be converted
+	into the equivalent Perl types, and vice versa.
+	
+	$Gtk::VERSION now provided.
+	
+	Partial color_context support added to Gtk, and sample6 (test of Gtktty)
+	now allocates colors properly.
+	
+	Added preliminary GtkPacker support. (Disabled, edit end of gendefs.pl
+	to renenable. testpacker.pl's options are buggy, in a suspicious
+	manner.)
+	
+	Added basic support for a few of the newer Gnome widgets.
+
+0.2.1		Thu May  7, 1998	Kenneth Albanowski
+
+	Included a variation of a module contributed by Dov Grobgeld
+	<dov@Orbotech.Co.IL>, GtkColorSelectButton.pm, which demonstrates a
+	functional Gtk widget created in Perl.
+	
+	Some fixes to widget creation were needed to get that running.
+	
+	Fixed some memory leaks, affecting, among other things, input handlers.
+	
+	Added AUTOLOAD facility to Gtk::Object, allowing Gtk variables to be
+	reffered to via gettor/settor methods. Thus:
+	
+		$object = new Gtk::Widget "Button", -width => 30;
+		print $object->get('width'); # 30
+		print $object->width; # 30, same as above
+		$object->set('width' => 40);
+		$object->width(40); # same as above
+
+	One incompatible change: constants for enums and flags now use
+	underscores instead of hyphens. (This looks a bit more ugly, but is more
+	flexible, as an underscore is a legal character in a Perl symbol.)
+
+0.2.0		Thu May  7, 1998	Kenneth Albanowski
+
+	Uses gtk-1.0.1
+
+
+0.1.16		Fri Apr 10, 1998	Kenneth Albanowski
+
+	Uses gtk-0.99.10:
+	
+		Memory management overhauled, should be much better. Gtk_objects
+		shouldn't leak in any common cases. (They'll be cleaned up soon
+		after all Perl and Gtk references vanish. Note that as soon as Perl
+		sees any gtk_object, it'll forge a connection that lasts until the
+		object is completely unreferenced. It is therefore safe to refer to
+		the Perl side from Gtk/C code, or store data in the Perl side.
+		
+		This requires some GC magic, which is reliable & safe, but is
+		slightly time-consuming. Be aware that idle & timer tasks are being
+		used by perl to implement this garbage collection.)
+		
+		Support added for most Gnome widgets, including GtkTty widget set
+		(including GtkLed), and the Gnome UI widget set. Please read
+		Makefile.PL for the list of available flags. (You may need to patch
+		up libraries or headers to build properly.)
+		
+		The Gnome support currently places the gnome-* widgets into the
+		Gnome::* namespace, and only includes widget support -- no
+		other Gnome functions are bound.
+
+		More of Paolo Molaro's <lupus@lettere.unipd.it> patches applied.
+		
+
+0.1.16		Fri Apr  3, 1998	Kenneth Albanowski
+
+	Uses gtk-0.99.8:
+
+		Primarily fixes substantial bug with boot_ invocation.
+
+0.1.14		Sun Feb 22, 1998	Kenneth Albanowski
+
+	Uses gtk-0.99.3:
+	
+		Adaptions to gtk-0.99.3, nothing major.
+
+0.1.13		Tue Jan 13, 1998	Kenneth Albanowski
+
+	Uses gtk-0.99.2:
+	
+		Reorganized code to break each modules into separate .xs files. 
+		Should not break when a widget isn't present, if the .h file is
+		removed along with the library.
+
+0.1.12		Sun Dec 14, 1997	Kenneth Albanowski
+
+	Uses gtk-971109:
+	
+		Adds missing Atoms.pm file.
+		
+		Adds widget creation (the ability to create new Gtk widgets from
+		Perl). This is still mostly busted, look in widget.pl for a possibly
+		comprehensible example. (Signals are completely busted.)
+
+0.1.11		Wed Nov 19, 1997	Kenneth Albanowski
+
+	Uses gtk-971025:
+	
+		Adds gtk_selection handling (Owen Taylor, thanks!) to Gtk.pm and
+		test.pl.
+		
+		Adds Gtk::Atom module to allow tied-hash access to atoms via
+		%Gtk::Atom.

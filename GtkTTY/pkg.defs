@@ -1,0 +1,20 @@
+(define-object GtkTerm (GtkWidget))
+(define-object GtkLed (GtkMisc))
+(define-object GtkTty (GtkTerm))
+(define-boxed GtkVtEmu
+	"(void)"
+	"(void)")
+(define-enum GtkCursorMode
+	(invisible GTK_CURSOR_INVISIBLE)
+	(underline GTK_CURSOR_UNDERLINE)
+	(block GTK_CURSOR_BLOCK))
+(define-flags GtkTtyKeyStateBits
+	(none GTK_TTY_STATE_NONE)
+	(scroll-lock GTK_TTY_STATE_SCROLL_LOCK)
+	(num-lock GTK_TTY_STATE_NUM_LOCK)
+	(shift GTK_TTY_STATE_SHIFT)
+	(caps-lock GTK_TTY_STATE_CAPS_LOCK)
+	(control GTK_TTY_STATE_CONTROL)
+	(alt GTK_TTY_STATE_ALT)
+	(super GTK_TTY_STATE_SUPER)
+	(hyper GTK_TTY_STATE_HYPER))
