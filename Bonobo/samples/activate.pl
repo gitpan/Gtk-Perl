@@ -25,7 +25,7 @@ try {
 		$content = $obj->read(256);
 		print "First 256 bytes of content:\n", $content, "\n";
 	} elsif ($obj->_is_a('IDL:Bonobo/Control:1.0')) {
-		$widget = new_control_from_objref Bonobo::Widget ($obj, undef);
+		$widget = new_control_from_objref Gnome::BonoboWidget ($obj, undef);
 		$win = new Gtk::Window;
 		$win->signal_connect('destroy', sub {Gtk->exit(0)});
 		$win->add($widget);

@@ -1,3 +1,70 @@
+Fri Jun  1 12:52:08 CEST 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Released version 0.7007.
+
+Wed May 30 17:58:58 CEST 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/GtkWidget.xs: allow $widget->draw() without area argument.
+	* Bonobo/*: updates. Require less changes in CORBA::ORBit module.
+
+Mon May 28 17:07:59 CEST 2001 Paolo Molaro <lupus@ximian.com>
+
+	* GdkImlib/xs/GdkImlib.xs, GtkXmHTML/xs/GtkXmHTML.xs: fix undefined behavior.
+	* Gnome/xs/Gnome.xs: clean up warning from new gcc.
+	* */xs/*.xs: clean up more warnings.
+
+Sun May 27 19:05:26 CEST 2001 Paolo Molaro <lupus@ximian.com>
+
+	* GnomePrint/xs/GnomePrintContext.xs, Gtk/GtkTypes.c: yet another "I can't count" bug.
+	* Gtk/xs/Gtk.xs: add accessor for enums and flags values.
+	* Gtk/objects.pod: update info and add enums and flags.
+	* GnomePrint/xs/GnomeFont.xs: compile with new GnomePrint release.
+
+Sat May 26 18:28:57 CEST 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/Gtk.xs, GdkPixbuf/xs/GdkPixbuf.xs: fix reference counting issues
+	with some boxed types: they need to be ref()ed the first time we insert them
+	in the cache only if we didn't create them. 
+	* Gtk/GtkTypes.c: handle also GdkWindow in args and signals (mostly to
+	fix stipples in Gnome::Canvas items): bug pointed out by dov@imagic.weizmann.ac.il
+	with a different patch.
+	* Gtk/MiscTypes.c: work around possible incompleteness of enum values exported
+	by gtk (related bug reported by Dov Grobgeld <dov@Orbotech.COM>).
+	* Makefile.PL: handle INSTALLDIRS in subdirs and better dependency tracking.
+	* Gtk/GtkTypes.c: uhm, strlen("info") == 4! Related bug reported by
+	Andrew Schretter <schrett@math.duke.edu>.
+	* tools/gpdoc2pod: handle situation gracefully when the user doesn't have XML::Writer
+	or XML::Parser installed.
+
+Thu May 17 12:47:38 CEST 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/Gtk.xs: fix evaluation ordering (reported by Pavel Rousnak <pr@rpb.ru>).
+	* Bonobo/xs/BonoboObject.xs: fixety fix.
+
+Mon May  7 12:12:29 CEST 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/Gtk.xs, Gtk/xs/GtkSelection.xs: selection_owner_set may get
+	undef to unset the window.
+	* MANIFEST: add Docklet file.
+	* Bonobo: following the great tradition of Bonobo API renames ...
+	This one-liner should fix your code.
+	perl -wpi.bak -e 's/\bBonobo::(\w+)/Gnome::Bonobo$1/g' files...
+	* Bonobo/Bonobo.pm: added perl interface implementation facilities.
+	* Bonobo/xs/BonoboObject.xs: added add_interface_obj() to add CORBA
+	object directly.
+	* Applet/xs/AppletWidget.xs: fix bug with unreferenced symbol.
+	* Gtk/gtk.0.99.typemap: fix leaks with SimpleVals.
+
+Sun Apr  1 15:14:25 CEST 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gal/*: fix is_cell_editable() callback, provide some useful default
+	methods and a better sample code.
+
+Sun Apr  1 13:23:47 CEST 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gal/*: initial Gal binding (ETable mostly complete, ETree
+	not done yet).
+
 Tue Mar 27 12:21:04 CEST 2001 Paolo Molaro <lupus@ximian.com>
 
 	* Gtk/Makefile.PL: install also the helper tools.
@@ -32,7 +99,7 @@ Thu Mar 22 15:31:39 CET 2001 Paolo Molaro <lupus@ximian.com>
 Thu Mar 22 13:41:57 CET 2001 Paolo Molaro <lupus@ximian.com>
 
 	* Gtk/cookbook.pod: added an entry validation recipe.
-	* Gtk/objects.xs: added missing files.
+	* Gtk/objects.pod: added missing files.
 
 Wed Mar 21 14:13:44 CET 2001 Paolo Molaro <lupus@ximian.com>
 

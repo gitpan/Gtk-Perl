@@ -15,7 +15,7 @@ init Bonobo;
 
 package Hello::BonoboView;
 
-@Hello::BonoboView::ISA = qw(Bonobo::View);
+@Hello::BonoboView::ISA = qw(Gnome::BonoboView);
 
 sub factory {
 	my ($class, $embeddable, $view_frame) = @_;
@@ -23,7 +23,7 @@ sub factory {
 	warn "started view ($embeddable -> $view_frame)\n";
 
 	$vbox = new Gtk::VBox(0, 10);
-	$self = new Bonobo::View($vbox);
+	$self = new Gnome::BonoboView($vbox);
 	$self->signal_connect('activate', sub {shift->activate_notify(shift)});
 	$self->{vbox} = $vbox;
 	$self->{label} = new Gtk::Label;
@@ -49,17 +49,17 @@ sub update {
 
 package Hello::BonoboEmbeddable;
 
-@Hello::BonoboEmbeddable::ISA = qw(Bonobo::Embeddable);
+@Hello::BonoboEmbeddable::ISA = qw(Gnome::BonoboEmbeddable);
 
 sub new {
 	my $class = shift;
 	warn "create $_[0] object\n";
-	my $res = new Bonobo::Embeddable(sub {Hello::BonoboView->factory(@_)});
+	my $res = new Gnome::BonoboEmbeddable(sub {Hello::BonoboView->factory(@_)});
 	# add interfaces
-#	my $stream = new Bonobo::PersistStream ();
+#	my $stream = new Gnome::BonoboPersistStream ();
 #	$self->add_interface($stream);
 
-	my $print = new Bonobo::Print (sub {$res->print(@_)});
+	my $print = new Gnome::BonoboPrint (sub {$res->print(@_)});
 	$res->add_interface($print);
 	warn "added interfaces\n";
 
@@ -94,7 +94,7 @@ package main;
 my $factory;
 my $running_objects = 0;
 
-$factory = new Bonobo::GenericFactory (
+$factory = new Gnome::BonoboGenericFactory (
 	"OAFIID:Bonobo_Perl_Hello_EmbeddableFactory", \&create_instance);
 
 sub create_instance {

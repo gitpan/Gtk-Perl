@@ -295,7 +295,9 @@ SV * newSVDefEnumHash (GtkType type, long value) {
 		}
 		vals++;
 	}
-	croak("Invalid value %d for %s", value, gtk_type_name(type));
+	/* Gtk/Gdk may get something wrong here, it's better to return undef
+	 * croak("Invalid value %d for %s", value, gtk_type_name(type));*/
+	return newSVsv(&PL_sv_undef);
 }
 
 SV * newSVDefFlagsHash (GtkType type, long value) {
@@ -454,7 +456,7 @@ void * SvMiscRef(SV * o, char * classname)
 		croak("variable is not of type %s", classname);
 	s = hv_fetch(q, "_gtk", 4, 0);
 	if (!s || !SvIV(*s))
-		croak("variable is damaged %s", classname);
+		croak("variable is damaged %s %p -> %p", classname, s, s?(void*)SvIV(*s):NULL);
 	return (void*)SvIV(*s);
 }
 

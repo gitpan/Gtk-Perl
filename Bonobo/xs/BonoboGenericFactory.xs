@@ -32,7 +32,7 @@ factory_handler(BonoboGenericFactory *Factory, void *data) {
 	if (i!=1)
 		croak("handler failed");
 	result = POPs;
-	obj = SvGtkObjectRef(result, "Bonobo::Object");
+	obj = SvGtkObjectRef(result, "Gnome::BonoboObject");
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
@@ -40,11 +40,11 @@ factory_handler(BonoboGenericFactory *Factory, void *data) {
 }
 
 
-MODULE = Bonobo::GenericFactory		PACKAGE = Bonobo::GenericFactory		PREFIX = bonobo_generic_factory_
+MODULE = Gnome::BonoboGenericFactory		PACKAGE = Gnome::BonoboGenericFactory		PREFIX = bonobo_generic_factory_
 
 #ifdef BONOBO_GENERIC_FACTORY
 
-Bonobo::GenericFactory
+Gnome::BonoboGenericFactory
 bonobo_generic_factory_new (Class, goad_id, handler, ...)
 	SV *	Class
 	char *	goad_id

@@ -17,9 +17,9 @@ main Bonobo;
 
 sub create_container {
 	die unless Bonobo->activate;
-	#my $win = new Gtk::Widget 'Bonobo::Window';# ('sample-container', 'Sample Perl/Bonobo container');
-	my $win = new Bonobo::Window ('sample-container', 'Sample Perl/Bonobo container');
-	my $uic = new Bonobo::UIContainer;
+	#my $win = new Gtk::Widget 'Gnome::BonoboWindow';# ('sample-container', 'Sample Perl/Bonobo container');
+	my $win = new Gnome::BonoboWindow ('sample-container', 'Sample Perl/Bonobo container');
+	my $uic = new Gnome::BonoboUIContainer;
 	my $box = new Gtk::VBox;
 
 	$uic->set_win($win);
@@ -27,7 +27,7 @@ sub create_container {
 	$win->signal_connect('destroy', sub {Gtk->main_quit;});
 	
 	warn "uic is $uic\n";
-	$control = new_control Bonobo::Widget (
+	$control = new_control Gnome::BonoboWidget (
 		"OAFIID:bonobo_calculator:fab8c2a7-9576-437c-aa3a-a8617408970f",
 		$uic->corba_objref);
 	warn "control is $control\n";

@@ -8,11 +8,11 @@
 #include "BonoboDefs.h"
 #include "GtkDefs.h"
 
-MODULE = Bonobo::Control		PACKAGE = Bonobo::Control		PREFIX = bonobo_control_
+MODULE = Gnome::BonoboControl		PACKAGE = Gnome::BonoboControl		PREFIX = bonobo_control_
 
 #ifdef BONOBO_CONTROL
 
-Bonobo::Control
+Gnome::BonoboControl
 bonobo_control_new (Class, widget)
 	SV *	Class
 	Gtk::Widget	widget
@@ -23,69 +23,65 @@ bonobo_control_new (Class, widget)
 
 Gtk::Widget
 bonobo_control_get_widget (control)
-	Bonobo::Control	control
+	Gnome::BonoboControl	control
 
 void
 bonobo_control_set_automerge (control, automerge)
-	Bonobo::Control	control
+	Gnome::BonoboControl	control
 	bool	automerge
 
 bool
 bonobo_control_get_automerge (control)
-	Bonobo::Control	control
+	Gnome::BonoboControl	control
 
 #if 0
 
 void
 bonobo_control_set_property (control, first_prop)
-	Bonobo::Control	control
+	Gnome::BonoboControl	control
 	char *	first_prop
 
 void
 bonobo_control_get_property (control, first_prop)
-	Bonobo::Control	control
+	Gnome::BonoboControl	control
 	char *	first_prop
 
 #endif
 
-CORBA::Object
-bonobo_control_corba_object_create (object)
-	Bonobo::Object	object
-
-Bonobo::UIComponent
+Gnome::BonoboUIComponent
 bonobo_control_get_ui_component (control)
-	Bonobo::Control	control
+	Gnome::BonoboControl	control
 
 void
 bonobo_control_set_ui_component (control, component)
-	Bonobo::Control	control
-	Bonobo::UIComponent	component
+	Gnome::BonoboControl	control
+	Gnome::BonoboUIComponent	component
 
 CORBA::Object
 bonobo_control_get_remote_ui_container (control)
-	Bonobo::Control	control
+	Gnome::BonoboControl	control
 
 void
 bonobo_control_set_control_frame (control, control_frame)
-	Bonobo::Control	control
+	Gnome::BonoboControl	control
 	CORBA::Object	control_frame
 
 CORBA::Object
 bonobo_control_get_control_frame (control)
-	Bonobo::Control	control
+	Gnome::BonoboControl	control
 
 void
 bonobo_control_set_properties (control, pb)
-	Bonobo::Control	control
-	Bonobo::PropertyBag	pb
+	Gnome::BonoboControl	control
+	Gnome::BonoboPropertyBag	pb
 
-Bonobo::PropertyBag
+Gnome::BonoboPropertyBag
 bonobo_control_get_properties (control)
-	Bonobo::Control	control
+	Gnome::BonoboControl	control
 
 CORBA::Object
 bonobo_control_get_ambient_properties (control)
-	Bonobo::Control	control
+	Gnome::BonoboControl	control
 	CODE:
 	TRY(RETVAL = bonobo_control_get_ambient_properties (control, &ev));
 	OUTPUT:
@@ -93,7 +89,7 @@ bonobo_control_get_ambient_properties (control)
 
 void
 bonobo_control_activate_notify (control, activated)
-	Bonobo::Control	control
+	Gnome::BonoboControl	control
 	bool	activated
 
 #endif

@@ -47,9 +47,13 @@ char*
 gnome_font_get_name (font)
 	Gnome::Font	font
 
+#if 0
+
 char*
 gnome_font_get_glyph_name (font)
 	Gnome::Font	font
+
+#endif
 
 char*
 gnome_font_get_pfa (font)

@@ -36,7 +36,7 @@ Perl-style calling conventions.
 
 You will find the reference documentation for the Gnome module in the
 C<Gnome::reference> manpage. More information can be found on 
-http://projects.prosa.it/gtkperl/.
+http://gtkperl.org.
 
 =head1 AUTHOR
 
@@ -55,7 +55,7 @@ require DynaLoader;
 
 use Carp;
 
-$VERSION = '0.7006';
+$VERSION = '0.7007';
 
 @ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export

@@ -7,7 +7,7 @@
 
 #include "BonoboDefs.h"
 
-MODULE = Bonobo::Moniker		PACKAGE = Bonobo::Moniker		PREFIX = bonobo_moniker_
+MODULE = Gnome::BonoboMoniker		PACKAGE = Gnome::BonoboMoniker		PREFIX = bonobo_moniker_
 
 #ifdef BONOBO_MONIKER
 
@@ -15,13 +15,13 @@ MODULE = Bonobo::Moniker		PACKAGE = Bonobo::Moniker		PREFIX = bonobo_moniker_
 
 CORBA::Object
 bonobo_moniker_corba_object_create (object)
-	Bonobo::Object	object
+	Gnome::BonoboObject	object
 
 #endif
 
 CORBA::Object
 bonobo_moniker_get_parent (moniker)
-	Bonobo::Moniker	moniker
+	Gnome::BonoboMoniker	moniker
 	CODE:
 	TRY(RETVAL = bonobo_moniker_get_parent (moniker, &ev));
 	OUTPUT:
@@ -29,18 +29,18 @@ bonobo_moniker_get_parent (moniker)
 
 void
 bonobo_moniker_set_parent (moniker, parent)
-	Bonobo::Moniker	moniker
+	Gnome::BonoboMoniker	moniker
 	CORBA::Object	parent
 	CODE:
 	TRY(bonobo_moniker_set_parent (moniker, parent, &ev));
 
 char*
 bonobo_moniker_get_name (moniker)
-	Bonobo::Moniker	moniker
+	Gnome::BonoboMoniker	moniker
 
 void
 bonobo_moniker_set_name (moniker, name)
-	Bonobo::Moniker	moniker
+	Gnome::BonoboMoniker	moniker
 	char*	name
 	CODE:
 	bonobo_moniker_set_name (moniker, name, strlen(name));

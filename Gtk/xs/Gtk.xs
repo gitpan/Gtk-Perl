@@ -1757,6 +1757,8 @@ new (Class)
 	SV *	Class
 	CODE:
 	RETVAL = gtk_rc_style_new ();
+	sv_2mortal(newSVGtkRcStyle(RETVAL));
+	gtk_rc_style_unref(RETVAL);
 	OUTPUT:
 	RETVAL
 
@@ -1819,6 +1821,8 @@ new(Class=0)
 	SV *	Class
 	CODE:
 	RETVAL = gtk_style_new();
+	sv_2mortal(newSVGtkStyle(RETVAL));
+	gtk_style_unref (RETVAL);
 	OUTPUT:
 	RETVAL
 
@@ -1834,6 +1838,12 @@ gtk_style_detach(style)
 Gtk::Style
 gtk_style_copy(style)
 	Gtk::Style	style
+	CODE:
+	RETVAL = gtk_style_copy (style);
+	sv_2mortal(newSVGtkStyle(RETVAL));
+	gtk_style_unref (RETVAL);
+	OUTPUT:
+	RETVAL
 
 void
 gtk_style_ref(style)
@@ -2148,6 +2158,43 @@ _get_packages (Class)
 			tmp = tmp->next;
 		}
 		g_list_free (p);
+	}
+
+void
+_get_children (Class, basetype)
+	SV	*Class
+	char	*basetype
+	PPCODE:
+	{
+		GList * p = gtk_type_children_types(gtk_type_from_name(basetype));
+		GList * tmp = p;
+		while (tmp) {
+			XPUSHs(sv_2mortal(newSVpv(gtk_type_name(GPOINTER_TO_UINT(tmp->data)), 0)));
+			tmp = tmp->next;
+		}
+		g_list_free (p);
+	}
+
+void
+_get_nicknames (Class, type)
+	SV	*Class
+	char	*type
+	PPCODE:
+	{
+		GtkEnumValue * vals;
+		GtkType gtype = gtk_type_from_name(type);
+
+		if (GTK_FUNDAMENTAL_TYPE(gtype) == GTK_TYPE_ENUM)
+			vals = gtk_type_enum_get_values(gtype);
+		else if (GTK_FUNDAMENTAL_TYPE(gtype) == GTK_TYPE_FLAGS)
+			vals = (GtkFlagValue*)gtk_type_flags_get_values(gtype);
+		else
+			croak("type '%s' must be an enum or a flag type", type);
+		while (vals && vals->value_nick) {
+			XPUSHs(sv_2mortal(newSVpv(vals->value_nick, 0)));
+			XPUSHs(sv_2mortal(newSViv(vals->value)));
+			vals++;
+		}
 	}
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk		PREFIX = gdk_
@@ -2792,6 +2839,8 @@ new(Class, attr)
 		RETVAL = gdk_window_new(parent, &a, mask);
 		if (!RETVAL)
 			croak("gdk_window_new failed");
+		sv_2mortal(newSVGdkWindow(RETVAL));
+		gdk_pixmap_unref(RETVAL);
 	}
 	OUTPUT:
 	RETVAL
@@ -2807,6 +2856,8 @@ new_foreign(Class, anid)
 		RETVAL = gdk_window_foreign_new(anid);
 		if (!RETVAL)
 			croak("gdk_window_foreign_new failed");
+		sv_2mortal(newSVGdkWindow(RETVAL));
+		gdk_pixmap_unref(RETVAL);
 	}
 	OUTPUT:
 	RETVAL
@@ -3202,7 +3253,7 @@ gdk_selection_convert (window, selection, target, time=GDK_CURRENT_TIME)
  #DESWC: Set the window as owner of the specified selection.
 gint
 gdk_selection_owner_set (window, selection, time=GDK_CURRENT_TIME, send_event=1)
-	Gtk::Gdk::Window	window
+	Gtk::Gdk::Window_OrNULL	window
 	Gtk::Gdk::Atom	selection
 	guint32	time
 	gint	send_event
@@ -3477,6 +3528,8 @@ new(Class, visual, allocate)
 	int	allocate
 	CODE:
 	RETVAL = gdk_colormap_new(visual, allocate);
+	sv_2mortal(newSVGdkColormap(RETVAL));
+	gdk_colormap_unref (RETVAL);
 	OUTPUT:
 	RETVAL
 
@@ -3697,6 +3750,8 @@ new(Class, window, width, height, depth=-1)
 	int	depth
 	CODE:
 	RETVAL = gdk_pixmap_new(window, width, height, depth);
+	sv_2mortal(newSVGdkWindow(RETVAL));
+	gdk_pixmap_unref(RETVAL);
 	OUTPUT:
 	RETVAL
 
@@ -3712,6 +3767,8 @@ create_from_data(Class, window, data, width, height, depth, fg, bg)
 	Gtk::Gdk::Color	bg
 	CODE:
 	RETVAL = gdk_pixmap_create_from_data(window, SvPV(data,PL_na), width, height, depth, fg, bg);
+	sv_2mortal(newSVGdkWindow(RETVAL));
+	gdk_pixmap_unref(RETVAL);
 	OUTPUT:
 	RETVAL
 
@@ -3839,6 +3896,8 @@ gdk_pixmap_foreign_new (Class, xid)
 	guint	xid
 	CODE:
 	RETVAL = gdk_pixmap_foreign_new(xid);
+	sv_2mortal(newSVGdkWindow(RETVAL));
+	gdk_pixmap_unref(RETVAL);
 	OUTPUT:
 	RETVAL
 
@@ -3907,6 +3966,8 @@ create_from_data(Class, window, data, width, height)
 	int	height
 	CODE:
 	RETVAL = gdk_bitmap_create_from_data(window, SvPV(data,PL_na), width, height);
+	sv_2mortal(newSVGdkWindow(RETVAL));
+	gdk_pixmap_unref(RETVAL);
 	OUTPUT:
 	RETVAL
 
@@ -4214,6 +4275,8 @@ load(Class, font_name)
 	char *	font_name
 	CODE:
 	RETVAL = gdk_font_load(font_name);
+	sv_2mortal(newSVGdkFont(RETVAL));
+	gdk_font_unref(RETVAL);
 	OUTPUT:
 	RETVAL
 
@@ -4225,6 +4288,8 @@ fontset_load(Class, fontset_name)
 	char *	fontset_name
 	CODE:
 	RETVAL = gdk_fontset_load(fontset_name);
+	sv_2mortal(newSVGdkFont(RETVAL));
+	gdk_font_unref(RETVAL);
 	OUTPUT:
 	RETVAL
 
@@ -4436,7 +4501,8 @@ gdk_string_extents(font, text, len=0)
 	{
 		gint lbearing, rbearing, width, ascent, descent;
 		STRLEN tlen;
-		gdk_text_extents(font, SvPV(text, tlen), ix==1?len:tlen, &lbearing, &rbearing, &width, &ascent, &descent);
+		char * t = SvPV(text, tlen);
+		gdk_text_extents(font, t, ix==1?len:tlen, &lbearing, &rbearing, &width, &ascent, &descent);
 		EXTEND(sp, 5);
 		XPUSHs(sv_2mortal(newSViv(lbearing)));
 		XPUSHs(sv_2mortal(newSViv(rbearing)));
@@ -4456,7 +4522,8 @@ gdk_string_height(font, text, len=0)
 	CODE:
 	{
 		STRLEN tlen;
-		RETVAL = gdk_text_height(font, SvPV(text, tlen), ix==1?len:tlen);
+		char * t = SvPV(text, tlen);
+		RETVAL = gdk_text_height(font, t, ix==1?len:tlen);
 	}
 	OUTPUT:
 	RETVAL

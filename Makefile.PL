@@ -29,7 +29,7 @@ use Config;
 	gnome => {order => 3, dir => 'Gnome',
 		check => sub {cconfig('gnome-config --version', '1\.[234]\.')}},
 	gnomeprint => {order => 4, dir => 'GnomePrint',
-		check => sub {cconfig('gnome-config --modversion print', 'gnome-print-0\.2[5-8]')}},
+		check => sub {cconfig('gnome-config --modversion print', 'gnome-print-0\.2[5-9]')}},
 	applets => {order => 4, dir => 'Applet',
 		check => sub {cconfig('gnome-config --modversion applets', 'applets-1\.[234]\.') &&
 			# --modversion capplet is broken
@@ -111,7 +111,7 @@ sub MY::postamble {
 			\@cd $d && \$(MAKE) all \$(PASTHRU)
 
 		install ::
-			cd $d && \$(MAKE) install
+			cd $d && \$(MAKE) install INSTALLDIRS=\$(INSTALLDIRS)
 
 		clean ::
 			-cd $d && \$(TEST_F) Makefile && \$(MAKE) clean
@@ -120,8 +120,8 @@ sub MY::postamble {
 			-cd $d && \$(TEST_F) Makefile.old && \$(MAKE) -f Makefile.old realclean
 			-cd $d && \$(TEST_F) Makefile && \$(MAKE)  realclean
 
-		$d/Makefile: $d/Makefile.PL
-			cd $d && \$(PERL) Makefile.PL \$(PASTHRU)
+		$d/Makefile: Makefile $d/Makefile.PL
+			cd $d && \$(PERL) Makefile.PL \$(PASTHRU) INSTALLDIRS=\$(INSTALLDIRS)
 
 		EOM
 	}

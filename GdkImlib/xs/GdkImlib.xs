@@ -126,7 +126,6 @@ imlib_free(pixmap)
 	Gtk::Gdk::Pixmap pixmap
 	CODE:
 	gdk_imlib_free_pixmap(pixmap);
-	UnregisterMisc((HV*)SvRV(ST(0)), pixmap);
 
 MODULE = Gtk::Gdk::ImlibImage	PACKAGE = Gtk::Gdk::Bitmap
 
@@ -135,7 +134,6 @@ imlib_free( bitmap)
 	Gtk::Gdk::Bitmap bitmap
 	CODE:
 	gdk_imlib_free_bitmap(bitmap);
-	UnregisterMisc((HV*)SvRV(ST(0)), bitmap);
 
 MODULE = Gtk::Gdk::ImlibImage	PACKAGE = Gtk::Gdk::ImlibImage	PREFIX = gdk_imlib_
 
@@ -549,7 +547,8 @@ gdk_imlib_inlined_png_to_image(Class, data)
 	CODE:
 	{
 		STRLEN len;
-		RETVAL = gdk_imlib_inlined_png_to_image(SvPV(data, len), len);
+		char * d = SvPV(data, len);
+		RETVAL = gdk_imlib_inlined_png_to_image(d, len);
 	}
 	OUTPUT:
 	RETVAL

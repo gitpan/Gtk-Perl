@@ -104,11 +104,11 @@ generic_foreach_item (BonoboCanvasComponent *comp, void *data) {
 }
 
 
-MODULE = Bonobo::Embeddable		PACKAGE = Bonobo::Embeddable		PREFIX = bonobo_embeddable_
+MODULE = Gnome::BonoboEmbeddable		PACKAGE = Gnome::BonoboEmbeddable		PREFIX = bonobo_embeddable_
 
 #ifdef BONOBO_EMBEDDABLE
 
-Bonobo::Embeddable
+Gnome::BonoboEmbeddable
 bonobo_embeddable_new (Class, factory, ...)
 	SV *	Class
 	SV *	factory
@@ -121,7 +121,7 @@ bonobo_embeddable_new (Class, factory, ...)
 	OUTPUT:
 	RETVAL
 
-Bonobo::Embeddable
+Gnome::BonoboEmbeddable
 bonobo_embeddable_new_canvas_item (Class, item_factory, ...)
 	SV *	Class
 	SV *	item_factory
@@ -134,9 +134,9 @@ bonobo_embeddable_new_canvas_item (Class, item_factory, ...)
 	OUTPUT:
 	RETVAL
 
-Bonobo::Embeddable
+Gnome::BonoboEmbeddable
 bonobo_embeddable_construct (embeddable, factory, ...)
-	Bonobo::Embeddable	embeddable
+	Gnome::BonoboEmbeddable	embeddable
 	SV *	factory
 	CODE:
 	{
@@ -147,13 +147,9 @@ bonobo_embeddable_construct (embeddable, factory, ...)
 	OUTPUT:
 	RETVAL
 
-CORBA::Object
-bonobo_embeddable_corba_object_create (object)
-	Bonobo::Object	object
-
 void
 bonobo_embeddable_set_view_factory (embeddable, factory, ...)
-	Bonobo::Embeddable	embeddable
+	Gnome::BonoboEmbeddable	embeddable
 	SV *	factory
 	CODE:
 	{
@@ -164,16 +160,16 @@ bonobo_embeddable_set_view_factory (embeddable, factory, ...)
 
 char *
 bonobo_embeddable_get_uri (embeddable)
-	Bonobo::Embeddable	embeddable
+	Gnome::BonoboEmbeddable	embeddable
 
 void
 bonobo_embeddable_set_uri (embeddable, uri)
-	Bonobo::Embeddable	embeddable
+	Gnome::BonoboEmbeddable	embeddable
 	char *	uri
 
 void
 bonobo_embeddable_foreach_view (embeddable, handler, ...)
-	Bonobo::Embeddable	embeddable
+	Gnome::BonoboEmbeddable	embeddable
 	SV *	handler
 	CODE:
 	{
@@ -184,7 +180,7 @@ bonobo_embeddable_foreach_view (embeddable, handler, ...)
 
 void
 bonobo_embeddable_foreach_item (embeddable, handler, ...)
-	Bonobo::Embeddable	embeddable
+	Gnome::BonoboEmbeddable	embeddable
 	SV *	handler
 	CODE:
 	{

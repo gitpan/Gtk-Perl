@@ -7,11 +7,11 @@
 
 #include "BonoboDefs.h"
 
-MODULE = Bonobo::UIContainer		PACKAGE = Bonobo::UIContainer		PREFIX = bonobo_ui_container_
+MODULE = Gnome::BonoboUIContainer		PACKAGE = Gnome::BonoboUIContainer		PREFIX = bonobo_ui_container_
 
 #ifdef BONOBO_UI_CONTAINER
 
-Bonobo::UIContainer
+Gnome::BonoboUIContainer
 bonobo_ui_container_new (Class)
 	SV *	Class
 	CODE:
@@ -21,8 +21,8 @@ bonobo_ui_container_new (Class)
 
 void
 bonobo_ui_container_set_win (container, win)
-	Bonobo::UIContainer	container
-	Bonobo::Window	win
+	Gnome::BonoboUIContainer	container
+	Gnome::BonoboWindow	win
 
 
 #endif

@@ -167,7 +167,6 @@ $run = new Gtk::Button "Run";
 $run->signal_connect("clicked" => sub { run $current_sample if defined $current_sample;} );
 show $run;
 $run->can_default(1);
-$run->grab_default();
 $run->set_sensitive(0);
 $hbbox->add($run);
 
@@ -196,6 +195,7 @@ Gtk->idle_add(\&idle);
 
 $main_window->signal_connect("destroy" => sub { destroy $main_window; exit } );
 
+$run->grab_default();
 show $main_window;
 
 main Gtk;

@@ -7,11 +7,11 @@
 
 #include "BonoboDefs.h"
 
-MODULE = Bonobo::Selector		PACKAGE = Bonobo::Selector		PREFIX = bonobo_selector_
+MODULE = Gnome::BonoboSelector		PACKAGE = Gnome::BonoboSelector		PREFIX = bonobo_selector_
 
 #ifdef BONOBO_SELECTOR
 
-Bonobo::Selector_Sink
+Gnome::BonoboSelector_Sink
 bonobo_selector_new (Class, title, interface, ...)
 	SV *	Class
 	char *	title
@@ -36,15 +36,15 @@ bonobo_selector_new (Class, title, interface, ...)
 
 char*
 bonobo_selector_get_selected_id (selector)
-	Bonobo::Selector	selector
+	Gnome::BonoboSelector	selector
 
 char*
 bonobo_selector_get_selected_name (selector)
-	Bonobo::Selector	selector
+	Gnome::BonoboSelector	selector
 
 char*
 bonobo_selector_get_selected_description (selector)
-	Bonobo::Selector	selector
+	Gnome::BonoboSelector	selector
 
 #endif
 

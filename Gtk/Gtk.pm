@@ -27,7 +27,7 @@ Perl-style calling conventions.
 You will find the reference documentation for the Gtk module in the
 C<Gtk::reference> manpage. There is also a cookbook style manual in
 C<Gtk::cookbook>. More information can be found on 
-http://projects.prosa.it/gtkperl/.
+http://gtkperl.org.
 
 =head1 AUTHOR
 
@@ -45,7 +45,7 @@ require AutoLoader;
 
 require Carp;
 
-$VERSION = '0.7006';
+$VERSION = '0.7007';
 
 @ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export

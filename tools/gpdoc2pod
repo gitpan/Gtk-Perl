@@ -1,10 +1,8 @@
 #!/usr/bin/perl -w
 
-use XML::Parser;
 use Getopt::Std;
 use strict;
 
-my $parser = new XML::Parser(Style=>'Stream', Pkg=>'main');
 my $inmethods;
 my $doneback;
 my $lasttag;
@@ -32,6 +30,13 @@ Reference documentation for the $::opt_t module
 
 EOF
 
+require XML::Parser;
+if ($@ || ! -f $file) {
+	print "Not available because XML::Parser and/or XML::Writer were missing at module build time\n";
+	close(OUT);
+	exit(0);
+}
+my $parser = new XML::Parser(Style=>'Stream', Pkg=>'main');
 $parser->parsefile($file);
 
 close(OUT);

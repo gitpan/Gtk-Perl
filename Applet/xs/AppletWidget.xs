@@ -8,6 +8,8 @@
 #include "GnomeAppletDefs.h"
 #include <applet-widget.h>
 
+#define newSVGnomePanelOrientType newSVPanelOrientType
+
 extern int pgtk_did_we_init_gnome;
 int pgtk_did_we_init_panel = 0;
 

@@ -6,6 +6,10 @@
 #include "GtkDefs.h"
 #include "GtkHTMLDefs.h"
 
+#ifdef GTKHTML_HAVE_GCONF
+#include <gconf/gconf.h>
+#endif
+
 static void 
 destroy_handler(gpointer data) {
         SvREFCNT_dec((AV*)data);
@@ -83,6 +87,30 @@ init(Class)
 		GtkHTML_InstallTypedefs();
 		GtkHTML_InstallObjects();
 		AddSignalHelperParts(gtk_html_get_type(), names, fixup_html, 0);
+#ifdef GTKHTML_HAVE_GCONF
+		/* gtkhtml is _so_ broken */
+		if (!gconf_is_initialized()) {
+			int argc;
+			char ** argv = 0;
+			AV * ARGV = perl_get_av("ARGV", FALSE);
+			SV * ARGV0 = perl_get_sv("0", FALSE);
+			int i;
+
+			argc = av_len(ARGV)+2;
+			if (argc) {
+				argv = malloc(sizeof(char*)*argc);
+				argv[0] = g_strdup(SvPV(ARGV0, PL_na));
+				for(i=0;i<=av_len(ARGV);i++)
+					argv[i+1] = g_strdup(SvPV(*av_fetch(ARGV, i, 0), PL_na));
+			}
+			gconf_init (argc, argv, NULL);
+			if (argv) {
+				for (i=0; i < argc; ++i)
+					g_free(argv[i]);
+				free(argv);
+			}
+		}
+#endif
 	}
 
 Gtk::HTML_Sink

@@ -9,20 +9,16 @@
 #include "GtkDefs.h"
 #include "GnomeDefs.h"
 
-MODULE = Bonobo::CanvasComponent		PACKAGE = Bonobo::CanvasComponent		PREFIX = bonobo_canvas_component_
+MODULE = Gnome::BonoboCanvasComponent		PACKAGE = Gnome::BonoboCanvasComponent		PREFIX = bonobo_canvas_component_
 
 #ifdef BONOBO_CANVAS_COMPONENT
 
-CORBA::Object
-bonobo_canvas_component_object_create (object)
-	Bonobo::Object	object
-
-Bonobo::CanvasComponent
+Gnome::BonoboCanvasComponent
 bonobo_canvas_component_construct (comp, item)
-	Bonobo::CanvasComponent	comp
+	Gnome::BonoboCanvasComponent	comp
 	Gnome::CanvasItem	item
 
-Bonobo::CanvasComponent
+Gnome::BonoboCanvasComponent
 bonobo_canvas_component_new (Class, item)
 	SV *	Class
 	Gnome::CanvasItem	item
@@ -33,23 +29,23 @@ bonobo_canvas_component_new (Class, item)
 
 Gnome::CanvasItem
 bonobo_canvas_component_get_item (comp)
-	Bonobo::CanvasComponent	comp
+	Gnome::BonoboCanvasComponent	comp
 
 void
 bonobo_canvas_component_grab (comp, mask, cursor, time)
-	Bonobo::CanvasComponent	comp
+	Gnome::BonoboCanvasComponent	comp
 	guint	mask
 	Gtk::Gdk::Cursor	cursor
 	guint32	time
 
 void
 bonobo_canvas_component_ungrab (comp, time)
-	Bonobo::CanvasComponent	comp
+	Gnome::BonoboCanvasComponent	comp
 	guint32	time
 
 CORBA::Object
 bonobo_canvas_component_get_ui_container (comp)
-	Bonobo::CanvasComponent	comp
+	Gnome::BonoboCanvasComponent	comp
 
 #endif
 

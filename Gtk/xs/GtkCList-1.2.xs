@@ -233,5 +233,7 @@ set_focus_row(clist, row)
 		clist->focus_row = row;
 	else
 		warn("incorrect row %d", row);
+	if (clist->freeze_count == 0)
+		gtk_widget_draw (GTK_WIDGET (clist), NULL);
 
 #endif

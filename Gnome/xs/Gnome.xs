@@ -498,6 +498,7 @@ SvGnomeUIInfo(SV *data, GnomeUIInfo *info)
 
 	default:
 		/* Do nothing */
+		break;
 	}
 }
 

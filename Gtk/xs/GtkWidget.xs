@@ -136,7 +136,7 @@ gtk_widget_destroyed(widget, ref)
 	}
 
 void
-gtk_widget_draw(widget, area)
+gtk_widget_draw(widget, area=NULL)
 	Gtk::Widget	widget
 	Gtk::Gdk::Rectangle	area
 

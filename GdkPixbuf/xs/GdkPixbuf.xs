@@ -44,6 +44,8 @@ gdk_pixbuf_new (Class, format, has_alpha, bits_per_sample, width, height)
 	int	height
 	CODE:
 	RETVAL = gdk_pixbuf_new (format, has_alpha, bits_per_sample, width, height);
+	sv_2mortal(newSVGdkPixbuf(RETVAL));
+	gdk_pixbuf_unref(RETVAL);
 	OUTPUT:
 	RETVAL
 	
@@ -53,6 +55,8 @@ gdk_pixbuf_new_from_file (Class, filename)
 	char	*filename
 	CODE:
 	RETVAL = gdk_pixbuf_new_from_file(filename);
+	sv_2mortal(newSVGdkPixbuf(RETVAL));
+	gdk_pixbuf_unref(RETVAL);
 	OUTPUT:
 	RETVAL
 
@@ -77,6 +81,8 @@ gdk_pixbuf_new_from_data (Class, data, colorspace, has_alpha, bits_per_sample, w
 		/* uhm: change this to work from the data in the SV */
 		RETVAL = gdk_pixbuf_new_from_data (datap, colorspace, has_alpha, 
 			bits_per_sample, width, height, rowstride, (GdkPixbufDestroyNotify)free, datap);
+		sv_2mortal(newSVGdkPixbuf(RETVAL));
+		gdk_pixbuf_unref(RETVAL);
 	}
 	OUTPUT:
 	RETVAL
@@ -95,11 +101,21 @@ gdk_pixbuf_new_from_xpm_data (Class, data, ...)
 			lines[i-1] = SvPV(ST(i),PL_na);
 		RETVAL = gdk_pixbuf_new_from_xpm_data (lines);
 		free(lines);
+		sv_2mortal(newSVGdkPixbuf(RETVAL));
+		gdk_pixbuf_unref(RETVAL);
 	}
 
 Gtk::Gdk::Pixbuf
 gdk_pixbuf_copy (pixbuf)
 	Gtk::Gdk::Pixbuf	pixbuf
+	CODE:
+	{
+		RETVAL = gdk_pixbuf_copy (pixbuf);
+		sv_2mortal(newSVGdkPixbuf(RETVAL));
+		gdk_pixbuf_unref(RETVAL);
+	}
+	OUTPUT:
+	RETVAL
 
 Gtk::Gdk::Pixbuf
 gdk_pixbuf_add_alpha (pixbuf, ...)
@@ -127,6 +143,8 @@ gdk_pixbuf_add_alpha (pixbuf, ...)
 			croak("Usage: Gtk::Gdk::Pixbuf:add_alpha(pixbuf[, rgbval|(r, g, b)])");
 		}
 		RETVAL = gdk_pixbuf_add_alpha (pixbuf, subst, r, g, b);
+		sv_2mortal(newSVGdkPixbuf(RETVAL));
+		gdk_pixbuf_unref(RETVAL);
 	}
 	OUTPUT:
 	RETVAL
@@ -204,6 +222,14 @@ gdk_pixbuf_get_from_drawable (dest, src, cmap, src_x, src_y, dest_x, dest_y, wid
 	int	dest_y
 	int	width
 	int	height
+	CODE:
+	{
+		RETVAL = gdk_pixbuf_get_from_drawable (dest, src, cmap, src_x, src_y, dest_x, dest_y, width, height);
+		sv_2mortal(newSVGdkPixbuf(RETVAL));
+		gdk_pixbuf_unref(RETVAL);
+	}
+	OUTPUT:
+	RETVAL
 
 void
 gdk_pixbuf_copy_area (src, src_x, src_y, width, height, dest, dest_x, dest_y)
@@ -271,6 +297,14 @@ gdk_pixbuf_scale_simple (src, dest_width, dest_height, filter_level)
 	int	dest_width
 	int	dest_height
 	int	filter_level
+	CODE:
+	{
+		RETVAL = gdk_pixbuf_scale_simple (src, dest_width, dest_height, filter_level);
+		sv_2mortal(newSVGdkPixbuf(RETVAL));
+		gdk_pixbuf_unref(RETVAL);
+	}
+	OUTPUT:
+	RETVAL
 
 Gtk::Gdk::Pixbuf
 gdk_pixbuf_composite_color_simple (src, dest_width, dest_height, filter_level, overall_alpha, check_size, color1, color2)
@@ -282,6 +316,14 @@ gdk_pixbuf_composite_color_simple (src, dest_width, dest_height, filter_level, o
 	int	check_size
 	int	color1
 	int	color2
+	CODE:
+	{
+		RETVAL = gdk_pixbuf_composite_color_simple (src, dest_width, dest_height, filter_level, overall_alpha, check_size, color1, color2);
+		sv_2mortal(newSVGdkPixbuf(RETVAL));
+		gdk_pixbuf_unref(RETVAL);
+	}
+	OUTPUT:
+	RETVAL
 
 #if 0
 
@@ -400,6 +442,8 @@ gdk_pixbuf_animation_new_from_file (Class, filename)
 	char	*filename
 	CODE:
 	RETVAL = gdk_pixbuf_animation_new_from_file(filename);
+	sv_2mortal(newSVGdkPixbufAnimation(RETVAL));
+	gdk_pixbuf_animation_unref(RETVAL);
 	OUTPUT:
 	RETVAL
 

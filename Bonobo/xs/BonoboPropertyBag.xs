@@ -7,7 +7,7 @@
 
 #include "BonoboDefs.h"
 
-MODULE = Bonobo::PropertyBag		PACKAGE = Bonobo::PropertyBag		PREFIX = bonobo_property_bag_
+MODULE = Gnome::BonoboPropertyBag		PACKAGE = Gnome::BonoboPropertyBag		PREFIX = bonobo_property_bag_
 
 #ifdef BONOBO_PROPERTY_BAG
 

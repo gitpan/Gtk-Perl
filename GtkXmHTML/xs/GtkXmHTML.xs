@@ -66,7 +66,7 @@ my_load_image(GtkWidget *self, gchar *ref) {
 
 	if (SvOK(result) && SvPV(result, len) != NULL) {
 		/*printf("Got data: len = %d\n", len);*/
-		info = XmHTMLImageDefaultProc(self, SvPV(name, len), SvPV(result, len), len);
+		info = XmHTMLImageDefaultProc(self, SvPV(name, PL_na), SvPV(result, PL_na), len);
 	} else {
 		/*printf("Got file: %s\n", SvPV(result, len));*/
 		info = XmHTMLImageDefaultProc(self, SvPV(name, len), NULL, 0);

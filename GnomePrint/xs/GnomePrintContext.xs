@@ -203,7 +203,7 @@ gnome_print_show (context, text, ...)
 				if ((val=hv_fetch(hv, "max_neg_space", 13, 0)) && SvOK(*val))
 					layout->max_neg_space = SvIV(*val);
 				/* leave this check last */
-				if ((val=hv_fetch(hv, "justify", 5, 0)) && SvOK(*val) && SvIV(*val))
+				if ((val=hv_fetch(hv, "justify", 7, 0)) && SvOK(*val) && SvIV(*val))
 					gnome_text_hs_just(layout);
 			}
 			lines = gnome_text_lines_from_layout(layout);
@@ -365,6 +365,8 @@ gnome_print_translate (context, x, y)
 	double	x
 	double	y
 
+#if 0
+
 int
 gnome_print_context_open_file (context, filename)
 	Gnome::PrintContext	context
@@ -386,6 +388,8 @@ gnome_print_context_write_file (context, data)
 int
 gnome_print_context_close_file (context)
 	Gnome::PrintContext	context
+
+#endif
 
 #endif
 

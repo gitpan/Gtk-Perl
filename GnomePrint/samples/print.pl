@@ -19,13 +19,18 @@ $context = $print_master->get_context;
 $context->beginpage("Urka!");
 
 # test gray and rgb images
-$context->moveto(250, 200);
 $width = 256;
 $height = 60;
 $image = pack("C*", 0..$width-1) x $height;
+$context->gsave;
+$context->concat($width, 0, 0, -$height, 250, 200);
 $context->grayimage($image, $width, $height);
-$context->moveto(250, 300);
-$context->rgbimage($image, $width, $height/3, $width);
+$context->grestore;
+$context->gsave;
+$image = pack("C*", 0..$width-1) x ($height*3);
+$context->concat($width, 0, 0, -$height, 250, 300);
+$context->rgbimage($image, $width, $height, $width);
+$context->grestore;
 
 $context->moveto(250, 350);
 $context->pixbuf($pixbuf);
@@ -38,7 +43,7 @@ if (1) {
 	$context->gsave();
 	$context->moveto(150, 400);
 	$context->concat(@slanted);
-	$context->show("Slanted text, Times, bold 10");
+	$context->show("Slanted text, Times, bold 20");
 	$context->grestore();
 }
 $context->moveto(250, 600);
@@ -46,7 +51,7 @@ foreach (map {$_*30} 0 .. 6) {
 	$context->gsave();
 	$context->concat(Gnome::Print->affine_rotate($_));
 	$context->show("Un cjargnel no cjolares ...");
-	$context->show("Un cjargnel \nno\n cjolares ...", {data=>0,handler=>sub {print "line: $_[1]\n";}}, 0, 'font-list', 'Times', 0, 'size', $_/10, 5, 'size', 10);
+	#$context->show("Un cjargnel \nno\n cjolares ...", {data=>0,handler=>sub {print "line: $_[1]\n";}}, 0, 'font-list', 'Times', 0, 'size', $_/10, 5, 'size', 10);
 	$context->grestore();
 }
 $context->showpage;

@@ -160,7 +160,7 @@ T_SimpleVal
     /*if (!$var) {      Oh, right smart that one, sheesh... For my next trick...
     	croak("failed to return mandatory object of type @{[grep {s/://g,s/^GtkGdk/Gdk/,1} $ntype]}");
     } else*/
-		$arg = newSV@{[grep {s/://g,s/^GtkGdk/Gdk/,1} $ntype]}($var);
+		$arg = sv_2mortal(newSV@{[grep {s/://g,s/^GtkGdk/Gdk/,1} $ntype]}($var));
 		/*sv_setsv($arg, newSV@{[grep {s/://g,s/^GtkGdk/Gdk/,1} $ntype]}($var));*/
 
 T_SimpleValOrNULL

@@ -11,11 +11,11 @@
 typedef void (*BonoboViewVerbFunc)(BonoboView *view, const char *verb_name, void *user_data);
 
 
-MODULE = Bonobo::View		PACKAGE = Bonobo::View		PREFIX = bonobo_view_
+MODULE = Gnome::BonoboView		PACKAGE = Gnome::BonoboView		PREFIX = bonobo_view_
 
 #ifdef BONOBO_VIEW
 
-Bonobo::View
+Gnome::BonoboView
 bonobo_view_new (Class, widget)
 	SV *	Class
 	Gtk::Widget	widget
@@ -24,39 +24,35 @@ bonobo_view_new (Class, widget)
 	OUTPUT:
 	RETVAL
 
-CORBA::Object
-bonobo_view_corba_object_create (object)
-	Bonobo::Object	object
-
 void
 bonobo_view_set_embeddable (view, embeddable)
-	Bonobo::View	view
-	Bonobo::Embeddable	embeddable
+	Gnome::BonoboView	view
+	Gnome::BonoboEmbeddable	embeddable
 
-Bonobo::Embeddable
+Gnome::BonoboEmbeddable
 bonobo_view_get_embeddable (view)
-	Bonobo::View	view
+	Gnome::BonoboView	view
 
 void
 bonobo_view_set_view_frame (view, view_frame)
-	Bonobo::View	view
+	Gnome::BonoboView	view
 	CORBA::Object	view_frame
 
 CORBA::Object
 bonobo_view_get_view_frame (view)
-	Bonobo::View	view
+	Gnome::BonoboView	view
 
 CORBA::Object
 bonobo_view_get_remote_ui_container (view)
-	Bonobo::View	view
+	Gnome::BonoboView	view
 
-Bonobo::UIComponent
+Gnome::BonoboUIComponent
 bonobo_view_get_ui_component (view)
-	Bonobo::View	view
+	Gnome::BonoboView	view
 
 void
 bonobo_view_activate_notify (view, activated)
-	Bonobo::View	view
+	Gnome::BonoboView	view
 	bool	activated
 						  
 #endif

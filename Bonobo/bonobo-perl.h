@@ -1,4 +1,3 @@
-#include "porbit-perl.h"
 
 typedef CORBA_ORB              CORBA__ORB;
 typedef CORBA_Object           CORBA__Object;

@@ -188,6 +188,8 @@ gdk_drag_context_new (Class)
 	SV *	Class
 	CODE:
 	RETVAL = gdk_drag_context_new();
+	sv_2mortal(newSVGdkDragContext(RETVAL));
+	gdk_drag_context_unref(RETVAL);
 	OUTPUT:
 	RETVAL
 
@@ -492,7 +494,7 @@ gtk_widget_set_parent_window (widget, window)
 	Gtk::Widget	widget
 	Gtk::Gdk::Window	window
 
-Gtk::Gdk::Window
+Gtk::Gdk::Window_OrNULL
 gtk_widget_get_parent_window (widget)
 	Gtk::Widget	widget
 

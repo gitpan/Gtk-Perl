@@ -5,6 +5,7 @@
 
 #include "PerlGnomePrintInt.h"
 
+#include "GtkDefs.h"
 #include "GnomePrintDefs.h"
 
 MODULE = Gnome::FontFace		PACKAGE = Gnome::FontFace		PREFIX = gnome_font_face_

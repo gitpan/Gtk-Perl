@@ -5,6 +5,7 @@
 
 #include "PerlGnomePrintInt.h"
 
+#include "GtkDefs.h"
 #include "GnomePrintDefs.h"
 
 MODULE = Gnome::PrintMeta		PACKAGE = Gnome::PrintMeta		PREFIX = gnome_print_meta_

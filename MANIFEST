@@ -5,9 +5,11 @@ Applet/pkg.defs
 Applet/pkg.typemap
 Applet/samples/applet.pl
 Applet/samples/capplet.pl
+Applet/samples/docklet.pl
 Applet/xs/Applet.xs
 Applet/xs/AppletWidget.xs
 Applet/xs/CappletWidget.xs
+Applet/xs/StatusDocklet.xs
 ChangeLog
 Depends.pm
 GdkImlib/GdkImlibImage.pm

@@ -9,7 +9,7 @@ MODULE = Gtk::Selection		PACKAGE = Gtk::Widget	PREFIX = gtk_
 
 int
 gtk_selection_owner_set(widget, atom, time)
-	Gtk::Widget	widget
+	Gtk::Widget_OrNULL	widget
 	Gtk::Gdk::Atom	atom
 	int	time
 

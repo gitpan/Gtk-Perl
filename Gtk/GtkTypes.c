@@ -777,7 +777,7 @@ SV * newSVGtkMenuEntry(GtkMenuEntry * e)
 	hv_store(h, "path", 4, e->path ? newSVpv(e->path,0) : newSVsv(&PL_sv_undef), 0);
 	hv_store(h, "accelerator", 11, e->accelerator ? newSVpv(e->accelerator,0) : newSVsv(&PL_sv_undef), 0);
 	hv_store(h, "widget", 6, e->widget ? newSVGtkObjectRef(GTK_OBJECT(e->widget), 0) : newSVsv(&PL_sv_undef), 0);
-	hv_store(h, "callback", 11, 
+	hv_store(h, "callback", 8, 
 		((e->callback == pgtk_menu_callback) && e->callback_data) ?
 		newSVsv(e->callback_data) :
 		newSVsv(&PL_sv_undef)
@@ -1014,6 +1014,8 @@ SV * GtkGetArg(GtkArg * a)
 				result = newSVGdkEvent(GTK_VALUE_BOXED(*a));
 			else if (a->type == GTK_TYPE_GDK_COLOR)
 				result = newSVGdkColor(GTK_VALUE_BOXED(*a));
+			else if (a->type == GTK_TYPE_GDK_WINDOW)
+				result = newSVGdkWindow(GTK_VALUE_BOXED(*a));
 			else if (a->type == GTK_TYPE_SELECTION_DATA)
 				result = newSVGtkSelectionDataRef(GTK_VALUE_BOXED(*a));
 			else
@@ -1129,6 +1131,8 @@ void GtkSetArg(GtkArg * a, SV * v, SV * Class, GtkObject * Object)
 				GTK_VALUE_BOXED(*a) = SvGdkEvent(v);
 			else if (a->type == GTK_TYPE_GDK_COLOR)
 				GTK_VALUE_BOXED(*a) = SvGdkColor(v);
+			else if (a->type == GTK_TYPE_GDK_WINDOW)
+				GTK_VALUE_BOXED(*a) = SvGdkWindow(v);
 			else if (a->type == GTK_TYPE_SELECTION_DATA)
 				GTK_VALUE_BOXED(*a) = SvGtkSelectionDataRef(v);
 			else
@@ -1192,6 +1196,8 @@ void GtkSetRetArg(GtkArg * a, SV * v, SV * Class, GtkObject * Object)
 				*GTK_RETLOC_BOXED(*a) = SvGdkEvent(v);
 			else if (a->type == GTK_TYPE_GDK_COLOR)
 				*GTK_RETLOC_BOXED(*a) = SvGdkColor(v);
+			else if (a->type == GTK_TYPE_GDK_WINDOW)
+				*GTK_RETLOC_BOXED(*a) = SvGdkWindow(v);
 			else if (a->type == GTK_TYPE_SELECTION_DATA)
 				*GTK_RETLOC_BOXED(*a) = SvGtkSelectionDataRef(v);
 			else
@@ -1252,6 +1258,8 @@ SV * GtkGetRetArg(GtkArg * a)
 				result = newSVGdkEvent(*GTK_RETLOC_BOXED(*a));
 			else if (a->type == GTK_TYPE_GDK_COLOR)
 				result = newSVGdkColor(*GTK_RETLOC_BOXED(*a));
+			else if (a->type == GTK_TYPE_GDK_WINDOW)
+				result = newSVGdkWindow(*GTK_RETLOC_BOXED(*a));
 			else if (a->type == GTK_TYPE_SELECTION_DATA)
 				result = newSVGtkSelectionDataRef(*GTK_RETLOC_BOXED(*a));
 			break;			
@@ -1364,7 +1372,7 @@ SvGtkTargetEntry(SV * data) {
 			e->target = SvPV(*s, len);
 		if ((s=hv_fetch(h, "flags", 5, 0)) && SvOK(*s))
 			e->flags = SvUV(*s);
-		if ((s=hv_fetch(h, "info", 5, 0)) && SvOK(*s))
+		if ((s=hv_fetch(h, "info", 4, 0)) && SvOK(*s))
 			e->info = SvUV(*s);
 	} else {
 		a = (AV*)SvRV(data);
@@ -1394,7 +1402,7 @@ newSVGtkTargetEntry (GtkTargetEntry* e) {
 	
 	hv_store(h, "target", 6, e->target ? newSVpv(e->target,0) : newSVsv(&PL_sv_undef), 0);
 	hv_store(h, "flags", 5, newSViv(e->flags), 0);
-	hv_store(h, "info", 5, newSViv(e->info), 0);
+	hv_store(h, "info", 4, newSViv(e->info), 0);
 	
 	return r;
 

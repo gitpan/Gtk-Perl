@@ -7,14 +7,14 @@ use Cwd;
 require '../Depends.pm';
 require '../tools/gendefs.pl';
 
-$bonobo = new ExtUtils::Depends('Bonobo', 'Gtk', 'Gtk::Gdk::ImlibImage', 'Gnome', 'CORBA::ORBit');
+$bonobo = new ExtUtils::Depends('Bonobo', 'Gtk', 'Gtk::Gdk::ImlibImage', 'Gnome');
 
 mkdir('build', 0777);
 
 $bonobo->set_inc ("-Ibuild ".`gnome-config --cflags bonobox_print`);
 $bonobo->set_libs (`gnome-config --libs bonobox_print`);
 
-$bonobo->add_typemaps (cwd() . '/pkg.typemap', cwd().'/build/BonoboTypemap');
+$bonobo->add_typemaps (cwd() . '/pkg.typemap', cwd().'/orbit.typemap', cwd().'/build/BonoboTypemap');
 $bonobo->add_headers ('"build/BonoboDefs.h"');
 
 $bonobo->save_config('build/IFiles.pm');

@@ -7,11 +7,11 @@
 
 #include "BonoboDefs.h"
 
-MODULE = Bonobo::ObjectClient		PACKAGE = Bonobo::ObjectClient		PREFIX = bonobo_object_client_
+MODULE = Gnome::BonoboObjectClient		PACKAGE = Gnome::BonoboObjectClient		PREFIX = bonobo_object_client_
 
 #ifdef BONOBO_OBJECT_CLIENT
 
-Bonobo::ObjectClient
+Gnome::BonoboObjectClient
 bonobo_object_client_from_corba (Class, unknown)
 	SV *	Class
 	CORBA::Object	unknown
@@ -20,7 +20,7 @@ bonobo_object_client_from_corba (Class, unknown)
 	OUTPUT:
 	RETVAL
 
-Bonobo::ObjectClient
+Gnome::BonoboObjectClient
 bonobo_object_activate (Class, iid, flags)
 	SV *	Class
 	char *	iid
@@ -32,7 +32,7 @@ bonobo_object_activate (Class, iid, flags)
 
 gboolean
 bonobo_object_client_has_interface (object, interface_desc)
-	Bonobo::ObjectClient	object
+	Gnome::BonoboObjectClient	object
 	char *	interface_desc
 	CODE:
 	TRY(RETVAL = bonobo_object_client_has_interface (object, interface_desc, &ev));

@@ -80,13 +80,13 @@ getset_prop_value (BonoboWidget *bonobo_widget, char *name, SV* newval) {
 	return sv;
 }
 
-MODULE = Bonobo::Widget		PACKAGE = Bonobo::Widget		PREFIX = bonobo_widget_
+MODULE = Gnome::BonoboWidget		PACKAGE = Gnome::BonoboWidget		PREFIX = bonobo_widget_
 
 #ifdef BONOBO_WIDGET
 
-Bonobo::ObjectClient
+Gnome::BonoboObjectClient
 bonobo_widget_get_server (bw)
-	Bonobo::Widget	bw
+	Gnome::BonoboWidget	bw
 
 Gtk::Widget_OrNULL_Up
 bonobo_widget_new_control (Class, goad_id, uih)
@@ -108,35 +108,35 @@ bonobo_widget_new_control_from_objref (Class, control, uih)
 	OUTPUT:
 	RETVAL
 
-Bonobo::ControlFrame
+Gnome::BonoboControlFrame
 bonobo_widget_get_control_frame (bw)
-	Bonobo::Widget	bw
+	Gnome::BonoboWidget	bw
 
 Gtk::Widget
 bonobo_widget_new_subdoc (object_desc, uih)
 	char *	object_desc
 	CORBA::Object	uih
 
-Bonobo::ItemContainer
+Gnome::BonoboItemContainer
 bonobo_widget_get_container (bw)
-	Bonobo::Widget	bw
+	Gnome::BonoboWidget	bw
 
-Bonobo::ClientSite
+Gnome::BonoboClientSite
 bonobo_widget_get_client_site (bw)
-	Bonobo::Widget	bw
+	Gnome::BonoboWidget	bw
 
-Bonobo::ViewFrame
+Gnome::BonoboViewFrame
 bonobo_widget_get_view_frame (bw)
-	Bonobo::Widget	bw
+	Gnome::BonoboWidget	bw
 
 CORBA::Object
 bonobo_widget_get_uih (bw)
-	Bonobo::Widget	bw
+	Gnome::BonoboWidget	bw
 
 
 void
 bonobo_widget_set_property (control, first_prop, ...)
-	Bonobo::Widget	control
+	Gnome::BonoboWidget	control
 	char *	first_prop
 	CODE:
 	{
@@ -149,7 +149,7 @@ bonobo_widget_set_property (control, first_prop, ...)
 
 void
 bonobo_widget_get_property (control, first_prop, ...)
-	Bonobo::Widget	control
+	Gnome::BonoboWidget	control
 	char *	first_prop
 	PPCODE:
 	{

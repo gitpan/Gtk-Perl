@@ -7,7 +7,7 @@
 
 #include "BonoboDefs.h"
 
-MODULE = Bonobo::ItemContainer		PACKAGE = Bonobo::ItemContainer		PREFIX = bonobo_item_container_
+MODULE = Gnome::BonoboItemContainer		PACKAGE = Gnome::BonoboItemContainer		PREFIX = bonobo_item_container_
 
 #ifdef BONOBO_ITEM_CONTAINER
 

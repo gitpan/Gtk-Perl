@@ -8,11 +8,11 @@
 #include "BonoboDefs.h"
 #include "GtkDefs.h"
 
-MODULE = Bonobo::ControlFrame		PACKAGE = Bonobo::ControlFrame		PREFIX = bonobo_control_frame_
+MODULE = Gnome::BonoboControlFrame		PACKAGE = Gnome::BonoboControlFrame		PREFIX = bonobo_control_frame_
 
 #ifdef BONOBO_CONTROL_FRAME
 
-Bonobo::ControlFrame
+Gnome::BonoboControlFrame
 bonobo_control_frame_new (Class, uic)
 	SV *	Class
 	CORBA::Object	uic
@@ -23,33 +23,33 @@ bonobo_control_frame_new (Class, uic)
 
 Gtk::Widget
 bonobo_control_frame_get_widget (frame)
-	Bonobo::ControlFrame	frame
+	Gnome::BonoboControlFrame	frame
 
 void
 bonobo_control_frame_set_ui_container (control_frame, uic)
-	Bonobo::ControlFrame	control_frame
+	Gnome::BonoboControlFrame	control_frame
 	CORBA::Object	uic
 
 void
 bonobo_control_frame_control_activate (control_frame)
-	Bonobo::ControlFrame	control_frame
+	Gnome::BonoboControlFrame	control_frame
 
 void
 bonobo_control_frame_control_deactivate (control_frame)
-	Bonobo::ControlFrame	control_frame
+	Gnome::BonoboControlFrame	control_frame
 
 void
 bonobo_control_frame_set_autoactivate (control_frame, autoactivate)
-	Bonobo::ControlFrame	control_frame
+	Gnome::BonoboControlFrame	control_frame
 	bool	autoactivate
 
 bool
 bonobo_control_frame_get_autoactivate (control_frame)
-	Bonobo::ControlFrame	control_frame
+	Gnome::BonoboControlFrame	control_frame
 
 CORBA::Object
 bonobo_control_frame_get_control_property_bag (control_frame)
-	Bonobo::ControlFrame	control_frame
+	Gnome::BonoboControlFrame	control_frame
 	CODE:
 	TRY(RETVAL = bonobo_control_frame_get_control_property_bag (control_frame, &ev));
 	OUTPUT:
@@ -57,43 +57,43 @@ bonobo_control_frame_get_control_property_bag (control_frame)
 
 void
 bonobo_control_frame_set_propbag (control_frame, propbag)
-	Bonobo::ControlFrame	control_frame
-	Bonobo::PropertyBag	propbag
+	Gnome::BonoboControlFrame	control_frame
+	Gnome::BonoboPropertyBag	propbag
 
-Bonobo::PropertyBag
+Gnome::BonoboPropertyBag
 bonobo_control_frame_get_propbag (control_frame)
-	Bonobo::ControlFrame	control_frame
+	Gnome::BonoboControlFrame	control_frame
 
 void
 bonobo_control_frame_control_set_state (control_frame, state)
-	Bonobo::ControlFrame	control_frame
+	Gnome::BonoboControlFrame	control_frame
 	Gtk::StateType	state
 
 void
 bonobo_control_frame_set_autostate (control_frame, autostate)
-	Bonobo::ControlFrame	control_frame
+	Gnome::BonoboControlFrame	control_frame
 	bool	autostate
 
 bool
 bonobo_control_frame_get_autostate (control_frame)
-	Bonobo::ControlFrame	control_frame
+	Gnome::BonoboControlFrame	control_frame
 
 void
 bonobo_control_frame_bind_to_control (control_frame, control)
-	Bonobo::ControlFrame	control_frame
+	Gnome::BonoboControlFrame	control_frame
 	CORBA::Object	control
 
 CORBA::Object
 bonobo_control_frame_get_control (control_frame)
-	Bonobo::ControlFrame	control_frame
+	Gnome::BonoboControlFrame	control_frame
 
 CORBA::Object
 bonobo_control_frame_get_ui_container (control_frame)
-	Bonobo::ControlFrame	control_frame
+	Gnome::BonoboControlFrame	control_frame
 
 void
 bonobo_control_frame_size_request (control_frame)
-	Bonobo::ControlFrame	control_frame
+	Gnome::BonoboControlFrame	control_frame
 	PPCODE:
 	{
 		int	desired_width, desired_height;

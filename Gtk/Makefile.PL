@@ -9,8 +9,8 @@ require '../Depends.pm';
 $gtk = new ExtUtils::Depends ('Gtk');
 
 # Guess packages
-print "You may use '--lazy-load', which will reduce initial memory usage\n";
-print "and loading time, at the cost of some internal glitches.\n\n";
+#print "You may use '--lazy-load', which will reduce initial memory usage\n";
+#print "and loading time, at the cost of some internal glitches.\n\n";
 
 @defines = ();
 
@@ -28,7 +28,7 @@ $Lazy = grep($_ eq "--lazy-load", @ARGV);
 $Lazy = 1;
 
 if ($Lazy) {
-	print "\n\nLazy loading enabled -- if anything breaks, please try disabling this.\n";
+	#print "\n\nLazy loading enabled -- if anything breaks, please try disabling this.\n";
 	push @defines, "-DLAZY_LOAD";
 }
 

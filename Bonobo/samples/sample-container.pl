@@ -3,17 +3,9 @@
 #TITLE: Bonobo sample control container
 #REQUIRES: Gtk Gnome Bonobo
 
-my $poa;
-
 # out listener class
 package MyListener;
-@ISA = qw(POA_Bonobo::Listener_1_0);
-
-sub new {
-	my $class = shift;
-	my $self = bless {}, ref($class)||$class;
-	return $self;
-}
+@ISA = qw(Bonobo::ListenerImpl);
 
 sub event {
 	my ($self, $event, $any) = @_;
@@ -22,20 +14,6 @@ sub event {
 	#warn "$self GOT event: $event ($name)\n";
 	$clist->set_text($clist->{$name}, 1, $any->value);
 }
-
-sub create_listener {
-	my $class = shift;
-	my $clist = shift;
-	my $servant = new MyListener;
-	$servant->{clist} = $clist;
-	my $id = $poa->activate_object ($servant);
-	my $ref = $poa->id_to_reference ($id);
-	return $ref;
-}
-# uhm ...
-sub ref {}
-#sub unref {}
-#sub queryInterface {}
 
 package main;
 
@@ -47,9 +25,6 @@ if (!Bonobo->init) {
 	die "Can't initialize bonobo\n";
 }
 
-my $orb =  CORBA::ORB_init("orbit-local-orb");
-$poa = $orb->resolve_initial_references("RootPOA");
-
 my $pb;
 
 Gtk->idle_add(\&container_create);
@@ -57,15 +32,15 @@ Bonobo->main;
 exit(0);
 
 sub container_create {
-	my ($app, $uic, $box, $control, $button, $clock_button, $container, $cf, $listener);
-	$app = new Bonobo::Window("sample-control-container", "Sample Bonobo Control Container");
+	my ($app, $uic, $uico, $box, $control, $button, $clock_button, $container, $cf, $listener);
+	$app = new Gnome::BonoboWindow("sample-control-container", "Sample Bonobo Control Container");
 	$app->set_default_size(400, 600);
 	$app->set_policy(1, 1, 0);
 	$app->signal_connect('delete_event', sub {shift->destroy; return 0;});
 	$app->signal_connect('destroy', sub {Gtk->main_quit;});
 
-	$container = new Bonobo::ItemContainer;
-	$uic = new Bonobo::UIContainer();
+	$container = new Gnome::BonoboItemContainer;
+	$uic = new Gnome::BonoboUIContainer();
 	$uic->set_win($app);
 	$uic->signal_connect('system_exception', sub {
 		my ($c, $o) = @_;
@@ -74,10 +49,11 @@ sub container_create {
 		$app->destroy;
 		Gtk->main_quit;
 	});
+	$uico = $uic->corba_objref;
 	$box = new Gtk::VBox(0, 0);
 	$app->set_contents($box);
 	
-	$control = new_control Bonobo::Widget("OAFIID:Bonobo_Sample_Calculator", $uic->corba_objref);
+	$control = new_control Gnome::BonoboWidget("OAFIID:Bonobo_Sample_Calculator", $uico);
 	$box->pack_start($control, 1, 1, 0) if $control;
 	$button = new Gtk::Button("Increment result");
 	$button->signal_connect('clicked', \&increment_cb, $control);
@@ -86,14 +62,14 @@ sub container_create {
 	$pb = $cf->get_control_property_bag;
 	$proplist = create_proplist ($control);
 
-	$control = new_control Bonobo::Widget("OAFIID:Bonobo_Sample_Clock", $uic->corba_objref);
+	$control = new_control Gnome::BonoboWidget("OAFIID:Bonobo_Sample_Clock", $uico);
 	$box->pack_start($control, 1, 1, 0) if $control;
 	$clock_button = new Gtk::Button("Pause/Resume Clock");
 	$clock_button->signal_connect('clicked', \&toggle_clock, $control);
 	
 	$box->pack_start($clock_button, 1, 1, 0);
 
-	$control = new_control Bonobo::Widget ("OAFIID:Bonobo_perlentry", $uic->corba_objref);
+	$control = new_control Gnome::BonoboWidget ("OAFIID:Bonobo_perlentry", $uico);
 	$box->pack_start($control, 1, 1, 0) if $control;
 
 	$box->pack_start($proplist, 1, 1, 0);
@@ -127,10 +103,10 @@ sub edit_property {
 sub populate_property_list {
 	my ($control, $clist) = @_;
 	my $props = $pb->getPropertyNames;
-	my $listener = create_listener MyListener($clist);
+	my $listener = new MyListener (clist => $clist);
 	foreach (@$props) {
 		my $prop = $pb->getPropertyByName($_);
-		$prop->addListener($listener);
+		$prop->addListener($listener->queryInterface);
 		my $row = $clist->append($_, $prop->getValue->value);
 		$clist->{$_} = $row;
 	}

@@ -406,7 +406,7 @@ close(T);
 use Config;
 
 $c = "$Config{cc} $::inc gtktypexp.c $::libs -o gtktypexp";
-open(T, "|$c && ./gtktypexp > gtktypexp.out ");
+open(T, "|$c 2> /dev/null && ./gtktypexp > gtktypexp.out 2> /dev/null");
 foreach my $hasht ((\%enum, \%flags, \%struct, \%boxed)) {
 	foreach (keys %{$hasht}) {
 		print T "$_\n";
