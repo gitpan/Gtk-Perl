@@ -22,10 +22,16 @@ new(Class, hadj=0, vadj=0)
 Gtk::Adjustment
 gtk_scrolled_window_get_hadjustment(scrolled_window)
 	Gtk::ScrolledWindow	scrolled_window
-
-Gtk::Adjustment
-gtk_scrolled_window_get_vadjustment(scrolled_window)
-	Gtk::ScrolledWindow	scrolled_window
+	ALIAS:
+		Gtk::ScrolledWindow::get_hadjustment = 0
+		Gtk::ScrolledWindow::get_vadjustment = 1
+	CODE:
+	if (ix == 0)
+		RETVAL = gtk_scrolled_window_get_hadjustment(scrolled_window);
+	else if (ix == 1)
+		RETVAL = gtk_scrolled_window_get_vadjustment(scrolled_window);
+	OUTPUT:
+	RETVAL
 
 void
 gtk_scrolled_window_set_policy(scrolled_window, hscrollbar_policy, vscrollbar_policy)
@@ -51,16 +57,14 @@ add_with_viewport(scrolled_window, widget)
 Gtk::Widget_Up
 hscrollbar(scrolled_window)
 	Gtk::ScrolledWindow	scrolled_window
+	ALIAS:
+		Gtk::ScrolledWindow::hscrollbar = 0
+		Gtk::ScrolledWindow::vscrollbar = 1
 	CODE:
-	RETVAL = scrolled_window->hscrollbar;
-	OUTPUT:
-	RETVAL
-
-Gtk::Widget_Up
-vscrollbar(scrolled_window)
-	Gtk::ScrolledWindow	scrolled_window
-	CODE:
-	RETVAL = scrolled_window->vscrollbar;
+	if (ix == 0)
+		RETVAL = scrolled_window->hscrollbar;
+	else if (ix == 1)
+		RETVAL = scrolled_window->vscrollbar;
 	OUTPUT:
 	RETVAL
 

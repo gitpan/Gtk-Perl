@@ -299,12 +299,14 @@ SV * newSVGdkTimeCoord(GdkTimeCoord * v)
 
 SV * newSVGdkAtom(GdkAtom a)
 {
-	return newSViv(a);
+	SV *s = newSViv(0);
+	sv_setuv(s, a);
+	return s;
 }
 
 GdkAtom SvGdkAtom(SV * data)
 {
-	return SvIV(data);
+	return SvUV(data);
 }
 
 SV * newSVGdkEvent(GdkEvent * e)
@@ -483,6 +485,12 @@ GdkEvent * SvSetGdkEvent(SV * data, GdkEvent * e)
 		e->any.send_event = SvIV(*s);
 	
 	switch (e->type) {
+	case GDK_MAP:
+	case GDK_UNMAP:
+	case GDK_DELETE:
+	case GDK_DESTROY:
+	case GDK_NO_EXPOSE:
+		break;
 	case GDK_EXPOSE:
 		if ((s=hv_fetch(h, "area", 4, 0)))
 			SvGdkRectangle(*s, &e->expose.area);
@@ -498,6 +506,7 @@ GdkEvent * SvSetGdkEvent(SV * data, GdkEvent * e)
 			e->visibility.state = SvGdkVisibilityState(*s);
 		else
 			croak("event must contain state");
+		break;
 	case GDK_MOTION_NOTIFY:
 		if ((s=hv_fetch(h, "x", 1, 0)))
 			e->motion.x = SvNV(*s);

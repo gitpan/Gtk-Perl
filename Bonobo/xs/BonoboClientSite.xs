@@ -21,9 +21,8 @@ bonobo_client_site_new (Class, container)
 	RETVAL
 
 Bonobo::ClientSite
-bonobo_client_site_construct (client_site, corba_client_site, container)
+bonobo_client_site_construct (client_site, container)
 	Bonobo::ClientSite	client_site
-	CORBA::Object	corba_client_site
 	Bonobo::ItemContainer	container
 
 bool

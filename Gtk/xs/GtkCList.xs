@@ -75,18 +75,32 @@ gtk_clist_set_policy(clist, vscrollbar_policy, hscrollbar_policy)
 void
 gtk_clist_freeze(clist)
 	Gtk::CList	clist
-
-void
-gtk_clist_thaw(clist)
-	Gtk::CList	clist
-
-void
-gtk_clist_column_titles_show (clist)
-	Gtk::CList  clist
-
-void
-gtk_clist_column_titles_hide (clist)
-	Gtk::CList  clist
+	ALIAS:
+		Gtk::CList::freeze = 0
+		Gtk::CList::thaw = 1
+		Gtk::CList::column_titles_show = 2
+		Gtk::CList::column_titles_hide = 3
+		Gtk::CList::column_titles_active = 4
+		Gtk::CList::column_titles_passive = 5
+		Gtk::CList::clear = 6
+		Gtk::CList::sort = 7
+		Gtk::CList::select_all = 8
+		Gtk::CList::unselect_all = 9
+		Gtk::CList::undo_selection = 10
+	CODE:
+	switch (ix) {
+	case 0: gtk_clist_freeze(clist); break;
+	case 1: gtk_clist_thaw(clist); break;
+	case 2: gtk_clist_column_titles_show(clist); break;
+	case 3: gtk_clist_column_titles_hide(clist); break;
+	case 4: gtk_clist_column_titles_active(clist); break;
+	case 5: gtk_clist_column_titles_passive(clist); break;
+	case 6: gtk_clist_clear(clist); break;
+	case 7: gtk_clist_sort(clist); break;
+	case 8: gtk_clist_select_all(clist); break;
+	case 9: gtk_clist_unselect_all(clist); break;
+	case 10: gtk_clist_undo_selection(clist); break;
+	}
 
 void
 gtk_clist_column_title_active (clist, column)
@@ -97,14 +111,6 @@ void
 gtk_clist_column_title_passive (clist, column)
 	Gtk::CList  clist
 	int column
-
-void
-gtk_clist_column_titles_active (clist)
-	Gtk::CList  clist
-
-void
-gtk_clist_column_titles_passive (clist)
-	Gtk::CList  clist
 
 void
 gtk_clist_set_column_title(clist, column, title)
@@ -196,7 +202,7 @@ gtk_clist_set_pixmap(clist, row, column, pixmap, mask)
 	int			row
 	int			column
 	Gtk::Gdk::Pixmap	pixmap
-	Gtk::Gdk::Bitmap	mask
+	Gtk::Gdk::Bitmap_OrNULL	mask
 
 void
 gtk_clist_get_pixmap (clist, row, column)
@@ -229,7 +235,7 @@ gtk_clist_set_pixtext(clist, row, column, text, spacing, pixmap, mask)
 	char*	text
 	int		spacing
 	Gtk::Gdk::Pixmap	pixmap
-	Gtk::Gdk::Bitmap	mask
+	Gtk::Gdk::Bitmap_OrNULL	mask
 
 void
 gtk_clist_get_pixtext (clist, row, column)
@@ -401,10 +407,6 @@ gtk_clist_unselect_row(clist, row, column)
 	Gtk::CList  clist
 	int		row
 	int		column
-
-void
-gtk_clist_clear(clist)
-	Gtk::CList  clist
 
 void
 gtk_clist_get_selection_info (clist, x, y)

@@ -47,64 +47,26 @@ gtk_file_selection_complete (file_selection, pattern)
 Gtk::Widget_Up
 ok_button(fs)
 	Gtk::FileSelection	fs
+	ALIAS:
+		Gtk::FileSelection::ok_button = 0
+		Gtk::FileSelection::cancel_button = 1
+		Gtk::FileSelection::dir_list = 2
+		Gtk::FileSelection::file_list = 3
+		Gtk::FileSelection::selection_entry = 4
+		Gtk::FileSelection::selection_text = 5
+		Gtk::FileSelection::main_vbox = 6
+		Gtk::FileSelection::help_button = 7
 	CODE:
-	RETVAL = fs->ok_button;
-	OUTPUT:
-	RETVAL
-
-Gtk::Widget_Up
-cancel_button(fs)
-	Gtk::FileSelection	fs
-	CODE:
-	RETVAL = fs->cancel_button;
-	OUTPUT:
-	RETVAL
-
-Gtk::Widget_Up
-dir_list(fs)
-	Gtk::FileSelection	fs
-	CODE:
-	RETVAL = fs->dir_list;
-	OUTPUT:
-	RETVAL
-
-Gtk::Widget_Up
-file_list(fs)
-	Gtk::FileSelection	fs
-	CODE:
-	RETVAL = fs->file_list;
-	OUTPUT:
-	RETVAL
-
-Gtk::Widget_Up
-selection_entry(fs)
-	Gtk::FileSelection	fs
-	CODE:
-	RETVAL = fs->selection_entry;
-	OUTPUT:
-	RETVAL
-
-Gtk::Widget_Up
-selection_text(fs)
-	Gtk::FileSelection	fs
-	CODE:
-	RETVAL = fs->selection_text;
-	OUTPUT:
-	RETVAL
-
-Gtk::Widget_Up
-main_vbox(fs)
-	Gtk::FileSelection	fs
-	CODE:
-	RETVAL = fs->main_vbox;
-	OUTPUT:
-	RETVAL
-
-Gtk::Widget_Up
-help_button(fs)
-	Gtk::FileSelection	fs
-	CODE:
-	RETVAL = fs->help_button;
+	switch (ix) {
+	case 0: RETVAL = fs->ok_button; break;
+	case 1: RETVAL = fs->cancel_button; break;
+	case 2: RETVAL = fs->dir_list; break;
+	case 3: RETVAL = fs->file_list; break;
+	case 4: RETVAL = fs->selection_entry; break;
+	case 5: RETVAL = fs->selection_text; break;
+	case 6: RETVAL = fs->main_vbox; break;
+	case 7: RETVAL = fs->help_button; break;
+	}
 	OUTPUT:
 	RETVAL
 

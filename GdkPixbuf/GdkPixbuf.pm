@@ -1,28 +1,16 @@
 
-
 package Gtk::Gdk::Pixbuf;
 
 require Gtk;
 require Exporter;
 require DynaLoader;
-require AutoLoader;
+require Gtk::Gdk::Pixbuf::Types;
 
-use Carp;
-
-$VERSION = "0.7005";
+$VERSION = "0.7006";
 
 @ISA = qw(Exporter DynaLoader);
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-@EXPORT = qw(
-        
-);
-# Other items we are prepared to export if requested
-@EXPORT_OK = qw(
-);
-
-# Autoload methods go after __END__, and are processed by the autosplit program.
+@EXPORT = qw();
+@EXPORT_OK = qw();
 
 sub dl_load_flags {0x01}
 
@@ -33,5 +21,16 @@ Gtk->mod_init_add('Gtk', sub {
 	init Gtk::Gdk::Pixbuf;
 });
 
+#Gtk->mod_init_add('Gnome', sub {
+#	my $libname = DynaLoader::dl_findfile("libgnomecanvaspixbuf");
+#	return unless $libname;
+#	my $libref = DynaLoader::dl_load_file($libname, 1);
+#	return unless $libname;
+#	my $symbol = DynaLoader::dl_find_symbol($libref, "gnome_canvas_pixbuf_get_type");
+#	return unless $symbol;
+#	my $parent = Gtk::Object->_register('Gnome::CanvasPixbuf', $symbol);
+#	return unless $parent;
+#	@Gnome::CanvasPixbuf = $parent;
+#});
+
 1;
-__END__

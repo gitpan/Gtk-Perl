@@ -1,4 +1,5 @@
 use ExtUtils::MakeMaker;
+use Config;
 use Cwd;
 use blib '..';
 require '../Depends.pm';
@@ -60,7 +61,7 @@ $moz->add_clean ( qw(
 
 # documentation
 gendefs::gen_doc('gtkmozembed');
-system("../tools/gendoc.pl", "-t", 'gtkmozembed', $moz->get_xs);
+system($Config{perlpath}, "../tools/gendoc.pl", "-t", 'gtkmozembed', $moz->get_xs);
 
 $moz->write_ext("build/extension.xsh");
 
@@ -85,7 +86,7 @@ build/PerlGtkMozEmbedExt.h build/PerlGtkMozEmbedExt.c build/PerlGtkMozEmbedInt.h
 	$(PERL) ../tools/genext.pl GtkMozEmbed </dev/null
 
 gendoc:
-	../tools/gendoc.pl -t gtkmozembed $(XS_FILES)
+	$(PERL) ../tools/gendoc.pl -t gtkmozembed $(XS_FILES)
 
 ';
 }

@@ -1,5 +1,4 @@
 
-
 package Gnome::Print;
 
 require Gtk;
@@ -8,11 +7,8 @@ require Gtk::Gdk::Pixbuf;
 require Gnome;
 require Exporter;
 require DynaLoader;
-require AutoLoader;
 
-use Carp;
-
-$VERSION = '0.7005';
+$VERSION = '0.7006';
 
 @ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export
@@ -25,17 +21,18 @@ $VERSION = '0.7005';
 @EXPORT_OK = qw(
 );
 
-require Gnome::Print::Types;
-
 sub dl_load_flags {0x01}
 
 bootstrap Gnome::Print $VERSION;
 
-# Autoload methods go after __END__, and are processed by the autosplit program.
+if ($Gnome::Print::lazy) {
+	require Gnome::Print::TypesLazy;
+} else {
+	require Gnome::Print::Types;
+	&Gnome::Print::_boot_all();
+}
 
-Gtk->mod_init_add('Gtk', sub {
-	init Gtk::Gdk::Rgb;
-});
+# Autoload methods go after __END__, and are processed by the autosplit program.
 
 Gtk->mod_init_add('Gnome', sub {
 	init Gnome::Print;

@@ -1,4 +1,5 @@
 use ExtUtils::MakeMaker;
+use Config;
 use blib '../Gtk';
 use Cwd;
 require '../Depends.pm';
@@ -68,7 +69,7 @@ $gl->add_clean ( qw(
 
 # documentation
 gendefs::gen_doc('gtkglarea');
-system("../tools/gendoc.pl", "-t", 'gtkglarea', $gl->get_xs);
+system($Config{perlpath}, "../tools/gendoc.pl", "-t", 'gtkglarea', $gl->get_xs);
 
 WriteMakefile(
 	'NAME'      => 'Gtk::GLArea',
@@ -92,7 +93,7 @@ build/PerlGtkGLAreaExt.h build/PerlGtkGLAreaExt.c build/PerlGtkGLAreaInt.h: buil
 	$(PERL) ../tools/genext.pl GtkGLArea </dev/null
 
 gendoc:
-	../tools/gendoc.pl -t gtkglarea $(XS_FILES)
+	$(PERL) ../tools/gendoc.pl -t gtkglarea $(XS_FILES)
 
 ';
 

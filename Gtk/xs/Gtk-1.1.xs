@@ -62,10 +62,19 @@ gdk_draw_rgb_image (pixmap, gc, x, y, width, height, dith, rgb_buf, rowstride)
 	Gtk::Gdk::Rgb::Dither	dith
 	unsigned char *	rgb_buf
 	gint	rowstride
-
+	ALIAS:
+		Gtk::Gdk::Pixmap::draw_rgb_image = 0
+		Gtk::Gdk::Pixmap::draw_rgb_32_image = 1
+		Gtk::Gdk::Pixmap::draw_gray_image = 2
+	CODE:
+	switch (ix) {
+	case 0: gdk_draw_rgb_image (pixmap, gc, x, y, width, height, dith, rgb_buf, rowstride); break;
+	case 1: gdk_draw_rgb_32_image (pixmap, gc, x, y, width, height, dith, rgb_buf, rowstride); break;
+	case 2: gdk_draw_gray_image (pixmap, gc, x, y, width, height, dith, rgb_buf, rowstride); break;
+	}
 
 void
-gdk_draw_rgb_32_image (pixmap, gc, x, y, width, height, dith, rgb_buf, rowstride)
+gdk_draw_rgb_image_dithalign (pixmap, gc, x, y, width, height, dith, rgb_buf, rowstride, xdith, ydith)
 	Gtk::Gdk::Pixmap	pixmap
 	Gtk::Gdk::GC	gc
 	gint	x
@@ -75,19 +84,8 @@ gdk_draw_rgb_32_image (pixmap, gc, x, y, width, height, dith, rgb_buf, rowstride
 	Gtk::Gdk::Rgb::Dither	dith
 	unsigned char *	rgb_buf
 	gint	rowstride
-
-
-void
-gdk_draw_gray_image (pixmap, gc, x, y, width, height, dith, rgb_buf, rowstride)
-	Gtk::Gdk::Pixmap	pixmap
-	Gtk::Gdk::GC	gc
-	gint	x
-	gint	y
-	gint	width
-	gint	height
-	Gtk::Gdk::Rgb::Dither	dith
-	unsigned char *	rgb_buf
-	gint	rowstride
+	gint	xdith
+	gint	ydith
 
 void
 gdk_draw_indexed_image (pixmap, gc, x, y, width, height, dith, rgb_buf, rowstride, cmap)

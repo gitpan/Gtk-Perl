@@ -1,4 +1,5 @@
 use ExtUtils::MakeMaker;
+use Config;
 use blib '../Gtk';
 use Cwd;
 require '../Depends.pm';
@@ -8,11 +9,15 @@ $glade = new ExtUtils::Depends('Gtk::GladeXML', 'Gtk');
 
 mkdir('build', 0777);
 
-if (defined(`libglade-config --libs gnome`)) {
-	$gnome = 'gnome';
-} else {
-	$gnome = '';
-}
+# Gnome support is automatically loaded at runtime if the Gnome module
+# is loaded too. See at the end of GladeXML.pm for more info.
+#if (defined(`libglade-config --libs gnome`)) {
+#	$gnome = 'gnome';
+#} else {
+#	$gnome = '';
+#}
+
+$gnome = '';
 
 $glade->set_inc (`libglade-config --cflags $gnome`);
 $glade->set_libs (`libglade-config --libs $gnome`);
@@ -68,13 +73,17 @@ $glade->add_clean( qw(
 
 # documentation
 gendefs::gen_doc('glade');
-system("../tools/gendoc.pl", "-t", 'glade', keys %ExtUtils::Depends::xs);
+system($Config{perlpath}, "../tools/gendoc.pl", "-t", 'glade', $glade->get_xs);
+system($Config{perlpath}, "../tools/gpdoc2pod", "-t", 'Glade');
 
 WriteMakefile(
 	'NAME'      => 'Gtk::GladeXML',
 	'VERSION_FROM'	=> 'GladeXML.pm',
 	'XSOPT' => '-noversioncheck',
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
+	'MAN3PODS' => {
+		'build/perl-glade-ref.pod' => '$(INST_MAN3DIR)/Gtk::GladeXML::reference.3pm',
+		},
 	$glade->get_makefile_vars,
 );
 
@@ -90,7 +99,7 @@ build/PerlGtkGladeXMLExt.h build/PerlGtkGladeXMLExt.c build/PerlGtkGladeXMLInt.h
 	$(PERL) ../tools/genext.pl GtkGladeXML </dev/null
 
 gendoc:
-	../tools/gendoc.pl -t glade $(XS_FILES)
+	$(PERL) ../tools/gendoc.pl -t glade $(XS_FILES)
 
 ';
 

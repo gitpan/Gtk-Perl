@@ -24,19 +24,20 @@ gtk_combo_set_value_in_list(combo, val, ok_if_empty)
 	int	ok_if_empty
 
 void
-gtk_combo_set_use_arrows(combo, val)
+gtk_combo_set_use_arrows(combo, value)
 	Gtk::Combo	combo
-	int	val
-
-void
-gtk_combo_set_use_arrows_always(combo, val)
-	Gtk::Combo	combo
-	int	val
-
-void
-gtk_combo_set_case_sensitive (combo, val)
-	Gtk::Combo	combo
-	int	val
+	int	value
+	ALIAS:
+		Gtk::Combo::set_use_arrows = 0
+		Gtk::Combo::set_use_arrows_always = 1
+		Gtk::Combo::set_case_sensitive = 2
+	CODE:
+	if (ix == 0)
+		gtk_combo_set_use_arrows(combo, value);
+	else if (ix == 1)
+		gtk_combo_set_use_arrows_always(combo, value);
+	else if (ix == 2)
+		gtk_combo_set_case_sensitive (combo, value);
 
 void
 gtk_combo_set_item_string(combo, item, item_value)
@@ -64,24 +65,17 @@ gtk_combo_disable_activate(combo)
 Gtk::Widget_Up
 list (combo)
 	Gtk::Combo	combo
+	ALIAS:
+		Gtk::Combo::list = 0
+		Gtk::Combo::entry = 1
+		Gtk::Combo::popwin = 2
 	CODE:
-	RETVAL = combo->list;
-	OUTPUT:
-	RETVAL
-
-Gtk::Widget_Up
-entry (combo)
-	Gtk::Combo	combo
-	CODE:
-	RETVAL = combo->entry;
-	OUTPUT:
-	RETVAL
-
-Gtk::Widget_Up
-popwin (combo)
-	Gtk::Combo	combo
-	CODE:
-	RETVAL = combo->popwin;
+	if (ix ==0)
+		RETVAL = combo->list;
+	else if (ix ==1)
+		RETVAL = combo->entry;
+	else if (ix ==2)
+		RETVAL = combo->popwin;
 	OUTPUT:
 	RETVAL
 

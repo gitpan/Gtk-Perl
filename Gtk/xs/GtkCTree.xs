@@ -16,7 +16,7 @@ static void ctree_func_handler (GtkCTree *ctree, GtkCTreeNode *node, gpointer da
 	int i;
 	dSP;
 
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(sv_ctree));
 	XPUSHs(sv_2mortal(sv_node));
 	for(i=2;i<av_len(perlargs);i++)

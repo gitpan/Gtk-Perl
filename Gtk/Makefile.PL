@@ -25,6 +25,8 @@ if ($] > 5.004) {
 $Lazy = grep($_ eq "--lazy-load", @ARGV);
 @ARGV = grep($_ ne "--lazy-load", @ARGV);
 
+$Lazy = 1;
+
 if ($Lazy) {
 	print "\n\nLazy loading enabled -- if anything breaks, please try disabling this.\n";
 	push @defines, "-DLAZY_LOAD";
@@ -70,7 +72,7 @@ mkdir("build", 0777);
 $gtk->set_inc($inc);
 $gtk->set_libs($libs);
 $gtk->add_typemaps(map {cwd().'/'.$_} "build/GtkTypemap", "gtk-0.99.typemap", "gtk-1.2.typemap");
-$gtk->add_headers ('<gtk/gtk.h>', '"GtkTypes.h"', '"GdkTypes.h"', '"MiscTypes.h"');
+$gtk->add_headers ('<gtk/gtk.h>', '<gtk/gtkinvisible.h>', '"GtkTypes.h"', '"GdkTypes.h"', '"MiscTypes.h"');
 $gtk->install (qw(build/PerlGtkInt.h build/PerlGtkExt.h ppport.h build/GtkDefs.h));
 $gtk->add_c(qw(build/GtkDefs.c build/PerlGtkExt.c 
 	GdkTypes.c GtkTypes.c MiscTypes.c Derived.c));
@@ -89,12 +91,18 @@ $gtk->add_pm (
 	'LWP.pm' => '$(INST_LIBDIR)/Gtk/LWP.pm',
 	'http.pm' => '$(INST_LIBDIR)/Gtk/LWP/http.pm',
 	'io.pm' => '$(INST_LIBDIR)/Gtk/io.pm',
+	'lazy.pm' => '$(INST_LIBDIR)/Gtk/lazy.pm',
 	'Atoms.pm' => '$(INST_LIBDIR)/Gtk/Atoms.pm',
+	'GtkCListModel.pm' => '$(INST_LIBDIR)/Gtk/CListModel.pm',
 	'GtkColorSelectButton.pm' => '$(INST_LIBDIR)/Gtk/ColorSelectButton.pm',
 	'LogHandler.pm' => '$(INST_LIBDIR)/Gtk/LogHandler.pm',
 	'build/GtkTypes.pm' => '$(INST_ARCHLIBDIR)/Gtk/Types.pm',
 	'build/GtkKeysyms.pm' => '$(INST_ARCHLIBDIR)/Gtk/Keysyms.pm'
 );
+
+$gtk->add_pm(
+	'build/GtkTypesLazy.pm' => '$(INST_ARCHLIBDIR)/Gtk/TypesLazy.pm'
+) if $Lazy;
 
 @clean = qw( build/* */*.o */*/*.o);
 
@@ -125,12 +133,13 @@ $gtk->add_xs(gendefs::gendefs(@a));
 
 # documentation
 gendefs::gen_doc();
-system("../tools/gendoc.pl", keys %xs);
+system($Config{perlpath}, "../tools/gendoc.pl", $gtk->get_xs);
+system($Config{perlpath}, "../tools/gpdoc2pod");
 
 use File::Basename;
 
-foreach ( 'build/GtkDefs.h', 'build/PerlGtkExt.h', 'build/PerlGtkInt.h', 'ppport.h', 'GtkTypes.h', 'GdkTypes.h', 'MiscTypes.h', '../tools/gendefs.pl', '../tools/genext.pl', '../tools/gendoc.pl') {
-	$pm->{$_} = '$(INST_ARCHLIBDIR)/Gtk/Install/' . basename($_);
+foreach ( '../tools/gendefs.pl', '../tools/genext.pl', '../tools/gendoc.pl', '../tools/gpdoc2pod') {
+	$gtk->add_pm($_, '$(INST_ARCHLIBDIR)/Gtk/Install/' . basename($_));
 }
 
 $depend = {'build/GtkDefs.c' => 'build/PerlGtkExt.h build/PerlGtkInt.h'};
@@ -150,7 +159,13 @@ WriteMakefile(
 	'depend' => $depend,
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
 	'OPTIMIZE' => '-O2 -g',
-	'MAN3PODS' => {'cookbook.pod' => '$(INST_MAN3DIR)/cookbook.3pm'},
+	'MAN3PODS' => {
+		'cookbook.pod' => '$(INST_MAN3DIR)/Gtk::cookbook.3pm',
+		'Gtk.pm' => '$(INST_MAN3DIR)/Gtk.3pm',
+		'objects.pod' => '$(INST_MAN3DIR)/Gtk::objects.3pm',
+		'GtkCListModel.pm' => '$(INST_MAN3DIR)/Gtk::CListModel.3pm',
+		'build/perl-gtk-ref.pod' => '$(INST_MAN3DIR)/Gtk::reference.3pm',
+		},
 	$gtk->get_makefile_vars,
 );
 
@@ -166,7 +181,7 @@ build/PerlGtkExt.h build/PerlGtkExt.c build/PerlGtkInt.h: build/GtkDefs.h ../too
 	$(PERL) ../tools/genext.pl Gtk
 
 gendoc:
-	../tools/gendoc.pl $(XS_FILES)
+	$(PERL) ../tools/gendoc.pl $(XS_FILES)
 
 ';
 
@@ -199,9 +214,13 @@ sub gtk_version {
 
 # build the keysyms mapping
 sub build_ksyms {
-	my ($incfile) = `gtk-config --prefix`;
-	chomp($incfile);
-	$incfile .= "/include/gdk/gdkkeysyms.h";
+	my ($dir) = `gtk-config --prefix`;
+	chomp($dir);
+	my $incfile;
+	foreach ("/", "/gtk-1.2") {
+		$incfile = "$dir/include$_/gdk/gdkkeysyms.h";
+		last if -f $incfile;
+	}
 
 	open(OUT, '>build/GtkKeysyms.pm') || die "Cannot open build/GtkKeysyms.pm: $!";
 	print OUT "# DO NOT EDIT!\n";

@@ -72,11 +72,14 @@ void
 gtk_window_add_embedded_xid (window, xid)
 	Gtk::Window	window
 	guint	xid
-
-void
-gtk_window_remove_embedded_xid (window, xid)
-	Gtk::Window	window
-	guint	xid
+	ALIAS:
+		Gtk::Window::add_embedded_xid = 0
+		Gtk::Window::remove_embedded_xid = 1
+	CODE:
+	if (ix == 0)
+		gtk_window_add_embedded_xid (window, xid);
+	else if (ix == 1)
+		gtk_window_remove_embedded_xid (window, xid);
 
 void
 gtk_window_add_accel_group(window, accel_group)
@@ -95,17 +98,19 @@ gtk_menu_set_accel_group (menu, accel_group)
 	Gtk::Menu	menu
 	Gtk::AccelGroup	accel_group
 
-Gtk::AccelGroup
+Gtk::AccelGroup_OrNULL
 gtk_menu_get_accel_group (menu)
 	Gtk::Menu	menu
-
-Gtk::AccelGroup
-gtk_menu_get_uline_accel_group (menu)
-	Gtk::Menu	menu
-
-Gtk::AccelGroup
-gtk_menu_ensure_uline_accel_group (menu)
-	Gtk::Menu	menu
+	ALIAS:
+		Gtk::Menu::get_accel_group = 0
+		Gtk::Menu::get_unline_accel_group = 1
+		Gtk::Menu::ensure_unline_accel_group = 2
+	CODE:
+	switch (ix) {
+	case 0: gtk_menu_get_accel_group (menu); break;
+	case 1: gtk_menu_get_uline_accel_group (menu); break;
+	case 2: gtk_menu_ensure_uline_accel_group (menu); break;
+	}
 
 void
 gtk_menu_reorder_child (menu, child, position)
@@ -121,14 +126,6 @@ gtk_drag_get_data (widget, context, target, time)
 	Gtk::Gdk::DragContext	context
 	Gtk::Gdk::Atom	target
 	int	time
-
-void
-gtk_drag_highlight (widget)
-	Gtk::Widget	widget
-
-void
-gtk_drag_unhighlight (widget)
-	Gtk::Widget	widget
 
 void
 gtk_drag_dest_set (widget, flags, actions, ...)
@@ -154,10 +151,6 @@ gtk_drag_dest_set_proxy (widget, proxy_window, protocol, use_coordinates)
 	gboolean	use_coordinates
 
 void
-gtk_drag_dest_unset (widget)
-	Gtk::Widget	widget
-
-void
 gtk_drag_source_set (widget, start_button_mask, actions, ...)
 	Gtk::Widget	widget
 	Gtk::Gdk::ModifierType	start_button_mask
@@ -174,10 +167,6 @@ gtk_drag_source_set (widget, start_button_mask, actions, ...)
 	}
 
 void
-gtk_drag_source_unset (widget)
-	Gtk::Widget	widget
-
-void
 gtk_drag_source_set_icon (widget, colormap=NULL, pixmap=NULL, mask=NULL)
 	Gtk::Widget	widget
 	Gtk::Gdk::Colormap_OrNULL	colormap
@@ -191,10 +180,6 @@ gtk_drag_begin(widget, targets, actions, button, event)
 	Gtk::Gdk::DragAction	actions
 	int	button
 	Gtk::Gdk::Event	event
-	CODE:
-	RETVAL = gtk_drag_begin(widget, targets, actions, button, event);
-	OUTPUT:
-	RETVAL
 
 MODULE = Gtk12		PACKAGE = Gtk::Gdk::DragContext		PREFIX = gdk_drag_context_
 
@@ -487,10 +472,6 @@ gtk_widget_size_request (widget, request=0)
 	}
 
 void
-gtk_widget_unlock_accelerators (widget)
-	Gtk::Widget	widget
-
-void
 gtk_widget_set_visual (widget, visual)
 	Gtk::Widget	widget
 	Gtk::Gdk::Visual	visual
@@ -505,10 +486,6 @@ gtk_widget_set_scroll_adjustments (widget, hadj, vadj)
 	Gtk::Widget	widget
 	Gtk::Adjustment	hadj
 	Gtk::Adjustment	vadj
-
-void
-gtk_widget_set_rc_style (widget)
-	Gtk::Widget	widget
 
 void
 gtk_widget_set_parent_window (widget, window)
@@ -532,18 +509,6 @@ void
 gtk_widget_set_app_paintable (widget, paintable)
 	Gtk::Widget	widget
 	gboolean	paintable
-
-void
-gtk_widget_restore_default_style (widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_reset_shapes (widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_reset_rc_styles (widget)
-	Gtk::Widget	widget
 
 gboolean
 gtk_widget_accelerators_locked (widget)
@@ -595,10 +560,6 @@ gtk_widget_queue_clear_area (widget, x, y, width, height)
 	int	height
 
 void
-gtk_widget_queue_clear (widget)
-	Gtk::Widget widget
-
-void
 gtk_widget_push_composite_child (Class)
 	SV *	Class
 	CODE:
@@ -645,10 +606,6 @@ gtk_widget_modify_style (widget, rcstyle)
 	Gtk::Widget	widget
 	Gtk::RcStyle	rcstyle
 
-void
-gtk_widget_lock_accelerators (widget)
-	Gtk::Widget	widget
-
 gint
 gtk_widget_is_ancestor (widget, ancestor)
 	Gtk::Widget	widget
@@ -656,10 +613,6 @@ gtk_widget_is_ancestor (widget, ancestor)
 
 gint
 gtk_widget_hide_on_delete (widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_ensure_style (widget)
 	Gtk::Widget	widget
 
 #if 0

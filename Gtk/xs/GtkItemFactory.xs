@@ -96,7 +96,7 @@ default_ifactory_callback (gpointer callback_data, guint callback_action, GtkWid
 	if (callback_data == NULL)
 		return;
 
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	args = (AV*)callback_data;
 	handler = *av_fetch(args, 0, 0); 
 	sv_widget = newSVGtkObjectRef(GTK_OBJECT(widget), 0);

@@ -7,6 +7,8 @@
 ;(define-object PanelWidget (GtkFixed) (perl Gnome::PanelWidget))
 ;(define-object SnappedWidget (GtkWindow) (perl Gnome::SnappedWidget))
 
+(define-object StatusDocklet (GtkObject) (perl Gnome::StatusDocklet))
+
 (define-enum PanelOrientType
 	(up	ORIENT_UP)
 	(down	ORIENT_DOWN)

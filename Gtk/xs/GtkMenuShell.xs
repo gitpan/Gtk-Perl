@@ -13,11 +13,16 @@ void
 gtk_menu_shell_append(menu_shell, child)
 	Gtk::MenuShell	menu_shell
 	Gtk::Widget	child
-
-void
-gtk_menu_shell_prepend(menu_shell, child)
-	Gtk::MenuShell	menu_shell
-	Gtk::Widget	child
+	ALIAS:
+		Gtk::MenuShell::append = 0
+		Gtk::MenuShell::prepend = 1
+		Gtk::MenuShell::select_item = 2
+	CODE:
+	switch (ix) {
+	case 0: gtk_menu_shell_append(menu_shell, child); break;
+	case 1: gtk_menu_shell_prepend(menu_shell, child); break;
+	case 2: gtk_menu_shell_select_item(menu_shell, child); break;
+	}
 
 void
 gtk_menu_shell_insert(menu_shell, child, position)
@@ -28,24 +33,19 @@ gtk_menu_shell_insert(menu_shell, child, position)
 void
 gtk_menu_shell_deactivate(menu_shell)
 	Gtk::MenuShell	menu_shell
-
-#if GTK_HVER >= 0x010200
-
-void
-gtk_menu_shell_select_item (menu_shell, widget)
-	Gtk::MenuShell	menu_shell
-	Gtk::Widget	widget
-
-void
-gtk_menu_shell_deselect (menu_shell)
-	Gtk::MenuShell	menu_shell
+	ALIAS:
+		Gtk::MenuShell::deactivate = 0
+		Gtk::MenuShell::deselect = 1
+	CODE:
+	if (ix == 0)
+		gtk_menu_shell_deactivate(menu_shell);
+	else if (ix == 1)
+		gtk_menu_shell_deselect (menu_shell);
 
 void
 gtk_menu_shell_activate_item (menu_shell, widget, force_deactivate)
 	Gtk::MenuShell	menu_shell
 	Gtk::Widget	widget
 	gboolean	force_deactivate
-
-#endif
 
 #endif

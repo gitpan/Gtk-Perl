@@ -1,4 +1,5 @@
 use ExtUtils::MakeMaker;
+use Config;
 use blib '..';
 use blib '../GdkImlib';
 use blib '../Gnome';
@@ -51,7 +52,7 @@ $bonobo->install (qw(build/BonoboDefs.h build/PerlBonoboInt.h));
 
 $bonobo->write_ext('build/extension.xsh');
 
-$bonobo->add_clean(clean = qw(
+$bonobo->add_clean(qw(
 	build/IFiles.pm build/BonoboDefs.c build/BonoboDefs.h 
 	build/BonoboTypemap build/BonoboTypes.pm 
 	build/PerlBonoboExt.c build/PerlBonoboExt.h 
@@ -61,7 +62,8 @@ $bonobo->add_clean(clean = qw(
 
 # documentation
 gendefs::gen_doc('bonobo');
-system("../tools/gendoc.pl", "-t", 'bonobo', keys %ExtUtils::Depends::xs);
+system($Config{perlpath}, "../tools/gendoc.pl", "-t", 'bonobo', $bonobo->get_xs);
+system($Config{perlpath}, "../tools/gpdoc2pod", "-t", 'Bonobo');
 
 WriteMakefile(
 	'NAME'      => 'Bonobo',
@@ -70,6 +72,9 @@ WriteMakefile(
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
 	'depend' => $depend,
 	OPTIMIZE =>'-g -O2',
+	'MAN3PODS' => {
+		'build/perl-bonobo-ref.pod' => '$(INST_MAN3DIR)/Bonobo::reference.3pm',
+		},
 	$bonobo->get_makefile_vars,
 );
 

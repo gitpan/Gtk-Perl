@@ -12,7 +12,7 @@ Gtk::Gdk::Cursor	T_MISCPTROBJ
 Gtk::Gdk::GC		T_MISCPTROBJ
 Gtk::Gdk::Image		T_SimpleVal
 Gtk::Gdk::GCValues	T_MISCPTROBJ
-Gtk::Gdk::Atom		T_SimpleValOrNULL
+Gtk::Gdk::Atom		T_UV
 
 Gtk::Gdk::Image_OrNULL		T_SimpleValOrNULL
 
@@ -37,11 +37,11 @@ Gtk::Gdk::Color		T_SimpleVal
 gfloat				T_FLOAT
 gdouble				T_DOUBLE
 gboolean			T_BOOL
-guint				T_IV
+guint				T_UV
 gint				T_IV
 glong				T_IV
-gulong				T_IV
-guint32				T_IV
+gulong				T_UV
+guint32				T_UV
 
 bool				T_BOOL
 
@@ -117,18 +117,18 @@ T_GtkPTROBJ
     if (!$var) {
     	croak("failed to return mandatory object of type $ntype");
     }
-	$arg = newSVGtkObjectRef(GTK_OBJECT($var), \"${ntype}\");
+	$arg = sv_2mortal(newSVGtkObjectRef(GTK_OBJECT($var), NULL));
 
 T_GtkPTROBJSink
     if (!$var) {
     	croak("failed to return mandatory object of type @{[grep {s/_Sink//,1} $ntype]}");
     }
-	$arg = newSVGtkObjectRef(GTK_OBJECT($var), \"@{[grep {s/_Sink//,1} $ntype]}\");
+	$arg = sv_2mortal(newSVGtkObjectRef(GTK_OBJECT($var), \"@{[grep {s/_Sink//,1} $ntype]}\"));
 	gtk_object_sink(GTK_OBJECT($var));
 
 T_GtkPTROBJOrNULL
     if ($var) {
-		$arg = newSVGtkObjectRef(GTK_OBJECT($var), \"@{[grep {s/_OrNULL//,1} $ntype]}\");
+		$arg = sv_2mortal(newSVGtkObjectRef(GTK_OBJECT($var), NULL));
 	} else
 		$arg = newSVsv(&PL_sv_undef);
 

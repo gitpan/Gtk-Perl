@@ -1,4 +1,5 @@
 use ExtUtils::MakeMaker;
+use Config;
 use Cwd;
 use blib '..';
 require '../Depends.pm';
@@ -69,7 +70,8 @@ $html->add_clean ( qw(
 
 # documentation
 gendefs::gen_doc('gtkhtml');
-system("../tools/gendoc.pl", "-t", 'gtkhtml', keys %ExtUtils::Depends::xs);
+system($Config{perlpath}, "../tools/gendoc.pl", "-t", 'gtkhtml', $html->get_xs);
+system($Config{perlpath}, "../tools/gpdoc2pod", "-t", 'GtkHTML');
 
 $html->write_ext("build/extension.xsh");
 
@@ -78,6 +80,9 @@ WriteMakefile(
 	'VERSION_FROM'	=> 'GtkHTML.pm',
 	'XSOPT' => '-noversioncheck',
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
+	'MAN3PODS' => {
+		'build/perl-gtkhtml-ref.pod' => '$(INST_MAN3DIR)/Gtk::HTML::reference.3pm',
+		},
 	$html->get_makefile_vars,
 	#'depend' => $depend,
 );
@@ -94,7 +99,7 @@ build/PerlGtkHTMLExt.h build/PerlGtkHTMLExt.c build/PerlGtkHTMLInt.h: build/GtkH
 	$(PERL) ../tools/genext.pl GtkHTML </dev/null
 
 gendoc:
-	../tools/gendoc.pl -t gtkhtml $(XS_FILES)
+	$(PERL) ../tools/gendoc.pl -t gtkhtml $(XS_FILES)
 
 ';
 }

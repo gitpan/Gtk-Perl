@@ -31,22 +31,20 @@ gtk_tree_item_set_subtree(tree_item, subtree)
 void
 gtk_tree_item_remove_subtree(tree_item)
 	Gtk::TreeItem   tree_item
-
-void
-gtk_tree_item_select(tree_item)
-	Gtk::TreeItem	tree_item
-
-void
-gtk_tree_item_deselect(tree_item)
-	Gtk::TreeItem	tree_item
-
-void
-gtk_tree_item_expand(tree_item)
-	Gtk::TreeItem	tree_item
-
-void
-gtk_tree_item_collapse(tree_item)
-	Gtk::TreeItem	tree_item
+	ALIAS:
+		Gtk::TreeItem::remove_subtree = 0
+		Gtk::TreeItem::select = 1
+		Gtk::TreeItem::deselect = 2
+		Gtk::TreeItem::expand = 3
+		Gtk::TreeItem::collapse = 4
+	CODE:
+	switch (ix) {
+	case 0: gtk_tree_item_remove_subtree(tree_item); break;
+	case 1: gtk_tree_item_select(tree_item); break;
+	case 2: gtk_tree_item_deselect(tree_item); break;
+	case 3: gtk_tree_item_expand(tree_item); break;
+	case 4: gtk_tree_item_collapse(tree_item); break;
+	}
 
 Gtk::Widget_OrNULL_Up
 subtree(tree_item)

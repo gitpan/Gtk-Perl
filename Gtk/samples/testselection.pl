@@ -6,7 +6,12 @@ use Gtk::Atoms;
 
 init Gtk;
 
+#die "PRIMARY: $Gtk::Atoms{PRIMARY}\n" unless $Gtk::Atoms{PRIMARY} == 1;
+
 use strict;
+use constant TARGET_STRING => 0;
+use constant TARGET_TEXT => 1;
+use constant TARGET_COMPOUND_TEXT => 2;
 
 use vars qw($have_selection $selection_text $selection_button
 			$selection_string);
@@ -34,13 +39,19 @@ sub selection_toggled {
 	}
 }
 
-sub selection_handle {
-	my ($widget, $selection_data) = @_;
-
-	$selection_data->set ($selection_data->target == $Gtk::Atoms{COMPOUND_TEXT} ?
-						      $Gtk::Atoms{COMPOUND_TEXT} : $Gtk::Atoms{STRING},
-						  8,
-						  defined $selection_string ? $selection_string : "");
+sub selection_get {
+	my ($widget, $data, $info, $time) = @_;
+	my $sdata;
+	my $type = 0;
+	if (defined($selection_string)) {
+		$sdata = $selection_string;
+	}
+	if ($info == TARGET_STRING) {
+		$type = $Gtk::Atoms{STRING};
+	} elsif ($info == TARGET_TEXT || $info == TARGET_COMPOUND_TEXT) {
+		$type = $Gtk::Atoms{COMPOUND_TEXT};
+	}
+	$data->set($type, 8, $sdata);
 }
 
 sub selection_clear {
@@ -119,6 +130,7 @@ sub selection_received {
 		warn "Selection retrieval failed\n";
 		return;
     }
+	warn "Selection received\n";
 	
 	my $name = Gtk::Gdk::Atom->name($selection_data->type);
 	
@@ -127,10 +139,10 @@ sub selection_received {
 
 		$selection_text->freeze;
 		$selection_text->set_point (0);
-		$selection_text->foreward_delete ($selection_text->get_length);
+		$selection_text->forward_delete ($selection_text->get_length);
 
 		$selection_text->insert (undef, $selection_text->style->black, undef,
-								 $selection_string);
+								 $selection_string."\n");
 		$selection_text->thaw;
 		
 	} else {
@@ -138,7 +150,15 @@ sub selection_received {
 			"(".$selection_data->type.") to string\n";
 	}
 }
-	
+
+# main:
+
+my @targetlist = (
+	{'target' => "STRING", 'flags' => 0, 'info' => TARGET_STRING},
+	{'target' => "TEXT", 'flags' => 0, 'info' => TARGET_TEXT},
+	{'target' => "COMPOUND_TEXT", 'flags' => 0, 'info' => TARGET_COMPOUND_TEXT},
+);
+
 my $dialog = new Gtk::Dialog;
 $dialog->set_name("Test Input");
 $dialog->border_width (0);
@@ -166,15 +186,8 @@ $selection_button->signal_connect ("toggled", \&selection_toggled);
 $selection_button->signal_connect ("selection_clear_event", \&selection_clear);
 $selection_button->signal_connect ("selection_received", \&selection_received);
 
-$selection_button->selection_add_handler ($Gtk::Atoms{PRIMARY}, $Gtk::Atoms{STRING},
-										  \&selection_handle);
-
-$selection_button->selection_add_handler ($Gtk::Atoms{PRIMARY}, $Gtk::Atoms{TEXT},
-										  \&selection_handle);
-
-$selection_button->selection_add_handler ($Gtk::Atoms{PRIMARY}, 
-										  $Gtk::Atoms{COMPOUND_TEXT},
-										  \&selection_handle);
+$selection_button->selection_add_targets($Gtk::Atoms{PRIMARY}, @targetlist);
+$selection_button->signal_connect('selection-get', \&selection_get);
 
 $selection_text = new Gtk::Text (undef, undef);
 $table->attach_defaults ($selection_text, 0, 1, 1, 2);

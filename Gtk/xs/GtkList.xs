@@ -36,12 +36,15 @@ insert_items(list, position, ...)
 		gtk_list_insert_items(list, tmp, position);
 	}
 
-# FIXME: See if these can't be aliased together
-
  #ARG: ... list (list of Gtk::ListItem widgets)
 void
 append_items(list, ...)
 	Gtk::List	list
+	ALIAS:
+		Gtk::List::append_items = 0
+		Gtk::List::prepend_items = 1
+		Gtk::List::remove_items = 2
+		Gtk::List::remove_items_no_unref = 3
 	CODE:
 	{
 		GList * tmp = 0;
@@ -53,68 +56,13 @@ append_items(list, ...)
 				croak("item cannot be undef");
 			tmp = g_list_prepend(tmp, GTK_LIST_ITEM(o));
 		}
-		gtk_list_append_items(list, tmp);
-	}
-
- #ARG: ... list (list of Gtk::ListItem widgets)
-void
-prepend_items(list, ...)
-	Gtk::List	list
-	CODE:
-	{
-		GList * tmp = 0;
-		int i;
-		for(i=items-1;i>0;i--) {
-			GtkObject * o;
-			o = SvGtkObjectRef(ST(i), "Gtk::ListItem");
-			if (!o)
-				croak("item cannot be undef");
-			tmp = g_list_prepend(tmp, GTK_LIST_ITEM(o));
+		switch (ix) {
+		case 0: gtk_list_append_items(list, tmp); break;
+		case 1: gtk_list_prepend_items(list, tmp); break;
+		case 2: gtk_list_remove_items(list, tmp); g_list_free(tmp); break;
+		case 3: gtk_list_remove_items_no_unref(list, tmp); g_list_free(tmp); break;
 		}
-		gtk_list_prepend_items(list, tmp);
 	}
-
- #ARG: ... list (list of Gtk::ListItem widgets)
-void
-remove_items(list, ...)
-	Gtk::List	list
-	CODE:
-	{
-		GList * tmp = 0;
-		int i;
-		for(i=items-1;i>0;i--) {
-			GtkObject * o;
-			o = SvGtkObjectRef(ST(i), "Gtk::ListItem");
-			if (!o)
-				croak("item cannot be undef");
-			tmp = g_list_prepend(tmp, GTK_LIST_ITEM(o));
-		}
-		gtk_list_remove_items(list, tmp);
-		g_list_free(tmp);
-	}
-
-#if GTK_HVER >= 0x010200
-
- #ARG: ... list (list of Gtk::ListItem widgets)
-void
-remove_items_no_unref(list, ...)
-	Gtk::List	list
-	CODE:
-	{
-		GList * tmp = 0;
-		int i;
-		for(i=items-1;i>0;i--) {
-			GtkObject * o;
-			o = SvGtkObjectRef(ST(i), "Gtk::ListItem");
-			if (!o)
-				croak("item cannot be undef");
-			tmp = g_list_prepend(tmp, GTK_LIST_ITEM(o));
-		}
-		gtk_list_remove_items_no_unref(list, tmp);
-		g_list_free(tmp);
-	}
-
-#endif
 
 void
 gtk_list_clear_items(list, start=0, end=-1)
@@ -126,21 +74,27 @@ void
 gtk_list_select_item(list, the_item)
 	Gtk::List	list
 	int	the_item
-
-void
-gtk_list_unselect_item(list, the_item)
-	Gtk::List	list
-	int	the_item
+	ALIAS:
+		Gtk::List::select_item = 0
+		Gtk::List::unselect_item = 1
+	CODE:
+	if (ix == 0)
+		gtk_list_select_item(list, the_item);
+	else if (ix == 1)
+		gtk_list_unselect_item(list, the_item);
 
 void
 gtk_list_select_child(list, widget)
 	Gtk::List	list
 	Gtk::Widget	widget
-
-void
-gtk_list_unselect_child(list, widget)
-	Gtk::List	list
-	Gtk::Widget	widget
+	ALIAS:
+		Gtk::List::select_child = 0
+		Gtk::List::unselect_child = 1
+	CODE:
+	if (ix == 0)
+		gtk_list_select_child(list, widget);
+	else if (ix == 1)
+		gtk_list_unselect_child(list, widget);
 
 int
 gtk_list_child_position(list, widget)
@@ -152,31 +106,29 @@ gtk_list_set_selection_mode(list, mode)
 	Gtk::List	list
 	Gtk::SelectionMode	mode
 
-#if GTK_HVER >= 0x010200
-
 void
 gtk_list_end_drag_selection (list)
 	Gtk::List	list
-
-void
-gtk_list_end_selection (list)
-	Gtk::List	list
-
-void
-gtk_list_undo_selection (list)
-	Gtk::List	list
-
-void
-gtk_list_start_selection (list)
-	Gtk::List	list
-
-void
-gtk_list_toggle_add_mode (list)
-	Gtk::List	list
-
-void
-gtk_list_toggle_focus_row (list)
-	Gtk::List	list
+	ALIAS:
+		Gtk::List::end_drag_selection = 0
+		Gtk::List::end_selection = 1
+		Gtk::List::undo_selection = 2
+		Gtk::List::start_selection = 3
+		Gtk::List::toggle_add_mode = 4
+		Gtk::List::toggle_focus_row = 5
+		Gtk::List::select_all = 6
+		Gtk::List::unselect_all = 7
+	CODE:
+	switch (ix) {
+	case 0: gtk_list_end_drag_selection (list); break;
+	case 1: gtk_list_end_selection (list); break;
+	case 2: gtk_list_undo_selection (list); break;
+	case 3: gtk_list_start_selection (list); break;
+	case 4: gtk_list_toggle_add_mode (list); break;
+	case 5: gtk_list_toggle_focus_row (list); break;
+	case 6: gtk_list_select_all (list); break;
+	case 7: gtk_list_unselect_all (list); break;
+	}
 
 void
 gtk_list_toggle_row (list, item)
@@ -201,16 +153,6 @@ gtk_list_scroll_vertical (list, scroll_type, position)
 	Gtk::List	list
 	Gtk::ScrollType	scroll_type
 	double	position
-
-void
-gtk_list_select_all (list)
-	Gtk::List	list
-
-void
-gtk_list_unselect_all (list)
-	Gtk::List	list
-
-#endif
 
  #OUTPUT: list
  #RETURNS: a list of the currently selected Gtk::Widgets

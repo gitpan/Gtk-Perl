@@ -19,10 +19,10 @@ $b->signal_connect(clicked => sub {
 
 	print "Starting DNS lookup...\n";
 
-	Gnome::DNS->lookup("www.altavista.digital.com",
+	Gnome::DNS->lookup("www.gnome.org",
 		sub {
-			print "Address of www.altavista.digital.com is $_[1], data is $_[0]\n";
-			exit;
+			my $o = Gnome::DialogUtil->ok("Address of www.gnome.org is $_[1], data is $_[0]");
+			$o->signal_connect("destroy", sub {Gtk->main_quit});
 		}, 34);
 });
 

@@ -26,9 +26,14 @@ $w->signal_connect('expose_event', sub {
 		0, 0, 0, 0,
 		$pb->get_width(), $pb->get_height(),
 		0, 50, 0, 0, 0);
+	1;
 });
 $w->set_usize($pb->get_width(), $pb->get_height());
 $w->show_all;
+
+#$w2 = new Gtk::Window;
+#$w2->signal_connect('delete_event', sub {Gtk->exit(0)});
+#$w2->set_app_paintable(1);
 
 Gtk->main();
 

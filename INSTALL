@@ -52,4 +52,13 @@ submodule instead (directory Applet).
                  support may be installed. Please make sure you install 
                  GdkImlib first to make sure your Gnome support gets 
                  installed correctly.  
-  
+
+If your system supports it, you can try to use the LD version script (ldscript) to
+improve the loading time of the module: the script will instruct the linker to
+make fewer symbols shared in the shared module, speeding up the dynamic linker.
+When you compile, simply set the LDDLFLAGS make variable:
+
+	make LDDLFLAGS="--shared -Wl,--version-script=`pwd`/ldscript"
+
+This works on modern Linux systems and should work also on Solaris.
+

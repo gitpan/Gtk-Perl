@@ -28,16 +28,16 @@ void
 gtk_entry_set_text(entry, text)
 	Gtk::Entry	entry
 	char *	text
-
-void
-gtk_entry_append_text(entry, text)
-	Gtk::Entry	entry
-	char *	text
-
-void
-gtk_entry_prepend_text(entry, text)
-	Gtk::Entry	entry
-	char *	text
+	ALIAS:
+		Gtk::Entry::set_text = 0
+		Gtk::Entry::append_text = 1
+		Gtk::Entry::prepend_text = 2
+	CODE:
+	switch (ix) {
+	case 0: gtk_entry_set_text(entry, text); break;
+	case 1: gtk_entry_append_text(entry, text); break;
+	case 2: gtk_entry_prepend_text(entry, text); break;
+	}
 
 void
 gtk_entry_set_position(entry, position)

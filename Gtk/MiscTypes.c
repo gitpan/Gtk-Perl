@@ -277,8 +277,10 @@ SV * newSVDefEnumHash (GtkType type, long value) {
 	SV * result;
 
 	vals = gtk_type_enum_get_values(type);
-	if (!vals)
-		croak("Invalid type for enum: %s", gtk_type_name(type));
+	if (!vals) {
+		warn("Invalid type for enum: %s", gtk_type_name(type));
+		return newSViv(value);
+	}
 	while (vals && vals->value_nick) {
 		if (vals->value == value) {
 			result = newSVpv(vals->value_nick, 0);
@@ -302,8 +304,10 @@ SV * newSVDefFlagsHash (GtkType type, long value) {
 	char *s, *p;
 	
 	vals = gtk_type_flags_get_values(type);
-	if (!vals)
-		croak("Invalid type for flags: %s", gtk_type_name(type));
+	if (!vals) {
+		warn("Invalid type for flags: %s", gtk_type_name(type));
+		return newSViv(value);
+	}
 	if (!pgtk_use_array) {
 		HV * h = newHV();
 		result = newRV((SV*)h);
@@ -406,8 +410,10 @@ long SvDefEnumHash (GtkType type, SV *name) {
 	long val = 0;
 	GtkEnumValue * vals;
 	vals = gtk_type_enum_get_values(type);
-	if (!vals)
-		croak("Invalid type for enum: %s", gtk_type_name(type));
+	if (!vals) {
+		warn("Invalid type for enum: %s", gtk_type_name(type));
+		return SvIV(name);
+	}
 	return SvEFValueLookup(vals, SvPV(name, PL_na), type);
 }
 
@@ -416,8 +422,10 @@ long SvDefFlagsHash (GtkType type, SV *name) {
 	GtkFlagValue * vals;
 	int i;
 	vals = gtk_type_flags_get_values(type);
-	if (!vals)
-		croak("Invalid type for flags: %s", gtk_type_name(type));
+	if (!vals) {
+		warn("Invalid type for flags: %s", gtk_type_name(type));
+		return SvIV(name);
+	}
 	if (SvROK(name) && (SvTYPE(SvRV(name)) == SVt_PVAV)) {
 		AV * r = (AV*)SvRV(name);
 		for(i=0;i<=av_len(r);i++)

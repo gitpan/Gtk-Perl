@@ -25,9 +25,13 @@ gtk_ruler_set_range(ruler, lower, upper, position, max_size)
 void
 gtk_ruler_draw_ticks(ruler)
 	Gtk::Ruler	ruler
-
-void
-gtk_ruler_draw_pos(ruler)
-	Gtk::Ruler	ruler
+	ALIAS:
+		Gtk::Ruler::draw_ticks = 0
+		Gtk::Ruler::draw_pos = 1
+	CODE:
+	if (ix == 0)
+		gtk_ruler_draw_ticks(ruler);
+	else if (ix == 1)
+		gtk_ruler_draw_pos(ruler);
 
 #endif

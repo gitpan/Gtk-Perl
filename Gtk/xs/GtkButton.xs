@@ -27,33 +27,20 @@ new(Class, label=0)
 void
 gtk_button_pressed(button)
 	Gtk::Button	button
-
-void
-gtk_button_released(button)
-	Gtk::Button	button
-
-void
-gtk_button_clicked(button)
-	Gtk::Button	button
-
-void
-gtk_button_enter(button)
-	Gtk::Button	button
-
-void
-gtk_button_leave(button)
-	Gtk::Button	button
-
-Gtk::Widget_Up
-child(widget, newvalue=0)
-	Gtk::Button	widget
-	Gtk::Widget_OrNULL	newvalue
+	ALIAS:
+		Gtk::Button::pressed = 0
+		Gtk::Button::released = 1
+		Gtk::Button::clicked = 2
+		Gtk::Button::enter = 3
+		Gtk::Button::leave = 4
 	CODE:
-	RETVAL = widget->child;
-	if (newvalue)
-		widget->child = newvalue;
-	OUTPUT:
-	RETVAL
+	switch(ix) {
+	case 0: gtk_button_pressed(button); break;
+	case 1: gtk_button_released(button); break;
+	case 2: gtk_button_clicked(button); break;
+	case 3: gtk_button_enter(button); break;
+	case 4: gtk_button_leave(button); break;
+	}
 
 # void FIXME
 # gtk_button_set_relief(button, newstyle)

@@ -62,6 +62,14 @@ gnome_canvas_set_pixels_per_unit(canvas, n)
 	Gnome::Canvas	canvas
 	double	n
 
+double
+get_pixels_per_unit (canvas)
+	Gnome::Canvas	canvas
+	CODE:
+	RETVAL = canvas->pixels_per_unit;
+	OUTPUT:
+	RETVAL
+
 #if 0
 
 void
@@ -194,8 +202,24 @@ gnome_canvas_world_to_window (canvas, wx, wy)
 		PUSHs(sv_2mortal(newSVnv(winy)));
 	}
 
-# missing: gnome_canvas_get_color
-# missing: gnome_canvas_get_color_pixel
+Gtk::Gdk::Color
+gnome_canvas_get_color (canvas, spec)
+	Gnome::Canvas	canvas
+	char *	spec
+	CODE:
+	{
+		GdkColor color;
+		RETVAL = NULL;
+		if (gnome_canvas_get_color (canvas, spec, &color))
+			RETVAL = &color;
+	}
+	OUTPUT:
+	RETVAL
+
+gulong
+gnome_canvas_get_color_pixel (canvas, rgba)
+	Gnome::Canvas	canvas
+	guint	rgba
 
 void
 gnome_canvas_set_stipple_origin (canvas, gc)
@@ -208,6 +232,15 @@ gnome_canvas_set_close_enough(canvas, ce)
 	int		ce
 	CODE:
 	canvas->close_enough = ce;
+
+void
+gnome_canvas_set_dither (canvas, dither)
+	Gnome::Canvas	canvas
+	Gtk::Gdk::Rgb::Dither	dither
+
+Gtk::Gdk::Rgb::Dither
+gnome_canvas_get_dither (canvas)
+	Gnome::Canvas	canvas
 
 #endif
 

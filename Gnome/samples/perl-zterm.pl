@@ -3,6 +3,8 @@
 #TITLE: Gnome Zvt
 #REQUIRES: Gtk Gnome
 
+BEGIN {$Gtk::lazy++}
+
 use Gnome;
 init Gnome "perl-zterm.pl";
 

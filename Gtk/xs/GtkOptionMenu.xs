@@ -16,14 +16,14 @@ new(Class)
 	OUTPUT:
 	RETVAL
 
-Gtk::Widget
+Gtk::Menu_OrNULL
 gtk_option_menu_get_menu(optionmenu)
 	Gtk::OptionMenu	optionmenu
 
 void
 gtk_option_menu_set_menu(optionmenu, menu)
 	Gtk::OptionMenu	optionmenu
-	Gtk::Widget	menu
+	Gtk::Menu	menu
 
 void
 gtk_option_menu_remove_menu(optionmenu)

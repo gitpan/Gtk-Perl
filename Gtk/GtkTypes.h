@@ -67,10 +67,6 @@ typedef GtkObject * Gtk__Object_OrNULL_Up;
 
 #define CastupGtk__Object GTK_OBJECT
 
-PerlGtkDeclareFunc(void, UnregisterGtkObject)(SV * sv_object, GtkObject * gtk_object);
-PerlGtkDeclareFunc(void, RegisterGtkObject)(SV * sv_object, GtkObject * gtk_object);
-PerlGtkDeclareFunc(SV *, RetrieveGtkObject)(GtkObject * gtk_object);
-
 PerlGtkDeclareFunc(SV *, newSVGtkObjectRef)(GtkObject * object, char * classname);
 PerlGtkDeclareFunc(GtkObject *, SvGtkObjectRef)(SV * o, char * name);
 
@@ -92,8 +88,8 @@ PerlGtkDeclareFunc(int, gtnumber_for_gtname)(char * name);
 PerlGtkDeclareFunc(char *, ptname_for_gtnumber)(int number);
 PerlGtkDeclareFunc(char *, gtname_for_ptname)(char * name);
 PerlGtkDeclareFunc(char *, ptname_for_gtname)(char * name);
-PerlGtkDeclareFunc(int, class_size_for_gtname)(char * gtkTypeName);
-PerlGtkDeclareFunc(int, obj_size_for_gtname)(char * gtkTypeName);
+PerlGtkDeclareFunc(int, pgtk_class_size_for_gtname)(char * gtkTypeName);
+PerlGtkDeclareFunc(int, pgtk_obj_size_for_gtname)(char * gtkTypeName);
 
 PerlGtkDeclareFunc(GtkType, FindArgumentTypeWithObject)(GtkObject * object, SV * name, GtkArg * result);
 PerlGtkDeclareFunc(GtkType, FindArgumentTypeWithClass)(GtkObjectClass * klass, SV * name, GtkArg * result);

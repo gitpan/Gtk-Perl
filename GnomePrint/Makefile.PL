@@ -1,4 +1,5 @@
 use ExtUtils::MakeMaker;
+use Config;
 use File::Basename;
 use blib '..';
 use blib '../Gnome';
@@ -21,7 +22,9 @@ $gp->save_config('build/Files.pm');
 $gp->install('build/Files.pm');
 
 $gp->add_pm('GnomePrint.pm' => '$(INST_ARCHLIBDIR)/Print.pm',
-	'build/GnomePrintTypes.pm' => '$(INST_ARCHLIBDIR)/Print/Types.pm');
+	'build/GnomePrintTypes.pm' => '$(INST_ARCHLIBDIR)/Print/Types.pm',
+	'build/GnomePrintTypesLazy.pm' => '$(INST_ARCHLIBDIR)/Print/TypesLazy.pm',
+	);
 
 $gp->add_c ('build/GnomePrintDefs.c');
 $gp->add_defs ('pkg.defs');
@@ -53,7 +56,7 @@ foreach ($gp->get_headers) {
 	push @a, '-i', $_;
 }
 
-$gp->add_xs(gendefs::gendefs(@a));
+$gp->add_xs(gendefs::gendefs('-L', @a));
 
 $depend = { 'build/GnomePrintDefs.c' => 'build/GnomePrintDefs.h build/PerlGnomePrintInt.h' };
 
@@ -73,7 +76,8 @@ $gp->add_clean ( qw(
 
 # documentation
 gendefs::gen_doc('gnomeprint');
-system("../tools/gendoc.pl", "-t", 'gnomeprint', keys %ExtUtils::Depends::xs);
+system($Config{perlpath}, "../tools/gendoc.pl", "-t", 'gnomeprint', $gp->get_xs);
+system($Config{perlpath}, "../tools/gpdoc2pod", "-t", 'Gnome::Print');
 
 WriteMakefile(
 	'NAME'      => 'Gnome::Print',
@@ -81,6 +85,9 @@ WriteMakefile(
 	'XSOPT' => '-noversioncheck',
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
 	'clean' => {FILES => join(' ', @clean) },
+	'MAN3PODS' => {
+		'build/perl-gnomeprint-ref.pod' => '$(INST_MAN3DIR)/Gnome::Print::reference.3pm',
+		},
 	$gp->get_makefile_vars,
 );
 
@@ -96,7 +103,7 @@ build/PerlGnomePrintExt.h build/PerlGnomePrintExt.c build/PerlGnomePrintInt.h: b
 	$(PERL) ../tools/genext.pl GnomePrint </dev/null
 
 gendoc:
-	../tools/gendoc.pl -t gnomeprint $(XS_FILES)
+	$(PERL) ../tools/gendoc.pl -t gnomeprint $(XS_FILES)
 
 ';
 

@@ -49,7 +49,7 @@ my_load_image(GtkWidget *self, gchar *ref) {
 	
 	ENTER;
 	SAVETMPS;
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(self), 0)));
 	XPUSHs(sv_2mortal(newSVpv(ref, 0)));
 	for (i=1;i<=av_len(args);i++)

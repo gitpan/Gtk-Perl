@@ -3,6 +3,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "GnomePrintDefs.h"
+
 #include <libart_lgpl/art_affine.h>
 
 static void     callXS (void (*subaddr)(CV* cv), CV *cv, SV **mark)
@@ -16,6 +18,13 @@ static void     callXS (void (*subaddr)(CV* cv), CV *cv, SV **mark)
 }
 
 MODULE = Gnome::Print	PACKAGE = Gnome::Print	PREFIX = gnome_print_
+
+void
+_boot_all ()
+	CODE:
+	{
+#include "GnomePrintobjects.xsh"
+	}
 
 void
 init (Class)
@@ -78,7 +87,5 @@ affine_translate (Class, dx, dy)
 	}
 
 INCLUDE: ../build/boxed.xsh
-
-INCLUDE: ../build/objects.xsh
 
 INCLUDE: ../build/extension.xsh

@@ -20,7 +20,7 @@ static void start_new_callback(const char * param, gpointer data)
         ENTER;
         SAVETMPS;
 
-        PUSHMARK(sp);
+        PUSHMARK(SP);
         for (i=1;i<=av_len(args);i++)
                 XPUSHs(sv_2mortal(newSVsv(*av_fetch(args, i, 0))));
         if (param)

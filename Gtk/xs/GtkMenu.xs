@@ -17,7 +17,7 @@ static void menu_pos_func (GtkMenu *menu, int *x, int *y, gpointer user_data)
 	ENTER;
 	SAVETMPS;
 
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(menu), 0)));
 	for (i=1;i<=av_len(args);i++)
 		XPUSHs(sv_2mortal(newSVsv(*av_fetch(args, i, 0))));
@@ -59,11 +59,14 @@ void
 gtk_menu_append(menu, child)
 	Gtk::Menu	menu
 	Gtk::Widget	child
-
-void
-gtk_menu_prepend(menu, child)
-	Gtk::Menu	menu
-	Gtk::Widget	child
+	ALIAS:
+		Gtk::Menu::append = 0
+		Gtk::Menu::prepend = 1
+	CODE:
+	if (ix == 0)
+		gtk_menu_append(menu, child);
+	else if (ix == 1)
+		gtk_menu_prepend(menu, child);
 
 void
 gtk_menu_insert(menu, child, position)
@@ -99,8 +102,18 @@ gtk_menu_popup(menu, parent_menu_shell, parent_menu_item, button, activate_time,
 void
 gtk_menu_popdown(menu)
 	Gtk::Menu	menu
+	ALIAS:
+		Gtk::Menu::popdown = 0
+		Gtk::Menu::detach = 1
+		Gtk::Menu::reposition = 2
+	CODE:
+	switch (ix) {
+	case 0: gtk_menu_popdown(menu); break;
+	case 1: gtk_menu_detach(menu); break;
+	case 2: gtk_menu_reposition(menu); break;
+	}
 
-Gtk::Widget
+Gtk::MenuItem_OrNULL
 gtk_menu_get_active(menu)
 	Gtk::Menu	menu
 
@@ -124,18 +137,6 @@ gtk_menu_set_active(menu, index)
 Gtk::Widget
 gtk_menu_get_attach_widget (menu)
 	Gtk::Menu   menu
-
-void
-gtk_menu_detach (menu)
-	Gtk::Menu   menu
-
-#if GTK_HVER >= 0x010100
-
-void
-gtk_menu_reposition(menu)
-	Gtk::Menu	menu
-
-#endif
 
 #if GTK_HVER >= 0x01010D
 

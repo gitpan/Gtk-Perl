@@ -24,6 +24,10 @@ gnome_less_clear(gl)
 	Gnome::Less	gl
 
 void
+gnome_less_reshow(gl)
+	Gnome::Less	gl
+
+void
 gnome_less_show_file(gl, path)
 	Gnome::Less	gl
 	char *	path
@@ -44,8 +48,23 @@ gnome_less_show_filestream(gl, stream)
 	FILE *	stream
 
 void
+gnome_less_show_fd(gl, fd)
+	Gnome::Less	gl
+	int	fd
+
+void
 gnome_less_fixed_font(gl)
 	Gnome::Less	gl
+
+void
+gnome_less_set_fixed_font (gl, fixed)
+	Gnome::Less	gl
+	bool	fixed
+
+void
+gnome_less_set_font (gl, font)
+	Gnome::Less	gl
+	Gtk::Gdk::Font	font
 
 #endif
 

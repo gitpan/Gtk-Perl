@@ -36,68 +36,43 @@ gtk_adjustment_get_value (adjustment)
 	RETVAL
 
 gfloat
-gtk_adjustment_value (adjustment, change=0)
+value (adjustment, new_value=0)
 	Gtk::Adjustment adjustment
-	gfloat	change
+	gfloat	new_value
+	ALIAS:
+		Gtk::Adjustment::value = 0
+		Gtk::Adjustment::lower = 1
+		Gtk::Adjustment::upper = 2
+		Gtk::Adjustment::step_increment = 3
+		Gtk::Adjustment::page_increment = 4
+		Gtk::Adjustment::page_size = 5
 	CODE:
-	RETVAL = adjustment->value;
-	if (items==2)
-		adjustment->value = change;
-	OUTPUT:
-	RETVAL
-
-gfloat
-gtk_adjustment_lower (adjustment, change=0)
-	Gtk::Adjustment adjustment
-	gfloat	change
-	CODE:
-	RETVAL = adjustment->lower;
-	if (items==2)
-		adjustment->lower = change;
-	OUTPUT:
-	RETVAL
-
-gfloat
-gtk_adjustment_upper (adjustment, change=0)
-	Gtk::Adjustment adjustment
-	gfloat	change
-	CODE:
-	RETVAL = adjustment->upper;
-	if (items==2)
-		adjustment->upper = change;
-	OUTPUT:
-	RETVAL
-
-gfloat
-gtk_adjustment_step_increment (adjustment, change=0)
-	Gtk::Adjustment adjustment
-	gfloat	change
-	CODE:
-	RETVAL = adjustment->step_increment;
-	if (items==2)
-		adjustment->step_increment = change;
-	OUTPUT:
-	RETVAL
-
-gfloat
-gtk_adjustment_page_increment (adjustment, change=0)
-	Gtk::Adjustment adjustment
-	gfloat	change
-	CODE:
-	RETVAL = adjustment->page_increment;
-	if (items==2)
-		adjustment->page_increment = change;
-	OUTPUT:
-	RETVAL
-
-gfloat
-gtk_adjustment_page_size (adjustment, change=0)
-	Gtk::Adjustment adjustment
-	gfloat	change
-	CODE:
-	RETVAL = adjustment->page_size;
-	if (items==2)
-		adjustment->page_size = change;
+	switch (ix) {
+	case 0:
+		RETVAL = adjustment->value;
+		if (items==2) adjustment->value = new_value;
+		break;
+	case 1:
+		RETVAL = adjustment->lower;
+		if (items==2) adjustment->lower = new_value;
+		break;
+	case 2:
+		RETVAL = adjustment->upper;
+		if (items==2) adjustment->upper = new_value;
+		break;
+	case 3:
+		RETVAL = adjustment->step_increment;
+		if (items==2) adjustment->step_increment = new_value;
+		break;
+	case 4:
+		RETVAL = adjustment->page_increment;
+		if (items==2) adjustment->page_increment = new_value;
+		break;
+	case 5:
+		RETVAL = adjustment->page_size;
+		if (items==2) adjustment->page_size = new_value;
+		break;
+	}
 	OUTPUT:
 	RETVAL
 

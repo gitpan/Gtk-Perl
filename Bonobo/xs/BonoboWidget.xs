@@ -27,18 +27,18 @@ getset_prop_value (BonoboWidget *bonobo_widget, char *name, SV* newval) {
 		case CORBA_tk_void:
 			break;
 		case CORBA_tk_boolean:
-			bonobo_property_bag_client_set_value_boolean(pb, name);
+			bonobo_property_bag_client_set_value_gboolean(pb, name, SvIV(newval), &ev);
 			break;
 		case CORBA_tk_short:
 		case CORBA_tk_long:
 		case CORBA_tk_char:
-			bonobo_property_bag_client_set_value_long(pb, name, SvIV(newval));
+			bonobo_property_bag_client_set_value_glong(pb, name, SvIV(newval), &ev);
 			break;
 		case CORBA_tk_float:
-			bonobo_property_bag_client_set_value_float(pb, name, SvNV(newval));
+			bonobo_property_bag_client_set_value_gfloat(pb, name, SvNV(newval), &ev);
 			break;
 		case CORBA_tk_double:
-			bonobo_property_bag_client_set_value_double(pb, name, SvNV(newval));
+			bonobo_property_bag_client_set_value_gdouble(pb, name, SvNV(newval), &ev);
 			break;
 		case CORBA_tk_string:
 			bonobo_property_bag_client_set_value_string(pb, name, SvPV(newval, PL_na), &ev);
@@ -54,18 +54,18 @@ getset_prop_value (BonoboWidget *bonobo_widget, char *name, SV* newval) {
 			sv = newSVsv(&PL_sv_undef);
 			break;
 		case CORBA_tk_boolean:
-			sv = newSViv(bonobo_property_bag_client_get_value_boolean(pb, name));
+			sv = newSViv(bonobo_property_bag_client_get_value_gboolean(pb, name, &ev));
 			break;
 		case CORBA_tk_short:
 		case CORBA_tk_long:
 		case CORBA_tk_char:
-			sv = newSViv(bonobo_property_bag_client_get_value_long(pb, name));
+			sv = newSViv(bonobo_property_bag_client_get_value_glong(pb, name, &ev));
 			break;
 		case CORBA_tk_float:
-			sv = newSVnv(bonobo_property_bag_client_get_value_float(pb, name));
+			sv = newSVnv(bonobo_property_bag_client_get_value_gfloat(pb, name, &ev));
 			break;
 		case CORBA_tk_double:
-			sv = newSVnv(bonobo_property_bag_client_get_value_double(pb, name));
+			sv = newSVnv(bonobo_property_bag_client_get_value_gdouble(pb, name, &ev));
 			break;
 		case CORBA_tk_string:
 			sv = newSVpv(bonobo_property_bag_client_get_value_string(pb, name, &ev), 0);
@@ -75,7 +75,7 @@ getset_prop_value (BonoboWidget *bonobo_widget, char *name, SV* newval) {
 			warn("Typecode %d not handled in property bag (%s)", type, name);
 		}
 	}
-	
+	/* FIXME: check ev */
 	CORBA_exception_free (&ev);
 	return sv;
 }

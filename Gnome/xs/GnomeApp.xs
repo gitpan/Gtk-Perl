@@ -20,6 +20,51 @@
 		infos[count].type = GNOME_APP_UI_ENDOFINFO; \
 
 
+static void
+string_callback (gchar * string, gpointer data) {
+	SV * handler;
+	AV *stuff = (AV*)data;
+	int i;
+	dSP;
+
+	handler = *av_fetch(stuff, 0, 0);
+
+	ENTER;
+	SAVETMPS;
+	
+	PUSHMARK(SP);
+	XPUSHs(sv_2mortal(newSVpv(string, 0)));
+	for (i=1;i<=av_len(stuff);i++)
+		XPUSHs(sv_2mortal(newSVsv(*av_fetch(stuff, i, 0))));
+	PUTBACK;
+	perl_call_sv(handler, G_DISCARD);
+	FREETMPS;
+	LEAVE;
+}
+
+static void
+reply_callback (gint reply, gpointer data) {
+	SV * handler;
+	AV *stuff = (AV*)data;
+	int i;
+	dSP;
+
+	handler = *av_fetch(stuff, 0, 0);
+
+	ENTER;
+	SAVETMPS;
+	
+	PUSHMARK(SP);
+	XPUSHs(sv_2mortal(newSViv(reply)));
+	for (i=1;i<=av_len(stuff);i++)
+		XPUSHs(sv_2mortal(newSVsv(*av_fetch(stuff, i, 0))));
+	PUTBACK;
+	perl_call_sv(handler, G_DISCARD);
+	FREETMPS;
+	LEAVE;
+}
+
+
 MODULE = Gnome::App		PACKAGE = Gnome::App		PREFIX = gnome_app_
 
 #ifdef GNOME_APP
@@ -154,5 +199,135 @@ gnome_app_get_dock_item_by_name(app, name)
 	char*	name
 
 
+void
+gnome_app_flash (app, flash)
+	Gnome::App	app
+	char *	flash
+
+Gtk::Widget_Up
+gnome_app_message (app, message)
+	Gnome::App	app
+	char *	message
+	ALIAS:
+		Gnome::App::message = 0
+		Gnome::App::error = 1
+		Gnome::App::warning = 2
+	CODE:
+	switch (ix) {
+	case 0: RETVAL = gnome_app_message (app, message); break;
+	case 1: RETVAL = gnome_app_error (app, message); break;
+	case 2: RETVAL = gnome_app_warning (app, message); break;
+	}
+	OUTPUT:
+	RETVAL
+
+Gtk::Widget_Up
+gnome_app_question (app, question, callback, ...)
+	Gnome::App	app
+	char *	question
+	SV *	callback
+	ALIAS:
+		Gnome::App::question = 0
+		Gnome::App::question_modal = 1
+		Gnome::App::ok_cancel = 2
+		Gnome::App::ok_cancel_modal = 3
+	CODE:
+	{
+		AV * args = newAV();
+		PackCallbackST(args, 2);
+		switch (ix) {
+		case 0: RETVAL = gnome_app_question (app, question, reply_callback, args); break;
+		case 1: RETVAL = gnome_app_question_modal (app, question, reply_callback, args); break;
+		case 2: RETVAL = gnome_app_ok_cancel (app, question, reply_callback, args); break;
+		case 3: RETVAL = gnome_app_ok_cancel_modal (app, question, reply_callback, args); break;
+		}
+	}
+	OUTPUT:
+	RETVAL
+
+Gtk::Widget_Up
+gnome_app_request_string (app, prompt, callback, ...)
+	Gnome::App	app
+	char *	prompt
+	SV *	callback
+	ALIAS:
+		Gnome::App::request_string = 0
+		Gnome::App::request_password = 1
+	CODE:
+	{
+		AV * args = newAV();
+		PackCallbackST(args, 2);
+		if (ix == 0)
+			RETVAL = gnome_app_request_string (app, prompt, string_callback, args);
+		else if (ix == 1)
+			RETVAL = gnome_app_request_password (app, prompt, string_callback, args);
+	}
+	OUTPUT:
+	RETVAL
+
+void
+gnome_app_remove_menus (app, path, items)
+	Gnome::App	app
+	char *	path
+	int	items
+
+void
+gnome_app_remove_menu_range (app, path, start, items)
+	Gnome::App	app
+	char *	path
+	int	start
+	int	items
+
 #endif
+
+MODULE = Gnome::App		PACKAGE = Gnome::DialogUtil PREFIX = gnome_
+
+Gtk::Widget_Up
+gnome_question_dialog (Class, message, handler, ...)
+	SV *	Class
+	char *	message
+	SV *	handler
+	ALIAS:
+		Gnome::DialogUtil::question_dialog = 0
+		Gnome::DialogUtil::question_dialog_modal = 1
+		Gnome::DialogUtil::ok_cancel_dialog = 2
+		Gnome::DialogUtil::ok_cancel_dialog_modal = 3
+	CODE:
+	{
+		AV * args = newAV();
+		PackCallbackST(args, 2);
+		switch (ix) {
+		case 0: RETVAL = gnome_question_dialog (message, reply_callback, args); break;
+		case 1: RETVAL = gnome_question_dialog_modal (message, reply_callback, args); break;
+		case 2: RETVAL = gnome_ok_cancel_dialog (message, reply_callback, args); break;
+		case 3: RETVAL = gnome_ok_cancel_dialog_modal (message, reply_callback, args); break;
+		}
+	}
+	OUTPUT:
+	RETVAL
+
+Gtk::Widget_Up
+gnome_question_dialog_parented (Class, message, parent, handler, ...)
+	SV *	Class
+	char *	message
+	Gtk::Window	parent
+	SV *	handler
+	ALIAS:
+		Gnome::DialogUtil::question_dialog_parented = 0
+		Gnome::DialogUtil::question_dialog_modal_parented = 1
+		Gnome::DialogUtil::ok_cancel_dialog_parented = 2
+		Gnome::DialogUtil::ok_cancel_dialog_modal_parented = 3
+	CODE:
+	{
+		AV * args = newAV();
+		PackCallbackST(args, 3);
+		switch (ix) {
+		case 0: RETVAL = gnome_question_dialog_parented (message, reply_callback, args, parent); break;
+		case 1: RETVAL = gnome_question_dialog_modal_parented (message, reply_callback, args, parent); break;
+		case 2: RETVAL = gnome_ok_cancel_dialog_parented (message, reply_callback, args, parent); break;
+		case 3: RETVAL = gnome_ok_cancel_dialog_modal_parented (message, reply_callback, args, parent); break;
+		}
+	}
+	OUTPUT:
+	RETVAL
 

@@ -14,7 +14,7 @@ void foreach_container_handler (GtkWidget *widget, gpointer data)
 	int i;
 	dSP;
 	
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(sv_object));
 	for(i=2;i<=av_len(perlargs);i++)
 		XPUSHs(sv_2mortal(newSVsv(*av_fetch(perlargs, i, 0))));
@@ -71,6 +71,9 @@ void
 foreach(container, handler, ...)
 	Gtk::Container	container
 	SV *	handler
+	ALIAS:
+		Gtk::Container::foreach = 0
+		Gtk::Container::forall = 1
 	PPCODE:
 	{
 		AV * args;
@@ -82,7 +85,10 @@ foreach(container, handler, ...)
 		av_push(args, newRV_inc(SvRV(ST(0))));
 		PackCallbackST(args, 1);
 
-		gtk_container_foreach(container, foreach_container_handler, args);
+		if (ix == 0)
+			gtk_container_foreach(container, foreach_container_handler, args);
+		else
+			gtk_container_forall(container, foreach_container_handler, args);
 		
 		SvREFCNT_dec(args);
 	}
@@ -184,6 +190,40 @@ gtk_container_child_composite_name (container, child)
 	Gtk::Container	container
 	Gtk::Widget	child
 
+void
+gtk_container_set_resize_mode(container, resize_mode)
+	Gtk::Container	container
+	Gtk::ResizeMode resize_mode
+
+void
+gtk_container_check_resize(container)
+	Gtk::Container	container
+
+
+void
+gtk_container_dequeue_resize_handler (container)
+	Gtk::Container	container
+
+void
+gtk_container_queue_resize (container)
+	Gtk::Container	container
+
+void
+gtk_container_clear_resize_widgets (container)
+	Gtk::Container	container
+
+void
+gtk_container_get_toplevels (Class)
+	SV *	Class
+	PPCODE:
+	{
+		GList * tmp = gtk_container_get_toplevels ();
+		while (tmp) {
+			EXTEND(sp, 1);
+			PUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(tmp->data), 0)));
+			tmp = tmp->next;
+		}
+	}
 
 #endif
 

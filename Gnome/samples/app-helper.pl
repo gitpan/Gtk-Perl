@@ -28,7 +28,11 @@ $app->create_menus({type => 'subtree',
 				 label => 'B_az',
 				 pixmap_type => 'stock',
 				 pixmap_info => 'Menu_Quit',
-				 callback => sub { Gtk->main_quit }}]},
+				 # example code with user data...
+				 # note that you get the user data first
+				 # and the object last unlike signals...
+				 callback => [sub { warn "GOTO DATA: $_[0]\n"; Gtk->main_quit }, "user data"]
+				 }]},
 		   {type => 'subtree',
 		    label => '_Edit',
 		    subtree => [{type => 'radioitems',

@@ -1,0 +1,1956 @@
+=head1 Gnome::About (Gnome::Dialog)
+
+=head1 Gnome::Animator (Gtk::Widget)
+
+=head1 Gnome::App (Gtk::Window)
+
+=head1 Gnome::AppBar (Gtk::HBox)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<clear-prompt> (Gnome::AppBar)
+
+=item * undef B<user-response> (Gnome::AppBar)
+
+=back
+
+=head1 Gnome::AppletWidget (Gtk::Plug)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<back-change> (Gnome::AppletWidget, Gtk::Enum, gpointer, gpointer)
+
+=item * undef B<change-orient> (Gnome::AppletWidget, Gtk::Enum)
+
+=item * undef B<change-pixel-size> (Gnome::AppletWidget, integer)
+
+=item * undef B<change-position> (Gnome::AppletWidget, integer, integer)
+
+=item * undef B<do-draw> (Gnome::AppletWidget)
+
+=item * bool B<save-session> (Gnome::AppletWidget, string, string)
+
+=item * undef B<tooltip-state> (Gnome::AppletWidget, integer)
+
+=back
+
+=head1 Gnome::Calculator (Gtk::VBox)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<result-changed> (Gnome::Calculator, number)
+
+=back
+
+=head1 Gnome::Canvas (Gtk::Layout)
+
+=head1 Gnome::CanvasEllipse (Gnome::CanvasRE)
+
+=head1 Gnome::CanvasGroup (Gnome::CanvasItem)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<x> (number) [writable, readable]
+
+=item * B<y> (number) [writable, readable]
+
+=back
+
+=head1 Gnome::CanvasImage (Gnome::CanvasItem)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<anchor> (Gtk::AnchorType) [writable, readable]
+
+=item * B<height> (number) [writable, readable]
+
+=item * B<image> (Gtk::GdkImlibImage) [writable, readable]
+
+=item * B<pixbuf> (Gtk::Boxed) [writable]
+
+=item * B<width> (number) [writable, readable]
+
+=item * B<x> (number) [writable, readable]
+
+=item * B<y> (number) [writable, readable]
+
+=back
+
+=head1 Gnome::CanvasItem (Gtk::Object)
+
+=head2 Signals
+
+=over 4
+
+=item * bool B<event> (Gnome::CanvasItem, Gtk::Gdk::Event)
+
+=back
+
+=head1 Gnome::CanvasLine (Gnome::CanvasItem)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<arrow_shape_a> (number) [writable, readable]
+
+=item * B<arrow_shape_b> (number) [writable, readable]
+
+=item * B<arrow_shape_c> (number) [writable, readable]
+
+=item * B<cap_style> (Gtk::GdkCapStyle) [writable, readable]
+
+=item * B<fill_color> (string) [writable]
+
+=item * B<fill_color_gdk> (Gtk::GdkColor) [writable, readable]
+
+=item * B<fill_color_rgba> (unsigned) [writable, readable]
+
+=item * B<fill_stipple> (Gtk::GdkWindow) [writable, readable]
+
+=item * B<first_arrowhead> (bool) [writable, readable]
+
+=item * B<join_style> (Gtk::GdkJoinStyle) [writable, readable]
+
+=item * B<last_arrowhead> (bool) [writable, readable]
+
+=item * B<line_style> (Gtk::GdkLineStyle) [writable, readable]
+
+=item * B<points> (GnomeCanvasPoints) [writable, readable]
+
+=item * B<smooth> (bool) [writable, readable]
+
+=item * B<spline_steps> (unsigned) [writable, readable]
+
+=item * B<width_pixels> (unsigned) [writable]
+
+=item * B<width_units> (number) [writable]
+
+=back
+
+=head1 Gnome::CanvasPolygon (Gnome::CanvasItem)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<fill_color> (string) [writable]
+
+=item * B<fill_color_gdk> (Gtk::GdkColor) [writable, readable]
+
+=item * B<fill_color_rgba> (unsigned) [writable, readable]
+
+=item * B<fill_stipple> (Gtk::GdkWindow) [writable, readable]
+
+=item * B<outline_color> (string) [writable]
+
+=item * B<outline_color_gdk> (Gtk::GdkColor) [writable, readable]
+
+=item * B<outline_color_rgba> (unsigned) [writable, readable]
+
+=item * B<outline_stipple> (Gtk::GdkWindow) [writable, readable]
+
+=item * B<points> (GnomeCanvasPoints) [writable, readable]
+
+=item * B<width_pixels> (unsigned) [writable]
+
+=item * B<width_units> (number) [writable]
+
+=back
+
+=head1 Gnome::CanvasRE (Gnome::CanvasItem)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<fill_color> (string) [writable]
+
+=item * B<fill_color_gdk> (Gtk::GdkColor) [writable, readable]
+
+=item * B<fill_color_rgba> (unsigned) [writable, readable]
+
+=item * B<fill_stipple> (Gtk::GdkWindow) [writable, readable]
+
+=item * B<outline_color> (string) [writable]
+
+=item * B<outline_color_gdk> (Gtk::GdkColor) [writable, readable]
+
+=item * B<outline_color_rgba> (unsigned) [writable, readable]
+
+=item * B<outline_stipple> (Gtk::GdkWindow) [writable, readable]
+
+=item * B<width_pixels> (unsigned) [writable]
+
+=item * B<width_units> (number) [writable]
+
+=item * B<x1> (number) [writable, readable]
+
+=item * B<x2> (number) [writable, readable]
+
+=item * B<y1> (number) [writable, readable]
+
+=item * B<y2> (number) [writable, readable]
+
+=back
+
+=head1 Gnome::CanvasRect (Gnome::CanvasRE)
+
+=head1 Gnome::CanvasText (Gnome::CanvasItem)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<anchor> (Gtk::AnchorType) [writable, readable]
+
+=item * B<clip> (bool) [writable, readable]
+
+=item * B<clip_height> (number) [writable, readable]
+
+=item * B<clip_width> (number) [writable, readable]
+
+=item * B<fill_color> (string) [writable]
+
+=item * B<fill_color_gdk> (Gtk::GdkColor) [writable, readable]
+
+=item * B<fill_color_rgba> (unsigned) [writable, readable]
+
+=item * B<fill_stipple> (Gtk::GdkWindow) [writable, readable]
+
+=item * B<font> (string) [writable]
+
+=item * B<font_gdk> (Gtk::GdkFont) [writable, readable]
+
+=item * B<fontset> (string) [writable]
+
+=item * B<justification> (Gtk::Justification) [writable, readable]
+
+=item * B<text> (string) [writable, readable]
+
+=item * B<text_height> (number) [readable]
+
+=item * B<text_width> (number) [readable]
+
+=item * B<x> (number) [writable, readable]
+
+=item * B<x_offset> (number) [writable, readable]
+
+=item * B<y> (number) [writable, readable]
+
+=item * B<y_offset> (number) [writable, readable]
+
+=back
+
+=head1 Gnome::CanvasWidget (Gnome::CanvasItem)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<anchor> (Gtk::AnchorType) [writable, readable]
+
+=item * B<height> (number) [writable, readable]
+
+=item * B<size_pixels> (bool) [writable, readable]
+
+=item * B<widget> (Gtk::Object) [writable, readable]
+
+=item * B<width> (number) [writable, readable]
+
+=item * B<x> (number) [writable, readable]
+
+=item * B<y> (number) [writable, readable]
+
+=back
+
+=head1 Gnome::CappletWidget (Gtk::Plug)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<cancel> (Gnome::CappletWidget)
+
+=item * undef B<help> (Gnome::CappletWidget)
+
+=item * undef B<new-multi-capplet> (Gnome::CappletWidget, gpointer)
+
+=item * undef B<ok> (Gnome::CappletWidget)
+
+=item * undef B<page-hidden> (Gnome::CappletWidget)
+
+=item * undef B<page-shown> (Gnome::CappletWidget)
+
+=item * undef B<revert> (Gnome::CappletWidget)
+
+=item * undef B<try> (Gnome::CappletWidget)
+
+=back
+
+=head1 Gnome::Client (Gtk::Object)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<connect> (Gnome::Client, bool)
+
+=item * undef B<die> (Gnome::Client)
+
+=item * undef B<disconnect> (Gnome::Client)
+
+=item * undef B<save-complete> (Gnome::Client)
+
+=item * bool B<save-yourself> (Gnome::Client, integer, Gtk::Enum, bool, Gtk::Enum, bool)
+
+=item * undef B<shutdown-cancelled> (Gnome::Client)
+
+=back
+
+=head1 Gnome::ColorPicker (Gtk::Button)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<color-set> (Gnome::ColorPicker, unsigned, unsigned, unsigned, unsigned)
+
+=back
+
+=head1 Gnome::DEntryEdit (Gtk::Object)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<changed> (Gnome::DEntryEdit)
+
+=item * undef B<icon-changed> (Gnome::DEntryEdit)
+
+=item * undef B<name-changed> (Gnome::DEntryEdit)
+
+=back
+
+=head1 Gnome::DateEdit (Gtk::HBox)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<date-changed> (Gnome::DateEdit)
+
+=item * undef B<time-changed> (Gnome::DateEdit)
+
+=back
+
+=head1 Gnome::Dialog (Gtk::Window)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<clicked> (Gnome::Dialog, integer)
+
+=item * integer B<close> (Gnome::Dialog)
+
+=back
+
+=head1 Gnome::Dock (Gtk::Container)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<layout-changed> (Gnome::Dock)
+
+=back
+
+=head1 Gnome::DockBand (Gtk::Container)
+
+=head1 Gnome::DockItem (Gtk::Bin)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<dock-detach> (Gnome::DockItem)
+
+=item * undef B<dock-drag-begin> (Gnome::DockItem)
+
+=item * undef B<dock-drag-end> (Gnome::DockItem)
+
+=item * undef B<dock-drag-motion> (Gnome::DockItem, integer, integer)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<orientation> (Gtk::Orientation) [writable, readable]
+
+=item * B<preferred_height> (unsigned) [readable]
+
+=item * B<preferred_width> (unsigned) [readable]
+
+=item * B<shadow> (Gtk::ShadowType) [writable, readable]
+
+=back
+
+=head1 Gnome::DockLayout (Gtk::Object)
+
+=head1 Gnome::Druid (Gtk::Container)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<cancel> (Gnome::Druid)
+
+=back
+
+=head1 Gnome::DruidPage (Gtk::Bin)
+
+=head2 Signals
+
+=over 4
+
+=item * bool B<back> (Gnome::DruidPage, gpointer)
+
+=item * bool B<cancel> (Gnome::DruidPage, gpointer)
+
+=item * undef B<finish> (Gnome::DruidPage, gpointer)
+
+=item * bool B<next> (Gnome::DruidPage, gpointer)
+
+=item * undef B<prepare> (Gnome::DruidPage, gpointer)
+
+=back
+
+=head1 Gnome::DruidPageFinish (Gnome::DruidPage)
+
+=head1 Gnome::DruidPageStandard (Gnome::DruidPage)
+
+=head1 Gnome::DruidPageStart (Gnome::DruidPage)
+
+=head1 Gnome::Entry (Gtk::Combo)
+
+=head1 Gnome::FileEntry (Gtk::HBox)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<browse-clicked> (Gnome::FileEntry)
+
+=back
+
+=head1 Gnome::FontPicker (Gtk::Button)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<font-set> (Gnome::FontPicker, string)
+
+=back
+
+=head1 Gnome::FontSelector (Gtk::Dialog)
+
+=head1 Gnome::HRef (Gtk::Button)
+
+=head1 Gnome::IconEntry (Gtk::VBox)
+
+=head1 Gnome::IconList (Gnome::Canvas)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<select-icon> (Gnome::IconList, integer, Gtk::Gdk::Event)
+
+=item * bool B<text-changed> (Gnome::IconList, integer, gpointer)
+
+=item * undef B<unselect-icon> (Gnome::IconList, integer, Gtk::Gdk::Event)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<hadjustment> (Gtk::Adjustment) [writable, readable]
+
+=item * B<vadjustment> (Gtk::Adjustment) [writable, readable]
+
+=back
+
+=head1 Gnome::IconSelection (Gtk::VBox)
+
+=head1 Gnome::Less (Gtk::VBox)
+
+=head1 Gnome::MDI (Gtk::Object)
+
+=head2 Signals
+
+=over 4
+
+=item * bool B<add-child> (Gnome::MDI, Gnome::MDIChild)
+
+=item * bool B<add-view> (Gnome::MDI, Gtk::Widget)
+
+=item * undef B<app-created> (Gnome::MDI, Gnome::App)
+
+=item * undef B<child-changed> (Gnome::MDI, Gnome::MDIChild)
+
+=item * bool B<remove-child> (Gnome::MDI, Gnome::MDIChild)
+
+=item * bool B<remove-view> (Gnome::MDI, Gtk::Widget)
+
+=item * undef B<view-changed> (Gnome::MDI, Gtk::Widget)
+
+=back
+
+=head1 Gnome::MDIChild (Gtk::Object)
+
+=head1 Gnome::MDIGenericChild (Gnome::MDIChild)
+
+=head1 Gnome::MessageBox (Gnome::Dialog)
+
+=head1 Gnome::NumberEntry (Gtk::HBox)
+
+=head1 Gnome::PaperSelector (Gtk::VBox)
+
+=head1 Gnome::Pixmap (Gtk::Widget)
+
+=head1 Gnome::PixmapEntry (Gtk::VBox)
+
+=head1 Gnome::PropertyBox (Gnome::Dialog)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<apply> (Gnome::PropertyBox, integer)
+
+=item * undef B<help> (Gnome::PropertyBox, integer)
+
+=back
+
+=head1 Gnome::Scores (Gnome::Dialog)
+
+=head1 Gnome::Spell (Gtk::VBox)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<found-word> (Gnome::Spell, gpointer)
+
+=item * undef B<handled-word> (Gnome::Spell, gpointer)
+
+=back
+
+=head1 Gnome::Stock (Gnome::Pixmap)
+
+=head1 Gnome::ZvtTerm (Gtk::Widget)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<child-died> (Gnome::ZvtTerm)
+
+=item * undef B<title-changed> (Gnome::ZvtTerm, integer, string)
+
+=back
+
+=head1 Gtk::AccelLabel (Gtk::Label)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<accel_widget> (Gtk::Widget) [writable, readable]
+
+=back
+
+=head1 Gtk::Adjustment (Gtk::Data)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<changed> (Gtk::Adjustment)
+
+=item * undef B<value-changed> (Gtk::Adjustment)
+
+=back
+
+=head1 Gtk::Alignment (Gtk::Bin)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<xalign> (number) [writable, readable]
+
+=item * B<xscale> (number) [writable, readable]
+
+=item * B<yalign> (number) [writable, readable]
+
+=item * B<yscale> (number) [writable, readable]
+
+=back
+
+=head1 Gtk::Arrow (Gtk::Misc)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<arrow_type> (Gtk::ArrowType) [writable, readable]
+
+=item * B<shadow_type> (Gtk::ShadowType) [writable, readable]
+
+=back
+
+=head1 Gtk::AspectFrame (Gtk::Frame)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<obey_child> (bool) [writable, readable]
+
+=item * B<ratio> (number) [writable, readable]
+
+=item * B<xalign> (number) [writable, readable]
+
+=item * B<yalign> (number) [writable, readable]
+
+=back
+
+=head1 Gtk::Bin (Gtk::Container)
+
+=head1 Gtk::Box (Gtk::Container)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<homogeneous> (bool) [writable, readable]
+
+=item * B<spacing> (integer) [writable, readable]
+
+=back
+
+=head1 Gtk::Button (Gtk::Bin)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<clicked> (Gtk::Button)
+
+=item * undef B<enter> (Gtk::Button)
+
+=item * undef B<leave> (Gtk::Button)
+
+=item * undef B<pressed> (Gtk::Button)
+
+=item * undef B<released> (Gtk::Button)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<label> (string) [writable, readable]
+
+=item * B<relief> (Gtk::ReliefStyle) [writable, readable]
+
+=back
+
+=head1 Gtk::ButtonBox (Gtk::Box)
+
+=head1 Gtk::CList (Gtk::Container)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<abort-column-resize> (Gtk::CList)
+
+=item * undef B<click-column> (Gtk::CList, integer)
+
+=item * undef B<end-selection> (Gtk::CList)
+
+=item * undef B<extend-selection> (Gtk::CList, Gtk::ScrollType, number, bool)
+
+=item * undef B<resize-column> (Gtk::CList, integer, integer)
+
+=item * undef B<row-move> (Gtk::CList, integer, integer)
+
+=item * undef B<scroll-horizontal> (Gtk::CList, Gtk::ScrollType, number)
+
+=item * undef B<scroll-vertical> (Gtk::CList, Gtk::ScrollType, number)
+
+=item * undef B<select-all> (Gtk::CList)
+
+=item * undef B<select-row> (Gtk::CList, integer, integer, Gtk::Gdk::Event)
+
+=item * undef B<start-selection> (Gtk::CList)
+
+=item * undef B<toggle-add-mode> (Gtk::CList)
+
+=item * undef B<toggle-focus-row> (Gtk::CList)
+
+=item * undef B<undo-selection> (Gtk::CList)
+
+=item * undef B<unselect-all> (Gtk::CList)
+
+=item * undef B<unselect-row> (Gtk::CList, integer, integer, Gtk::Gdk::Event)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<n_columns> (unsigned) [writable, readable, construct_only]
+
+=item * B<reorderable> (bool) [writable, readable]
+
+=item * B<row_height> (unsigned) [writable, readable]
+
+=item * B<selection_mode> (Gtk::SelectionMode) [writable, readable]
+
+=item * B<shadow_type> (Gtk::ShadowType) [writable, readable]
+
+=item * B<sort_type> (Gtk::SortType) [writable, readable]
+
+=item * B<titles_active> (bool) [writable, readable]
+
+=item * B<use_drag_icons> (bool) [writable, readable]
+
+=back
+
+=head1 Gtk::CTree (Gtk::CList)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<change-focus-row-expansion> (Gtk::CTree, Gtk::CTreeExpansionType)
+
+=item * undef B<tree-collapse> (Gtk::CTree, Gtk::CTreeNode)
+
+=item * undef B<tree-expand> (Gtk::CTree, Gtk::CTreeNode)
+
+=item * undef B<tree-move> (Gtk::CTree, Gtk::CTreeNode, Gtk::CTreeNode, Gtk::CTreeNode)
+
+=item * undef B<tree-select-row> (Gtk::CTree, Gtk::CTreeNode, integer)
+
+=item * undef B<tree-unselect-row> (Gtk::CTree, Gtk::CTreeNode, integer)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<expander_style> (Gtk::CTreeExpanderStyle) [writable, readable]
+
+=item * B<indent> (unsigned) [writable, readable]
+
+=item * B<line_style> (Gtk::CTreeLineStyle) [writable, readable]
+
+=item * B<n_columns> (unsigned) [writable, readable, construct_only]
+
+=item * B<show_stub> (bool) [writable, readable]
+
+=item * B<spacing> (unsigned) [writable, readable]
+
+=item * B<tree_column> (unsigned) [writable, readable, construct_only]
+
+=back
+
+=head1 Gtk::Calendar (Gtk::Widget)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<day-selected> (Gtk::Calendar)
+
+=item * undef B<day-selected-double-click> (Gtk::Calendar)
+
+=item * undef B<month-changed> (Gtk::Calendar)
+
+=item * undef B<next-month> (Gtk::Calendar)
+
+=item * undef B<next-year> (Gtk::Calendar)
+
+=item * undef B<prev-month> (Gtk::Calendar)
+
+=item * undef B<prev-year> (Gtk::Calendar)
+
+=back
+
+=head1 Gtk::CheckButton (Gtk::ToggleButton)
+
+=head1 Gtk::CheckMenuItem (Gtk::MenuItem)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<toggled> (Gtk::CheckMenuItem)
+
+=back
+
+=head1 Gtk::Clock (Gtk::Label)
+
+=head1 Gtk::ColorSelection (Gtk::VBox)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<color-changed> (Gtk::ColorSelection)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<policy> (Gtk::UpdateType) [writable, readable]
+
+=item * B<use_opacity> (bool) [writable, readable]
+
+=back
+
+=head1 Gtk::ColorSelectionDialog (Gtk::Window)
+
+=head1 Gtk::Combo (Gtk::HBox)
+
+=head1 Gtk::Container (Gtk::Widget)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<add> (Gtk::Container, Gtk::Widget)
+
+=item * undef B<check-resize> (Gtk::Container)
+
+=item * Gtk::DirectionType B<focus> (Gtk::Container, Gtk::DirectionType)
+
+=item * undef B<remove> (Gtk::Container, Gtk::Widget)
+
+=item * undef B<set-focus-child> (Gtk::Container, Gtk::Widget)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<border_width> (unsigned) [writable, readable]
+
+=item * B<child> (Gtk::Widget) [writable]
+
+=item * B<reallocate_redraws> (bool) [writable, readable]
+
+=item * B<resize_mode> (Gtk::ResizeMode) [writable, readable]
+
+=back
+
+=head1 Gtk::Curve (Gtk::DrawingArea)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<curve-type-changed> (Gtk::Curve)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<curve_type> (Gtk::CurveType) [writable, readable]
+
+=item * B<max_x> (number) [writable, readable]
+
+=item * B<max_y> (number) [writable, readable]
+
+=item * B<min_x> (number) [writable, readable]
+
+=item * B<min_y> (number) [writable, readable]
+
+=back
+
+=head1 Gtk::Data (Gtk::Object)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<disconnect> (Gtk::Data)
+
+=back
+
+=head1 Gtk::Dial (Gtk::Widget)
+
+=head1 Gtk::Dialog (Gtk::Window)
+
+=head1 Gtk::DrawingArea (Gtk::Widget)
+
+=head1 Gtk::Editable (Gtk::Widget)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<activate> (Gtk::Editable)
+
+=item * undef B<changed> (Gtk::Editable)
+
+=item * undef B<copy-clipboard> (Gtk::Editable)
+
+=item * undef B<cut-clipboard> (Gtk::Editable)
+
+=item * undef B<delete-text> (Gtk::Editable, integer, integer)
+
+=item * undef B<insert-text> (Gtk::Editable, string, integer, gpointer)
+
+=item * undef B<kill-char> (Gtk::Editable, integer)
+
+=item * undef B<kill-line> (Gtk::Editable, integer)
+
+=item * undef B<kill-word> (Gtk::Editable, integer)
+
+=item * undef B<move-cursor> (Gtk::Editable, integer, integer)
+
+=item * undef B<move-page> (Gtk::Editable, integer, integer)
+
+=item * undef B<move-to-column> (Gtk::Editable, integer)
+
+=item * undef B<move-to-row> (Gtk::Editable, integer)
+
+=item * undef B<move-word> (Gtk::Editable, integer)
+
+=item * undef B<paste-clipboard> (Gtk::Editable)
+
+=item * undef B<set-editable> (Gtk::Editable, bool)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<editable> (bool) [writable, readable]
+
+=item * B<text_position> (integer) [writable, readable]
+
+=back
+
+=head1 Gtk::Entry (Gtk::Editable)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<max_length> (unsigned) [writable, readable]
+
+=item * B<visibility> (bool) [writable, readable]
+
+=back
+
+=head1 Gtk::EventBox (Gtk::Bin)
+
+=head1 Gtk::FileSelection (Gtk::Window)
+
+=head1 Gtk::Fixed (Gtk::Container)
+
+=head1 Gtk::FontSelection (Gtk::Notebook)
+
+=head1 Gtk::FontSelectionDialog (Gtk::Window)
+
+=head1 Gtk::Frame (Gtk::Bin)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<label> (string) [writable, readable]
+
+=item * B<label_xalign> (number) [writable, readable]
+
+=item * B<label_yalign> (number) [writable, readable]
+
+=item * B<shadow> (Gtk::ShadowType) [writable, readable]
+
+=back
+
+=head1 Gtk::GLArea (Gtk::DrawingArea)
+
+=head1 Gtk::GammaCurve (Gtk::VBox)
+
+=head1 Gtk::Gdk::PixbufLoader ()
+
+=head1 Gtk::GladeXML (Gtk::Data)
+
+=head1 Gtk::HBox (Gtk::Box)
+
+=head1 Gtk::HButtonBox (Gtk::ButtonBox)
+
+=head1 Gtk::HPaned (Gtk::Paned)
+
+=head1 Gtk::HRuler (Gtk::Ruler)
+
+=head1 Gtk::HScale (Gtk::Scale)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<adjustment> (Gtk::Adjustment) [writable, construct, readable]
+
+=back
+
+=head1 Gtk::HScrollbar (Gtk::Scrollbar)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<adjustment> (Gtk::Adjustment) [writable, construct, readable]
+
+=back
+
+=head1 Gtk::HSeparator (Gtk::Separator)
+
+=head1 Gtk::HTML (Gtk::Layout)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<command> (Gtk::HTML, GTK_HTML_COMMAND)
+
+=item * undef B<current-paragraph-alignment-changed> (Gtk::HTML, integer)
+
+=item * undef B<current-paragraph-indentation-changed> (Gtk::HTML, integer)
+
+=item * undef B<current-paragraph-style-changed> (Gtk::HTML, integer)
+
+=item * undef B<cursor-move> (Gtk::HTML, Gtk::DirectionType, GTK_HTML_CURSOR_SKIP)
+
+=item * undef B<insertion-color-changed> (Gtk::HTML, gpointer)
+
+=item * undef B<insertion-font-style-changed> (Gtk::HTML, integer)
+
+=item * undef B<link-clicked> (Gtk::HTML, string)
+
+=item * undef B<load-done> (Gtk::HTML)
+
+=item * bool B<object-requested> (Gtk::HTML, Gtk::Object)
+
+=item * undef B<on-url> (Gtk::HTML, string)
+
+=item * undef B<redirect> (Gtk::HTML, string, integer)
+
+=item * undef B<scroll> (Gtk::HTML, Gtk::Orientation, Gtk::ScrollType, number)
+
+=item * undef B<set-base> (Gtk::HTML, string)
+
+=item * undef B<set-base-target> (Gtk::HTML, string)
+
+=item * undef B<size-changed> (Gtk::HTML)
+
+=item * undef B<submit> (Gtk::HTML, string, string, string)
+
+=item * undef B<title-changed> (Gtk::HTML, string)
+
+=item * undef B<url-requested> (Gtk::HTML, string, gpointer)
+
+=back
+
+=head1 Gtk::HandleBox (Gtk::Bin)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<child-attached> (Gtk::HandleBox, Gtk::Widget)
+
+=item * undef B<child-detached> (Gtk::HandleBox, Gtk::Widget)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<handle_position> (Gtk::PositionType) [writable, readable]
+
+=item * B<shadow> (Gtk::ShadowType) [writable, readable]
+
+=item * B<snap_edge> (Gtk::PositionType) [writable, readable]
+
+=back
+
+=head1 Gtk::Image (Gtk::Misc)
+
+=head1 Gtk::InputDialog (Gtk::Dialog)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<disable-device> (Gtk::InputDialog, integer)
+
+=item * undef B<enable-device> (Gtk::InputDialog, integer)
+
+=back
+
+=head1 Gtk::Invisible (Gtk::Widget)
+
+=head1 Gtk::Item (Gtk::Bin)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<deselect> (Gtk::Item)
+
+=item * undef B<select> (Gtk::Item)
+
+=item * undef B<toggle> (Gtk::Item)
+
+=back
+
+=head1 Gtk::ItemFactory (Gtk::Object)
+
+=head1 Gtk::Label (Gtk::Misc)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<justify> (Gtk::Justification) [writable, readable]
+
+=item * B<label> (string) [writable, readable]
+
+=item * B<pattern> (string) [writable, readable]
+
+=item * B<wrap> (bool) [writable, readable]
+
+=back
+
+=head1 Gtk::Layout (Gtk::Container)
+
+=head1 Gtk::List (Gtk::Container)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<select-child> (Gtk::List, Gtk::Widget)
+
+=item * undef B<selection-changed> (Gtk::List)
+
+=item * undef B<unselect-child> (Gtk::List, Gtk::Widget)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<selection_mode> (Gtk::SelectionMode) [writable, readable]
+
+=back
+
+=head1 Gtk::ListItem (Gtk::Item)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<end-selection> (Gtk::ListItem)
+
+=item * undef B<extend-selection> (Gtk::ListItem, Gtk::Enum, number, bool)
+
+=item * undef B<scroll-horizontal> (Gtk::ListItem, Gtk::Enum, number)
+
+=item * undef B<scroll-vertical> (Gtk::ListItem, Gtk::Enum, number)
+
+=item * undef B<select-all> (Gtk::ListItem)
+
+=item * undef B<start-selection> (Gtk::ListItem)
+
+=item * undef B<toggle-add-mode> (Gtk::ListItem)
+
+=item * undef B<toggle-focus-row> (Gtk::ListItem)
+
+=item * undef B<undo-selection> (Gtk::ListItem)
+
+=item * undef B<unselect-all> (Gtk::ListItem)
+
+=back
+
+=head1 Gtk::Menu (Gtk::MenuShell)
+
+=head1 Gtk::MenuBar (Gtk::MenuShell)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<shadow> (Gtk::ShadowType) [writable, readable]
+
+=back
+
+=head1 Gtk::MenuItem (Gtk::Item)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<activate> (Gtk::MenuItem)
+
+=item * undef B<activate-item> (Gtk::MenuItem)
+
+=back
+
+=head1 Gtk::MenuShell (Gtk::Container)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<activate-current> (Gtk::MenuShell, bool)
+
+=item * undef B<cancel> (Gtk::MenuShell)
+
+=item * undef B<deactivate> (Gtk::MenuShell)
+
+=item * undef B<move-current> (Gtk::MenuShell, Gtk::MenuDirectionType)
+
+=item * undef B<selection-done> (Gtk::MenuShell)
+
+=back
+
+=head1 Gtk::Misc (Gtk::Widget)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<xalign> (number) [writable, readable]
+
+=item * B<xpad> (integer) [writable, readable]
+
+=item * B<yalign> (number) [writable, readable]
+
+=item * B<ypad> (integer) [writable, readable]
+
+=back
+
+=head1 Gtk::Notebook (Gtk::Container)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<switch-page> (Gtk::Notebook, gpointer, unsigned)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<enable_popup> (bool) [writable, readable]
+
+=item * B<homogeneous> (bool) [writable, readable]
+
+=item * B<page> (integer) [writable, readable]
+
+=item * B<scrollable> (bool) [writable, readable]
+
+=item * B<show_border> (bool) [writable, readable]
+
+=item * B<show_tabs> (bool) [writable, readable]
+
+=item * B<tab_border> (unsigned) [writable]
+
+=item * B<tab_hborder> (unsigned) [writable, readable]
+
+=item * B<tab_pos> (Gtk::PositionType) [writable, readable]
+
+=item * B<tab_vborder> (unsigned) [writable, readable]
+
+=back
+
+=head1 Gtk::Object ()
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<destroy> (Gtk::Object)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<object_signal> (Gtk::Signal) [writable]
+
+=item * B<object_signal_after> (Gtk::Signal) [writable]
+
+=item * B<signal> (Gtk::Signal) [writable]
+
+=item * B<signal_after> (Gtk::Signal) [writable]
+
+=item * B<user_data> (gpointer) [writable, readable]
+
+=back
+
+=head1 Gtk::OptionMenu (Gtk::Button)
+
+=head1 Gtk::Packer (Gtk::Container)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<default_border_width> (unsigned) [writable, readable]
+
+=item * B<default_ipad_x> (unsigned) [writable, readable]
+
+=item * B<default_ipad_y> (unsigned) [writable, readable]
+
+=item * B<default_pad_x> (unsigned) [writable, readable]
+
+=item * B<default_pad_y> (unsigned) [writable, readable]
+
+=item * B<spacing> (unsigned) [writable, readable]
+
+=back
+
+=head1 Gtk::Paned (Gtk::Container)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<gutter_size> (unsigned) [writable, readable]
+
+=item * B<handle_size> (unsigned) [writable, readable]
+
+=back
+
+=head1 Gtk::Pixmap (Gtk::Misc)
+
+=head1 Gtk::PixmapMenuItem (Gtk::MenuItem)
+
+=head1 Gtk::Plug (Gtk::Window)
+
+=head1 Gtk::Preview (Gtk::Widget)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<expand> (bool) [writable, readable]
+
+=back
+
+=head1 Gtk::Progress (Gtk::Widget)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<activity_mode> (bool) [writable, readable]
+
+=item * B<show_text> (bool) [writable, readable]
+
+=item * B<text_xalign> (number) [writable, readable]
+
+=item * B<text_yalign> (number) [writable, readable]
+
+=back
+
+=head1 Gtk::ProgressBar (Gtk::Progress)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<activity_blocks> (unsigned) [writable, readable]
+
+=item * B<activity_step> (unsigned) [writable, readable]
+
+=item * B<adjustment> (Gtk::Adjustment) [writable, construct, readable]
+
+=item * B<bar_style> (Gtk::ProgressBarStyle) [writable, readable]
+
+=item * B<discrete_blocks> (unsigned) [writable, readable]
+
+=item * B<orientation> (Gtk::ProgressBarOrientation) [writable, readable]
+
+=back
+
+=head1 Gtk::RadioButton (Gtk::CheckButton)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<group> (Gtk::RadioButton) [writable]
+
+=back
+
+=head1 Gtk::RadioMenuItem (Gtk::CheckMenuItem)
+
+=head1 Gtk::Range (Gtk::Widget)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<update_policy> (Gtk::UpdateType) [writable, readable]
+
+=back
+
+=head1 Gtk::Ruler (Gtk::Widget)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<lower> (number) [writable, readable]
+
+=item * B<max_size> (number) [writable, readable]
+
+=item * B<position> (number) [writable, readable]
+
+=item * B<upper> (number) [writable, readable]
+
+=back
+
+=head1 Gtk::Scale (Gtk::Range)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<digits> (integer) [writable, readable]
+
+=item * B<draw_value> (bool) [writable, readable]
+
+=item * B<value_pos> (Gtk::PositionType) [writable, readable]
+
+=back
+
+=head1 Gtk::Scrollbar (Gtk::Range)
+
+=head1 Gtk::ScrolledWindow (Gtk::Bin)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<hadjustment> (Gtk::Adjustment) [writable, construct, readable]
+
+=item * B<hscrollbar_policy> (Gtk::PolicyType) [writable, readable]
+
+=item * B<vadjustment> (Gtk::Adjustment) [writable, construct, readable]
+
+=item * B<vscrollbar_policy> (Gtk::PolicyType) [writable, readable]
+
+=item * B<window_placement> (Gtk::CornerType) [writable, readable]
+
+=back
+
+=head1 Gtk::Separator (Gtk::Widget)
+
+=head1 Gtk::Socket (Gtk::Container)
+
+=head1 Gtk::SpinButton (Gtk::Entry)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<adjustment> (Gtk::Adjustment) [writable, readable]
+
+=item * B<climb_rate> (number) [writable, readable]
+
+=item * B<digits> (unsigned) [writable, readable]
+
+=item * B<numeric> (bool) [writable, readable]
+
+=item * B<shadow_type> (Gtk::ShadowType) [writable, readable]
+
+=item * B<snap_to_ticks> (bool) [writable, readable]
+
+=item * B<update_policy> (Gtk::SpinButtonUpdatePolicy) [writable, readable]
+
+=item * B<value> (number) [writable, readable]
+
+=item * B<wrap> (bool) [writable, readable]
+
+=back
+
+=head1 Gtk::Statusbar (Gtk::HBox)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<text-popped> (Gtk::Statusbar, unsigned, string)
+
+=item * undef B<text-pushed> (Gtk::Statusbar, unsigned, string)
+
+=back
+
+=head1 Gtk::Table (Gtk::Container)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<column_spacing> (unsigned) [writable, readable]
+
+=item * B<homogeneous> (bool) [writable, readable]
+
+=item * B<n_columns> (unsigned) [writable, readable]
+
+=item * B<n_rows> (unsigned) [writable, readable]
+
+=item * B<row_spacing> (unsigned) [writable, readable]
+
+=back
+
+=head1 Gtk::TearoffMenuItem (Gtk::MenuItem)
+
+=head1 Gtk::Ted (Gtk::Table)
+
+=head1 Gtk::Text (Gtk::Editable)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<hadjustment> (Gtk::Adjustment) [writable, construct, readable]
+
+=item * B<line_wrap> (bool) [writable, readable]
+
+=item * B<vadjustment> (Gtk::Adjustment) [writable, construct, readable]
+
+=item * B<word_wrap> (bool) [writable, readable]
+
+=back
+
+=head1 Gtk::TipsQuery (Gtk::Label)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<start-query> (Gtk::TipsQuery)
+
+=item * undef B<stop-query> (Gtk::TipsQuery)
+
+=item * undef B<widget-entered> (Gtk::TipsQuery, Gtk::Widget, string, string)
+
+=item * bool B<widget-selected> (Gtk::TipsQuery, Gtk::Widget, string, string, Gtk::Gdk::Event)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<caller> (Gtk::Widget) [writable, readable]
+
+=item * B<emit_always> (bool) [writable, readable]
+
+=item * B<label_inactive> (string) [writable, readable]
+
+=item * B<label_no_tip> (string) [writable, readable]
+
+=back
+
+=head1 Gtk::ToggleButton (Gtk::Button)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<toggled> (Gtk::ToggleButton)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<active> (bool) [writable, readable]
+
+=item * B<draw_indicator> (bool) [writable, readable]
+
+=back
+
+=head1 Gtk::Toolbar (Gtk::Container)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<orientation-changed> (Gtk::Toolbar, integer)
+
+=item * undef B<style-changed> (Gtk::Toolbar, integer)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<orientation> (Gtk::Orientation) [writable, readable]
+
+=item * B<relief> (Gtk::ReliefStyle) [writable, readable]
+
+=item * B<space_size> (unsigned) [writable, readable]
+
+=item * B<space_style> (Gtk::ToolbarSpaceStyle) [writable, readable]
+
+=item * B<toolbar_style> (Gtk::ToolbarStyle) [writable, readable]
+
+=back
+
+=head1 Gtk::Tooltips (Gtk::Data)
+
+=head1 Gtk::Tree (Gtk::Container)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<select-child> (Gtk::Tree, Gtk::Widget)
+
+=item * undef B<selection-changed> (Gtk::Tree)
+
+=item * undef B<unselect-child> (Gtk::Tree, Gtk::Widget)
+
+=back
+
+=head1 Gtk::TreeItem (Gtk::Item)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<collapse> (Gtk::TreeItem)
+
+=item * undef B<expand> (Gtk::TreeItem)
+
+=back
+
+=head1 Gtk::VBox (Gtk::Box)
+
+=head1 Gtk::VButtonBox (Gtk::ButtonBox)
+
+=head1 Gtk::VPaned (Gtk::Paned)
+
+=head1 Gtk::VRuler (Gtk::Ruler)
+
+=head1 Gtk::VScale (Gtk::Scale)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<adjustment> (Gtk::Adjustment) [writable, construct, readable]
+
+=back
+
+=head1 Gtk::VScrollbar (Gtk::Scrollbar)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<adjustment> (Gtk::Adjustment) [writable, construct, readable]
+
+=back
+
+=head1 Gtk::VSeparator (Gtk::Separator)
+
+=head1 Gtk::Viewport (Gtk::Bin)
+
+=head2 Arguments
+
+=over 4
+
+=item * B<hadjustment> (Gtk::Adjustment) [writable, construct, readable]
+
+=item * B<shadow_type> (Gtk::ShadowType) [writable, readable]
+
+=item * B<vadjustment> (Gtk::Adjustment) [writable, construct, readable]
+
+=back
+
+=head1 Gtk::Widget (Gtk::Object)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<add-accelerator> (Gtk::Widget, unsigned, Gtk::AccelGroup, unsigned, Gtk::GdkModifierType, Gtk::AccelFlags)
+
+=item * bool B<button-press-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * bool B<button-release-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * bool B<client-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * bool B<configure-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * undef B<debug-msg> (Gtk::Widget, string)
+
+=item * bool B<delete-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * bool B<destroy-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * undef B<drag-begin> (Gtk::Widget, Gtk::GdkDragContext)
+
+=item * undef B<drag-data-delete> (Gtk::Widget, Gtk::GdkDragContext)
+
+=item * undef B<drag-data-get> (Gtk::Widget, Gtk::GdkDragContext, Gtk::SelectionData, unsigned, unsigned)
+
+=item * undef B<drag-data-received> (Gtk::Widget, Gtk::GdkDragContext, integer, integer, Gtk::SelectionData, unsigned, unsigned)
+
+=item * bool B<drag-drop> (Gtk::Widget, Gtk::GdkDragContext, integer, integer, unsigned)
+
+=item * undef B<drag-end> (Gtk::Widget, Gtk::GdkDragContext)
+
+=item * undef B<drag-leave> (Gtk::Widget, Gtk::GdkDragContext, unsigned)
+
+=item * bool B<drag-motion> (Gtk::Widget, Gtk::GdkDragContext, integer, integer, unsigned)
+
+=item * undef B<draw> (Gtk::Widget, gpointer)
+
+=item * undef B<draw-default> (Gtk::Widget)
+
+=item * undef B<draw-focus> (Gtk::Widget)
+
+=item * bool B<enter-notify-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * bool B<event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * bool B<expose-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * bool B<focus-in-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * bool B<focus-out-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * undef B<grab-focus> (Gtk::Widget)
+
+=item * undef B<hide> (Gtk::Widget)
+
+=item * bool B<key-press-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * bool B<key-release-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * bool B<leave-notify-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * undef B<map> (Gtk::Widget)
+
+=item * bool B<map-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * bool B<motion-notify-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * bool B<no-expose-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * undef B<parent-set> (Gtk::Widget, Gtk::Object)
+
+=item * bool B<property-notify-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * bool B<proximity-in-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * bool B<proximity-out-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * undef B<realize> (Gtk::Widget)
+
+=item * undef B<remove-accelerator> (Gtk::Widget, Gtk::AccelGroup, unsigned, Gtk::GdkModifierType)
+
+=item * bool B<selection-clear-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * undef B<selection-get> (Gtk::Widget, Gtk::SelectionData, unsigned, unsigned)
+
+=item * bool B<selection-notify-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * undef B<selection-received> (Gtk::Widget, Gtk::SelectionData, unsigned)
+
+=item * bool B<selection-request-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * undef B<show> (Gtk::Widget)
+
+=item * undef B<size-allocate> (Gtk::Widget, gpointer)
+
+=item * undef B<size-request> (Gtk::Widget, gpointer)
+
+=item * undef B<state-changed> (Gtk::Widget, Gtk::StateType)
+
+=item * undef B<style-set> (Gtk::Widget, Gtk::Style)
+
+=item * undef B<unmap> (Gtk::Widget)
+
+=item * bool B<unmap-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=item * undef B<unrealize> (Gtk::Widget)
+
+=item * bool B<visibility-notify-event> (Gtk::Widget, Gtk::Gdk::Event)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<app_paintable> (bool) [writable, readable]
+
+=item * B<can_default> (bool) [writable, readable]
+
+=item * B<can_focus> (bool) [writable, readable]
+
+=item * B<composite_child> (bool) [writable, readable]
+
+=item * B<events> (Gtk::GdkEventMask) [writable, readable]
+
+=item * B<extension_events> (Gtk::GdkEventMask) [writable, readable]
+
+=item * B<has_default> (bool) [writable, readable]
+
+=item * B<has_focus> (bool) [writable, readable]
+
+=item * B<height> (integer) [writable, readable]
+
+=item * B<name> (string) [writable, readable]
+
+=item * B<parent> (Gtk::Container) [writable, readable]
+
+=item * B<receives_default> (bool) [writable, readable]
+
+=item * B<sensitive> (bool) [writable, readable]
+
+=item * B<style> (Gtk::Style) [writable, readable]
+
+=item * B<visible> (bool) [writable, readable]
+
+=item * B<width> (integer) [writable, readable]
+
+=item * B<x> (integer) [writable, readable]
+
+=item * B<y> (integer) [writable, readable]
+
+=back
+
+=head1 Gtk::Window (Gtk::Bin)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<set-focus> (Gtk::Window, Gtk::Widget)
+
+=back
+
+=head2 Arguments
+
+=over 4
+
+=item * B<allow_grow> (bool) [writable, readable]
+
+=item * B<allow_shrink> (bool) [writable, readable]
+
+=item * B<auto_shrink> (bool) [writable, readable]
+
+=item * B<default_height> (integer) [writable, readable]
+
+=item * B<default_width> (integer) [writable, readable]
+
+=item * B<modal> (bool) [writable, readable]
+
+=item * B<title> (string) [writable, readable]
+
+=item * B<type> (Gtk::WindowType) [writable, readable]
+
+=item * B<window_position> (Gtk::WindowPosition) [writable, readable]
+
+=back
+
+=head1 Gtk::XmHTML (Gtk::Container)
+
+=head2 Signals
+
+=over 4
+
+=item * undef B<-focus> (Gtk::XmHTML, gpointer)
+
+=item * undef B<activate> (Gtk::XmHTML, gpointer)
+
+=item * undef B<anchor-track> (Gtk::XmHTML, gpointer)
+
+=item * integer B<anchor-visited> (Gtk::XmHTML, string, gpointer)
+
+=item * undef B<arm> (Gtk::XmHTML, gpointer)
+
+=item * undef B<document> (Gtk::XmHTML, gpointer)
+
+=item * undef B<form> (Gtk::XmHTML, gpointer)
+
+=item * undef B<frame> (Gtk::XmHTML, gpointer)
+
+=item * undef B<html-event> (Gtk::XmHTML, gpointer)
+
+=item * undef B<imagemap> (Gtk::XmHTML, gpointer)
+
+=item * undef B<input> (Gtk::XmHTML, gpointer)
+
+=item * undef B<link> (Gtk::XmHTML, gpointer)
+
+=item * undef B<losing-focus> (Gtk::XmHTML, gpointer)
+
+=item * undef B<motion> (Gtk::XmHTML, gpointer)
+
+=item * undef B<motion-track> (Gtk::XmHTML, gpointer)
+
+=back
+

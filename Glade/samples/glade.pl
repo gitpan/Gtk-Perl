@@ -15,6 +15,8 @@ init Gtk if $@;
 
 print STDERR "Glade inited\n";
 
+# use new style custom handler.
+Gtk::GladeXML->set_custom_handler(\&new_create_custom_widget);
 $g = new Gtk::GladeXML(shift || "test.glade");
 
 print "Glade object: ", ref($g),"\n";
@@ -22,6 +24,10 @@ print "Glade object: ", ref($g),"\n";
 #$g->handler_connect('gtk_main_quit', sub {Gtk->main_quit;});
 $g->signal_autoconnect_from_package('main');
 $w = $g->get_widget('MainWindow');
+$button2 = $g->get_widget('button2');
+$button2->signal_connect('clicked', sub {
+	print "clicked\n";
+});
 
 print STDERR "NAME: ", $w->get_name(), "\n" if $w;
 
@@ -35,6 +41,7 @@ sub gtk_main_quit {
 
 sub gtk_widget_hide {
 	shift->hide();
+	1;
 }
 sub gtk_widget_show {
 	my ($w) = shift;
@@ -43,6 +50,16 @@ sub gtk_widget_show {
 }
 
 # custom widget creation func
+sub new_create_custom_widget {
+	my $xml = shift;
+	my $func_name = shift;
+	my @args = @_;
+	my $w = new Gtk::Label($args[1])|| die;
+	print "New style custom widget got: @args -> $w\n";
+	return $w;
+}
+
+# custom widget creation func: use the new style instead
 sub Gtk::GladeXML::create_custom_widget {
 	my @args = @_;
 	my $w = new Gtk::Label($args[1])|| die;

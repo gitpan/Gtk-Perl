@@ -68,10 +68,12 @@ $cgroup->signal_connect("event", sub {
 	   $event->{button} == 1) {
 	   	$bp = 1; ($bpx, $bpy) = @{$event}{qw/x y/};
 		print "PRESSED\n";
+		$item->grab(['pointer-motion-mask', 'button-release-mask'], undef, $event->{'time'});
 	} elsif($event->{type} eq "button_release" and 
 	   $event->{button} == 1) {
 	   	$bp = 0; 
 		print "RELEASED\n";
+		$item->ungrab($event->{'time'});
 	} elsif($event->{type} eq "motion_notify" and $bp) {
 		my $dx = $event->{x} - $bpx;
 		my $dy = $event->{y} - $bpy;

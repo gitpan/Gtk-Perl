@@ -22,7 +22,7 @@ generic_view_factory (BonoboEmbeddable *embeddable, const Bonobo_ViewFrame view_
 
 	ENTER;
 	SAVETMPS;
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(embeddable), 0)));
 	XPUSHs(sv_2mortal(newSVsv(porbit_objref_to_sv(view_frame))));
 	for (i=1;i<=av_len(args);i++)
@@ -52,7 +52,7 @@ generic_item_factory (BonoboEmbeddable *embeddable, GnomeCanvas *canvas, void *c
 
 	ENTER;
 	SAVETMPS;
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(embeddable), 0)));
 	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(canvas), 0)));
 	for (i=1;i<=av_len(args);i++)
@@ -78,7 +78,7 @@ generic_foreach_view (BonoboView *view, void *data) {
 	int i;
 	dSP;
 
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(view), 0)));
 	for (i=1;i<=av_len(args);i++)
 		XPUSHs(sv_2mortal(newSVsv(*av_fetch(args, i, 0))));
@@ -94,7 +94,7 @@ generic_foreach_item (BonoboCanvasComponent *comp, void *data) {
 	int i;
 	dSP;
 
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(comp), 0)));
 	for (i=1;i<=av_len(args);i++)
 		XPUSHs(sv_2mortal(newSVsv(*av_fetch(args, i, 0))));
@@ -135,15 +135,14 @@ bonobo_embeddable_new_canvas_item (Class, item_factory, ...)
 	RETVAL
 
 Bonobo::Embeddable
-bonobo_embeddable_construct (embeddable, corba_embeddable, factory, ...)
+bonobo_embeddable_construct (embeddable, factory, ...)
 	Bonobo::Embeddable	embeddable
-	CORBA::Object	corba_embeddable
 	SV *	factory
 	CODE:
 	{
 		AV *args = newAV();
-		PackCallbackST(args, 2);
-		RETVAL = bonobo_embeddable_construct (embeddable, corba_embeddable, generic_view_factory, args);
+		PackCallbackST(args, 1);
+		RETVAL = bonobo_embeddable_construct (embeddable, generic_view_factory, args);
 	}
 	OUTPUT:
 	RETVAL

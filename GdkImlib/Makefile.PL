@@ -1,4 +1,5 @@
 use ExtUtils::MakeMaker;
+use Config;
 use Cwd;
 use blib '../Gtk';
 require '../Depends.pm';
@@ -25,13 +26,17 @@ $imlib->add_clean( qw(
 
 # documentation
 #gendefs::gen_doc('gdkimlib');
-system("../tools/gendoc.pl", "-t", 'gdkimlib', $imlib->get_xs);
+system($Config{perlpath}, "../tools/gendoc.pl", "-t", 'gdkimlib', $imlib->get_xs);
+system($Config{perlpath}, "../tools/gpdoc2pod", "-t", 'GdkImlib');
 
 WriteMakefile(
 	'NAME'      => 'Gtk::Gdk::ImlibImage',
 	'VERSION_FROM'	=> 'GdkImlibImage.pm',
 	'XSOPT' => '-noversioncheck',
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
+	'MAN3PODS' => {
+		'build/perl-gdkimlib-ref.pod' => '$(INST_MAN3DIR)/Gtk::Gdk::ImlibImage::reference.3pm',
+		},
 	$imlib->get_makefile_vars,
 );
 

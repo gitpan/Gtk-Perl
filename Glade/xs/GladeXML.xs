@@ -8,6 +8,8 @@
 #include "GtkDefs.h"
 #include "GtkGladeXMLDefs.h"
 
+static AV *custom_args = NULL;
+
 static void
 connect_func_handler(const gchar *handler_name, GtkObject* object, 
 		const gchar * signal_name, const gchar* signal_data, 
@@ -29,16 +31,16 @@ connect_func_handler(const gchar *handler_name, GtkObject* object,
 	
 	ENTER;
 	SAVETMPS;
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 
-	XPUSHs(sv_2mortal(newSVpv(handler_name, 0)));
+	XPUSHs(sv_2mortal(newSVpv(handler_name, strlen(handler_name))));
 	XPUSHs(sv_2mortal(newSVGtkObjectRef(object, 0)));
-	XPUSHs(sv_2mortal(newSVpv(signal_name, 0)));
-	XPUSHs(sv_2mortal(newSVpv(signal_data, 0)));
+	XPUSHs(sv_2mortal(newSVpv(signal_name, strlen(signal_name))));
+	XPUSHs(sv_2mortal(newSVpv(signal_data, strlen(signal_data))));
 	if (connect_object)
 		XPUSHs(sv_2mortal(newSVGtkObjectRef(connect_object, 0)));
 	else
-		XPUSHs(sv_2mortal(newSVsv(&sv_undef)));
+		XPUSHs(sv_2mortal(newSVsv(&PL_sv_undef)));
 	XPUSHs(sv_2mortal(newSViv(after)));
 
 	for (i=1;i<=av_len(stuff);i++)
@@ -65,15 +67,15 @@ pgtk_glade_custom_widget (char* name, char* string1, char* string2, int int1, in
 
 	ENTER;
 	SAVETMPS;
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 
 	if (!name) name = "";
 	if (!string1) string1 = "";
 	if (!string2) string2 = "";
 
-	XPUSHs(sv_2mortal(newSVpv(name, 0)));
-	XPUSHs(sv_2mortal(newSVpv(string1, 0)));
-	XPUSHs(sv_2mortal(newSVpv(string2, 0)));
+	XPUSHs(sv_2mortal(newSVpv(name, strlen(name))));
+	XPUSHs(sv_2mortal(newSVpv(string1, strlen(string1))));
+	XPUSHs(sv_2mortal(newSVpv(string2, strlen(string2))));
 	XPUSHs(sv_2mortal(newSViv(int1)));
 	XPUSHs(sv_2mortal(newSViv(int2)));
 
@@ -84,12 +86,56 @@ pgtk_glade_custom_widget (char* name, char* string1, char* string2, int int1, in
 	if (i != 1)
 		croak("create_custom_widget failed");
 	s = POPs;
-	result = SvGtkObjectRef(s, "Gtk::Widget");
+	result = (GtkWidget*)SvGtkObjectRef(s, "Gtk::Widget");
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
 	return result;
 }
+
+static GtkWidget*
+pgtk_glade_custom_widget2 (GladeXML *xml, gchar *func_name, char* name, char* string1, char* string2, int int1, int int2, gpointer data) {
+	SV * s;
+	SV *handler;
+	int i;
+	GtkWidget *result;
+	dSP;
+
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(SP);
+
+	if (!name) name = "";
+	if (!func_name) func_name = "";
+	if (!string1) string1 = "";
+	if (!string2) string2 = "";
+
+	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(xml), 0)));
+	XPUSHs(sv_2mortal(newSVpv(func_name, strlen(func_name))));
+	XPUSHs(sv_2mortal(newSVpv(name, strlen(name))));
+	XPUSHs(sv_2mortal(newSVpv(string1, strlen(string1))));
+	XPUSHs(sv_2mortal(newSVpv(string2, strlen(string2))));
+	XPUSHs(sv_2mortal(newSViv(int1)));
+	XPUSHs(sv_2mortal(newSViv(int2)));
+
+	for (i=1;i<=av_len(custom_args);i++)
+		XPUSHs(sv_2mortal(newSVsv(*av_fetch(custom_args, i, 0))));
+	PUTBACK;
+
+	handler = *av_fetch(custom_args, 0, 0);
+	i=perl_call_sv(handler, G_SCALAR);
+	SPAGAIN;
+	if (i != 1)
+		croak("create_custom_widget2 failed");
+	s = POPs;
+	result = (GtkWidget*)SvGtkObjectRef(s, "Gtk::Widget");
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+	return result;
+}
+
+typedef void (*pgtk_glade_init_func)();
 
 MODULE = Gtk::GladeXML		PACKAGE = Gtk::GladeXML		PREFIX = glade_xml_
 
@@ -104,15 +150,25 @@ init (Class)
 		if (did_it)
 			return;
 		did_it = 1;
-#ifdef GNOME_HVER
-		glade_gnome_init();
-#else
 		glade_init();
-#endif
 		GtkGladeXML_InstallObjects();
 		GtkGladeXML_InstallTypedefs();
 	}
 
+void
+call_init (Class, handle)
+	SV *	Class
+	IV	handle
+	CODE:
+	{
+		pgtk_glade_init_func func = (pgtk_glade_init_func)handle;
+
+		if (handle) {
+			func();
+			GtkGladeXML_InstallObjects();
+			GtkGladeXML_InstallTypedefs();
+		}
+	}
 
 Gtk::GladeXML_Sink
 glade_xml_new (Class, filename, root=0)
@@ -148,7 +204,8 @@ glade_xml_new_from_memory (Class, buffer, root=0, domain=0)
 	CODE: 
 	{
 		STRLEN len;
-		RETVAL = glade_xml_new_from_memory(SvPV(buffer, len), len, root, domain);
+		char *p = SvPV(buffer, len);
+		RETVAL = glade_xml_new_from_memory(p, len, root, domain);
 	}
 	OUTPUT:
 	RETVAL
@@ -209,6 +266,23 @@ char*
 glade_xml_relative_file (gladexml, filename)
 	Gtk::GladeXML	gladexml
 	char*	filename
+
+MODULE = Gtk::GladeXML		PACKAGE = Gtk::GladeXML		PREFIX = glade_
+
+void
+glade_set_custom_handler (Class, handler, ...)
+	SV *	Class
+	SV *	handler
+	CODE:
+	if (custom_args) {
+		SvREFCNT_dec((SV*)custom_args);
+		custom_args = NULL;
+	}
+	if (handler) {
+		custom_args = newAV();
+		PackCallbackST(custom_args, 1);
+		glade_set_custom_handler (pgtk_glade_custom_widget2, NULL);
+	}
 
 
 MODULE = Gtk::GladeXML		PACKAGE = Gtk::Widget		PREFIX = glade_

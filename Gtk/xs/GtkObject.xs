@@ -4,6 +4,7 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GtkTypes.h"
 
 #undef DEBUG_TYPES
 
@@ -30,7 +31,7 @@ static void generic_perl_gtk_arg_get_func(GtkObject * object, GtkArg * arg, guin
 	ENTER;
 	SAVETMPS;
 	
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(s));
 	XPUSHs(sv_2mortal(newSVpv(arg->name,0)));
 	XPUSHs(sv_2mortal(newSViv(arg_id)));
@@ -58,7 +59,7 @@ static void generic_perl_gtk_arg_set_func(GtkObject * object, GtkArg * arg, guin
 		return;
 	}
 
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(s));
 	XPUSHs(sv_2mortal(newSVpv(arg->name,0)));	
 	XPUSHs(sv_2mortal(newSViv(arg_id)));
@@ -92,7 +93,7 @@ static void generic_perl_gtk_class_init(GtkObjectClass * klass)
 #endif
 
 
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(newSVpv(perlClass, 0)));
 	PUTBACK;
 	perl_call_method("GTK_CLASS_INIT", G_DISCARD);
@@ -112,7 +113,7 @@ static void generic_perl_gtk_object_init(GtkObject * object, GtkObjectClass *kla
 		return;
 	}
 
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	/*XPUSHs(sv_2mortal(newSVpv(ptname_for_gtnumber(object->klass->type), 0)));*/
 	XPUSHs(sv_2mortal(s));
 	PUTBACK;
@@ -248,31 +249,157 @@ DESTROY(object)
 	CODE:
 	FreeHVObject((HV*)SvRV(ST(0)));
 
+char*
+parent_type (Class)
+	SV *	Class
+	CODE:
+	{
+		GtkObject * obj;
+		GtkType type;
+
+		if (SvROK(Class)) {
+			obj = SvGtkObjectRef (Class, 0);
+			type = obj->klass->type;
+		} else {
+			type = gtnumber_for_ptname (SvPV(Class, PL_na));
+		}
+		type = gtk_type_parent (type);
+		if (type)
+			RETVAL = ptname_for_gtnumber (type);
+		else
+			RETVAL = NULL;
+	}
+	OUTPUT:
+	RETVAL
+
 void
-_get_arg_info(obj, name)
-	Gtk::Object	obj
+_get_args (Class, parent=0)
+	SV *	Class
+	int parent
+	PPCODE:
+	{
+		GtkObject * obj;
+		GtkType type;
+		GtkArg* args;
+		int i;
+		guint nargs;
+		gpointer class;
+
+		if (SvROK(Class)) {
+			obj = SvGtkObjectRef (Class, 0);
+			type = obj->klass->type;
+		} else {
+			type = gtnumber_for_ptname (SvPV(Class, PL_na));
+		}
+		while (type) {
+			class = gtk_type_class (type);
+			args = gtk_object_query_args (type, NULL, &nargs);
+			/*warn ("types %s (%d)\n", gtk_type_name(type), nsignals);*/
+			for (i=0; i < nargs; ++i) {
+				XPUSHs (sv_2mortal(newSVpv(args[i].name, 0)));
+			}
+			g_free (args);
+			if (!parent)
+				break;
+			type = gtk_type_parent (type);
+		}
+	}
+
+void
+_get_signals (Class, parent=0)
+	SV *	Class
+	int parent
+	PPCODE:
+	{
+		GtkObject * obj;
+		GtkType type;
+		int i;
+		gpointer class;
+		guint *signals;
+		guint nsignals;
+
+		if (SvROK(Class)) {
+			obj = SvGtkObjectRef (Class, 0);
+			type = obj->klass->type;
+		} else {
+			type = gtnumber_for_ptname (SvPV(Class, PL_na));
+		}
+		while (type) {
+			class = gtk_type_class (type);
+			signals = GTK_OBJECT_CLASS (class)->signals;
+			nsignals = GTK_OBJECT_CLASS (class)->nsignals;
+			/*warn ("types %s (%d)\n", gtk_type_name(type), nsignals);*/
+			for (i=0; i < nsignals; ++i) {
+				XPUSHs (sv_2mortal(newSVpv(gtk_signal_name(signals[i]), 0)));
+			}
+			if (!parent)
+				break;
+			type = gtk_type_parent (type);
+		}
+	}
+
+void
+_get_signal_info(Class, name)
+	SV *	Class
+	char * name
+	PPCODE:
+	{
+		GtkObject * obj;
+		GtkType type;
+		GtkSignalQuery * q;
+		guint signal_id;
+		int i;
+
+		if (SvROK(Class)) {
+			obj = SvGtkObjectRef (Class, 0);
+			type = obj->klass->type;
+		} else {
+			type = gtnumber_for_ptname (SvPV(Class, PL_na));
+		}
+		if (!type)
+			XSRETURN_UNDEF;
+		signal_id = gtk_signal_lookup (name, type);
+		q = gtk_signal_query (signal_id);
+		if (q) {
+			XPUSHs (sv_2mortal(newSVpv(ptname_for_gtnumber(q->object_type), 0)));
+			XPUSHs (sv_2mortal(newSVGtkSignalRunType(q->signal_flags)));
+			XPUSHs (sv_2mortal(newSVpv(gtk_type_name(q->return_val), 0)));
+			for (i=0; i < q->nparams; ++i)
+				XPUSHs (sv_2mortal(newSVpv(gtk_type_name(q->params[i]), 0)));
+			g_free (q);
+		}
+	}
+
+void
+_get_arg_info(Class, name)
+	SV *	Class
 	SV * name
 	PPCODE:
 	{
 		GtkArg argv;
 		GtkType type;
+		GtkObject * obj;
 		GtkArgInfo * arginfo = NULL;
 		char* error;
-		int klass = obj->klass->type;
 
-		type = FindArgumentTypeWithObject(obj, name, &argv);
-		error = gtk_object_arg_get_info(klass, argv.name, &arginfo);
+		if (SvROK(Class)) {
+			obj = SvGtkObjectRef (Class, 0);
+			type = FindArgumentTypeWithObject(obj, name, &argv);
+			error = gtk_object_arg_get_info(obj->klass->type, argv.name, &arginfo);
+		} else {
+			type = gtnumber_for_ptname (SvPV(Class, PL_na));
+			error = gtk_object_arg_get_info(type, SvPV(name, PL_na), &arginfo);
+		}
 		if (error) {
 			g_warning("cannot get arg info: %s", error);
 			g_free(error);
 		} else {
-			EXTEND(sp, 1);
+			EXTEND(sp, 4);
 			PUSHs(sv_2mortal(newSVpv(arginfo->full_name, 0)));
-			EXTEND(sp, 1);
 			PUSHs(sv_2mortal(newSVpv(ptname_for_gtnumber(arginfo->class_type), 0)));
 			/* export more stuff here newSVGtkArgFlags() */
-			EXTEND(sp, 1);
 			PUSHs(sv_2mortal(newSVGtkArgFlags(arginfo->arg_flags)));
+			PUSHs(sv_2mortal(newSVpv(gtk_type_name(arginfo->type), 0)));
 		}
 	}
 
@@ -366,7 +493,7 @@ new(Class, ...)
 
 		RETVAL = newSVGtkObjectRef(object, perl_class);
 #ifdef DEBUG_TYPES
-		printf("created SV %p for object %p from perltype %s (gtktype: %d -> %s)\n", RETVAL, object, SvPV(klass, PL_na), type, gtk_type_name(type));
+		printf("created SV %p (%s) for object %p from perltype %s (gtktype: %d -> %s) %s\n", RETVAL, SvPV(RETVAL, PL_na), object, SvPV(Class, PL_na), type, gtk_type_name(type), perl_class);
 #endif
 		gtk_object_sink(object);
 		
@@ -587,7 +714,7 @@ _object_size(object)
 			} else {
 				type = gtnumber_for_ptname(SvPV(object, PL_na));
 			}
-			RETVAL = obj_size_for_gtname(gtk_type_name(type));
+			RETVAL = pgtk_obj_size_for_gtname(gtk_type_name(type));
 		}
 		OUTPUT:
 		RETVAL
@@ -603,7 +730,7 @@ _class_size(object)
 				type = o->klass->type;
 			else
 				type = gtnumber_for_ptname(SvPV(object, PL_na));
-			RETVAL = class_size_for_gtname(gtk_type_name(type));
+			RETVAL = pgtk_class_size_for_gtname(gtk_type_name(type));
 		}
 		OUTPUT:
 		RETVAL
@@ -624,8 +751,13 @@ _register (Class, perlname, addr)
 		if (!t)
 			croak("Cannot init type");
 		parent = gtk_type_parent(t);
-		RETVAL = ptname_for_gtnumber(parent);
-		pgtk_link_types(gtk_type_name(t), g_strdup(perlname), t, 0);
+		if (parent) {
+			RETVAL = ptname_for_gtnumber(parent);
+			pgtk_link_types(gtk_type_name(t), g_strdup(perlname), t, get_type_func);
+		} else {
+			warn("Cannot find parent for %s\n", perlname);
+			RETVAL = NULL;
+		}
 	}
 	OUTPUT:
 	RETVAL
@@ -668,7 +800,7 @@ register_subtype(parentClass, perlClass, ...)
 		ENTER;
 		SAVETMPS;
 		
-		PUSHMARK(sp);
+		PUSHMARK(SP);
 		XPUSHs(sv_2mortal(newSVsv(parentClass)));
 		PUTBACK;
 		count = perl_call_method("_object_type", G_SCALAR);
@@ -686,7 +818,7 @@ register_subtype(parentClass, perlClass, ...)
 		ENTER;
 		SAVETMPS;
 		
-		PUSHMARK(sp);
+		PUSHMARK(SP);
 		XPUSHs(sv_2mortal(newSVsv(parentClass)));
 		PUTBACK;
 		count = perl_call_method("_object_size", G_SCALAR);
@@ -703,7 +835,7 @@ register_subtype(parentClass, perlClass, ...)
 		ENTER;
 		SAVETMPS;
 		
-		PUSHMARK(sp);
+		PUSHMARK(SP);
 		XPUSHs(sv_2mortal(newSVsv(parentClass)));
 		PUTBACK;
 		count = perl_call_method("_class_size", G_SCALAR);
@@ -765,7 +897,7 @@ register_subtype(parentClass, perlClass, ...)
 #ifdef DEBUG_TYPES	
 		printf("New type = %d\n", RETVAL);
 #endif
-		pgtk_link_types(SvPV(gtkName, PL_na), SvPV(perlClass,PL_na), RETVAL, 0);
+		pgtk_link_types(g_strdup(SvPV(gtkName, PL_na)), g_strdup(SvPV(perlClass,PL_na)), RETVAL, 0);
 
 	}
 	OUTPUT:

@@ -22,6 +22,8 @@
 
 #include "GtkDefs.h"
 
+extern GList * pgtk_get_packages ();
+
 /* if true things are a bit faster, but not source compatible:
    enum and flags values will have '-' instead of '_' as in previous
    versions. 
@@ -158,7 +160,7 @@ static void marshal_signal (GtkObject *object, gpointer data, guint nparams, Gtk
 	ENTER;
 	SAVETMPS;
 	
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	signal_id = SvUV(*av_fetch(perlargs,2, 0));
 	
 	XPUSHs(sv_2mortal(sv_object));
@@ -260,7 +262,7 @@ void pgtk_generic_handler(GtkObject * object, gpointer data, guint n_args, GtkAr
 	ENTER;
 	SAVETMPS;
 	
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	for (i=1;i<=av_len(stuff);i++)
 		XPUSHs(sv_2mortal(newSVsv(*av_fetch(stuff, i, 0))));
 	/*XPUSHs(sv_2mortal(newSVsv(*av_fetch(stuff, 1, 0))));*/
@@ -295,7 +297,7 @@ static int init_handler(gpointer data) {
 	int i;
 	dSP;
 
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	for (i=1;i<=av_len(args);i++)
 		XPUSHs(sv_2mortal(newSVsv(*av_fetch(args, i, 0))));
 	PUTBACK;
@@ -315,7 +317,7 @@ static int snoop_handler(GtkWidget * grab_widget, GdkEventKey * event, gpointer 
 	ENTER;
 	SAVETMPS;
 
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(grab_widget), 0)));
 	XPUSHs(sv_2mortal(newSVGdkEvent((GdkEvent*)event)));
 	for (i=1;i<=av_len(args);i++)
@@ -353,7 +355,7 @@ static void input_handler(gpointer data, gint source, GdkInputCondition conditio
 	SAVETMPS;
 	
 
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	for (i=1;i<=av_len(args);i++)
 		XPUSHs(sv_2mortal(newSVsv(*av_fetch(args, i, 0))));
 	XPUSHs(sv_2mortal(newSViv(source)));
@@ -380,7 +382,7 @@ static void menu_callback (GtkWidget *widget, gpointer user_data)
 	ENTER;
 	SAVETMPS;
 
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(widget), 0)));
 	PUTBACK;
 
@@ -476,7 +478,7 @@ static void log_handler(const char * log_domain, GLogLevelFlags log_level, const
 		sv_catpv(message_sv, ": ");
 		sv_catpv(message_sv, (char*)message);
 		
-		PUSHMARK(sp) ;
+		PUSHMARK(SP) ;
 		XPUSHs(sv_2mortal(newSVpv((char*)log_domain,0)));
 		XPUSHs(sv_2mortal(newSViv(log_level)));
 		XPUSHs(sv_2mortal(message_sv));
@@ -568,10 +570,21 @@ static int fixup_window_u(SV ** * _sp, int match, GtkObject * object, char * sig
 	XPUSHs(sv_2mortal(newSViv(GTK_VALUE_INT(args[3]))));
 	return 1;
 }
+static int fixup_entry_r(SV ** * _sp, int count, int match, GtkObject * object, char * signame, int nparams, GtkArg * args, GtkType return_type)
+{
+	dTHR;
+	if (count) {
+		SV *s = POPs;
+		*GTK_RETLOC_INT(args[2]) = SvIV(s);
+		return 1;
+	} else {
+		return 0;
+	}
+}
 static int fixup_entry_u(SV ** * _sp, int match, GtkObject * object, char * signame, int nparams, GtkArg * args, GtkType return_type)
 {
 	dTHR;
-	XPUSHs(sv_2mortal(newSVpv(GTK_VALUE_STRING(args[0]),0)));
+	XPUSHs(sv_2mortal(newSVpv(GTK_VALUE_STRING(args[0]), GTK_VALUE_INT(args[1]))));
 	XPUSHs(sv_2mortal(newSViv(GTK_VALUE_INT(args[1]))));
 	XPUSHs(sv_2mortal(newSViv(*GTK_RETLOC_INT(args[2]))));
 	return 1;
@@ -679,7 +692,7 @@ void GtkInit_internal() {
 #endif
 		{
 			static char * names[] = {"insert-text", 0};
-			AddSignalHelperParts(gtk_entry_get_type(), names, fixup_entry_u, 0);
+			AddSignalHelperParts(gtk_entry_get_type(), names, fixup_entry_u, fixup_entry_r);
 		}
 #if GTK_HVER >= 0x010200
 		{
@@ -769,7 +782,7 @@ watch_var_dispatch (gpointer source_data, GTimeVal *current_time, gpointer user_
 	ENTER;
 	SAVETMPS;
 	
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(newSVsv(wvd->sv)));
 	for (i=1;i<=av_len(args);i++)
 		XPUSHs(sv_2mortal(newSVsv(*av_fetch(args, i, 0))));
@@ -830,12 +843,31 @@ watch_var_set (IV ix, SV *sv) {
 	return 0;
 }
 
+typedef void (*pgtk_boostrapf)(CV* cv);
+
 MODULE = Gtk		PACKAGE = Gtk		PREFIX = gtk_
 
 double
 constant(name,arg)
 	char *		name
 	int		arg
+
+void
+_bootstrap (func)
+	IV	func
+	CODE:
+	{
+		pgtk_boostrapf f = (pgtk_boostrapf)func;
+		if (f)
+			callXS(f, cv, mark);
+	}
+
+void
+_boot_all ()
+	CODE:
+	{
+#include "Gtkobjects.xsh"
+	}
 
  #DESC: Perform a garbage collection run.
 void
@@ -868,7 +900,7 @@ init(Class)
 	int i;
 
 	if (pgtk_did_we_init_gtk)
-		return;
+		XSRETURN_UNDEF;
 #ifdef PGTK_THREADS
 			g_thread_init(NULL); /* should probably check the perl thread implementation... */
 #endif
@@ -902,7 +934,7 @@ init(Class)
 				XPUSHs(sv_2mortal(newSVsv(&PL_sv_undef)));
 				if (argv)
 					free(argv);
-				return;
+				XSRETURN_UNDEF;
 			} else if ( ix == 0 ) {
 				gtk_init(&argc, &argv);
 			}
@@ -932,22 +964,17 @@ main(Class)
 
 int
 micro_version(Class)
+	SV *	Class
+	ALIAS:
+		Gtk::micro_version = 0
+		Gtk::minor_version = 1
+		Gtk::major_version = 2
 	CODE:
-	RETVAL = gtk_micro_version;
-	OUTPUT:
-	RETVAL
-
-int
-minor_version(Class)
-	CODE:
-	RETVAL = gtk_minor_version;
-	OUTPUT:
-	RETVAL
-
-int
-major_version(Class)
-	CODE:
-	RETVAL = gtk_major_version;
+	switch (ix) {
+	case 0: RETVAL = gtk_micro_version; break;
+	case 1: RETVAL = gtk_minor_version; break;
+	case 2: RETVAL = gtk_major_version; break;
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1129,6 +1156,9 @@ watch_add(Class, sv, priority, handler, ...)
 		MAGIC *mg;
 		MAGIC *mg_list;
 		
+		if (SvROK(sv) && SvRV(sv)) {
+			sv = (SV*)SvRV(sv);
+		}
 		/* code basically stolen from perl-tk */
 		if (SvTHINKFIRST(sv) && SvREADONLY(sv))
 			croak("Cannot trace readonly variable");
@@ -1720,6 +1750,66 @@ DESTROY(selectiondata)
 	CODE:
 	UnregisterMisc((HV *)SvRV(ST(0)), selectiondata);
 
+MODULE = Gtk		PACKAGE = Gtk::RcStyle	PREFIX = gtk_rc_style_
+
+Gtk::RcStyle
+new (Class)
+	SV *	Class
+	CODE:
+	RETVAL = gtk_rc_style_new ();
+	OUTPUT:
+	RETVAL
+
+void
+modify_color (rc_style, component, state, color=0)
+	Gtk::RcStyle	rc_style
+	Gtk::RcFlags	component
+	Gtk::StateType	state
+	Gtk::Gdk::Color	color
+	CODE:
+	if (!color) {
+		rc_style->color_flags[state] &= ~component;
+	} else {
+		if (component&GTK_RC_FG)
+			rc_style->fg[state] = *color;
+		if (component&GTK_RC_BG)
+			rc_style->bg[state] = *color;
+		if (component&GTK_RC_TEXT)
+			rc_style->text[state] = *color;
+		if (component&GTK_RC_BASE)
+			rc_style->base[state] = *color;
+
+		rc_style->color_flags[state] |= component;
+	}
+
+void
+modify_bg_pixmap (rc_style, state, pixmap_file=0)
+	Gtk::RcStyle	rc_style
+	Gtk::StateType	state
+	char *	pixmap_file
+	CODE:
+	g_free (rc_style->bg_pixmap_name[state]);
+	rc_style->bg_pixmap_name[state] = pixmap_file ? g_strdup(pixmap_file) : NULL;
+
+void
+modify_font (rc_style, font_name=0)
+	Gtk::RcStyle	rc_style
+	char *	font_name
+	ALIAS:
+		Gtk::RcStyle::modify_font = 0
+		Gtk::RcStyle::modify_fontset = 1
+	CODE:
+	if (ix == 0) {
+		g_free(rc_style->font_name);
+		rc_style->font_name = NULL;
+		if (font_name)
+			rc_style->font_name = g_strdup(font_name);
+	} else {
+		g_free(rc_style->fontset_name);
+		rc_style->fontset_name = NULL;
+		if (font_name)
+			rc_style->fontset_name = g_strdup(font_name);
+	}
 
 MODULE = Gtk		PACKAGE = Gtk::Style	PREFIX = gtk_style_
 
@@ -1764,85 +1854,24 @@ fg(style, state, new_color=0)
 	Gtk::Style	style
 	Gtk::StateType	state
 	Gtk::Gdk::Color	new_color
+	ALIAS:
+		Gtk::Style::fg = 0
+		Gtk::Style::bg = 1
+		Gtk::Style::light = 2
+		Gtk::Style::dark = 3
+		Gtk::Style::mid = 4
+		Gtk::Style::text = 5
+		Gtk::Style::base = 6
 	CODE:
-	RETVAL = &style->fg[state];
-	if (items>2) style->fg[state] = *new_color;
-	OUTPUT:
-	RETVAL
-
-Gtk::Gdk::Color
-bg(style, state, new_color=0)
-	Gtk::Style	style
-	Gtk::StateType	state
-	Gtk::Gdk::Color	new_color
-	CODE:
-	RETVAL = &style->bg[state];
-	if (items>2) style->bg[state] = *new_color;
-	OUTPUT:
-	RETVAL
-
-Gtk::Gdk::Color
-light(style, state, new_color=0)
-	Gtk::Style	style
-	Gtk::StateType	state
-	Gtk::Gdk::Color	new_color
-	CODE:
-	RETVAL = &style->light[state];
-	if (items>2) style->light[state] = *new_color;
-	OUTPUT:
-	RETVAL
-
-Gtk::Gdk::Color
-dark(style, state, new_color=0)
-	Gtk::Style	style
-	Gtk::StateType	state
-	Gtk::Gdk::Color	new_color
-	CODE:
-	RETVAL = &style->dark[state];
-	if (items>2) style->dark[state] = *new_color;
-	OUTPUT:
-	RETVAL
-
-Gtk::Gdk::Color
-mid(style, state, new_color=0)
-	Gtk::Style	style
-	Gtk::StateType	state
-	Gtk::Gdk::Color	new_color
-	CODE:
-	RETVAL = &style->mid[state];
-	if (items>2) style->mid[state] = *new_color;
-	OUTPUT:
-	RETVAL
-
-Gtk::Gdk::Color
-text(style, state, new_color=0)
-	Gtk::Style	style
-	Gtk::StateType	state
-	Gtk::Gdk::Color	new_color
-	CODE:
-	RETVAL = &style->text[state];
-	if (items>2) style->text[state] = *new_color;
-	OUTPUT:
-	RETVAL
-
-Gtk::Gdk::Color
-base(style, state, new_color=0)
-	Gtk::Style	style
-	Gtk::StateType	state
-	Gtk::Gdk::Color	new_color
-	CODE:
-	RETVAL = &style->base[state];
-	if (items>2) style->base[state] = *new_color;
-	OUTPUT:
-	RETVAL
-
-Gtk::Gdk::Color
-black(style, new_color=0)
-	Gtk::Style	style
-	Gtk::Gdk::Color	new_color
-	CODE:
-	RETVAL = &style->black;
-	if (items>1) style->black = *new_color;
+	switch (ix) {
+	case 0: RETVAL = &style->fg[state]; if (items>2) style->fg[state] = *new_color; break;
+	case 1: RETVAL = &style->bg[state]; if (items>2) style->bg[state] = *new_color; break;
+	case 2: RETVAL = &style->light[state]; if (items>2) style->light[state] = *new_color; break;
+	case 3: RETVAL = &style->dark[state]; if (items>2) style->dark[state] = *new_color; break;
+	case 4: RETVAL = &style->mid[state]; if (items>2) style->mid[state] = *new_color; break;
+	case 5: RETVAL = &style->text[state]; if (items>2) style->text[state] = *new_color; break;
+	case 6: RETVAL = &style->base[state]; if (items>2) style->base[state] = *new_color; break;
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1850,9 +1879,17 @@ Gtk::Gdk::Color
 white(style, new_color=0)
 	Gtk::Style	style
 	Gtk::Gdk::Color	new_color
+	ALIAS:
+		Gtk::Style::white = 0
+		Gtk::Style::black = 1
 	CODE:
-	RETVAL = &style->white;
-	if (items>1) style->white = *new_color;
+	if (ix == 0) {
+		RETVAL = &style->white; 
+		if (items>1) style->white = *new_color;
+	} else if (ix == 1) {
+		RETVAL = &style->black; 
+		if (items>1) style->black = *new_color;
+	}
 	OUTPUT:
 	RETVAL
 
@@ -1877,116 +1914,31 @@ fg_gc(style, state, new_gc=0)
 	Gtk::Style	style
 	Gtk::StateType	state
 	Gtk::Gdk::GC	new_gc
+	ALIAS:
+		Gtk::Style::fg_gc = 0
+		Gtk::Style::bg_gc = 1
+		Gtk::Style::light_gc = 2
+		Gtk::Style::dark_gc = 3
+		Gtk::Style::mid_gc = 4
+		Gtk::Style::text_gc = 5
+		Gtk::Style::base_gc = 6
 	CODE:
-	RETVAL = style->fg_gc[state];
-	if (items>2) {
-		if(style->fg_gc[state])
-			gdk_gc_unref(style->fg_gc[state]);
-		style->fg_gc[state] = new_gc;
-		if(style->fg_gc[state])
-			gdk_gc_ref(style->fg_gc[state]);
+#define HANDLE_NEW_GC(gcname) RETVAL = style->gcname;	\
+	if (items>2) {	\
+		if(style->gcname)		\
+			gdk_gc_unref(style->gcname);	\
+		style->gcname = new_gc;	\
+		if(style->gcname)			\
+			gdk_gc_ref(style->gcname);	\
 	}
-	OUTPUT:
-	RETVAL
-
-Gtk::Gdk::GC
-bg_gc(style, state, new_gc=0)
-	Gtk::Style	style
-	Gtk::StateType	state
-	Gtk::Gdk::GC	new_gc
-	CODE:
-	RETVAL = style->bg_gc[state];
-	if (items>2) {
-		if(style->bg_gc[state])
-			gdk_gc_unref(style->bg_gc[state]);
-		style->bg_gc[state] = new_gc;
-		if(style->bg_gc[state])
-			gdk_gc_ref(style->bg_gc[state]);
-	}
-	OUTPUT:
-	RETVAL
-
-Gtk::Gdk::GC
-light_gc(style, state, new_gc=0)
-	Gtk::Style	style
-	Gtk::StateType	state
-	Gtk::Gdk::GC	new_gc
-	CODE:
-	RETVAL = style->light_gc[state];
-	if (items>2) {
-		if (style->light_gc[state])
-			gdk_gc_unref(style->light_gc[state]);
-		style->light_gc[state] = new_gc;
-		if (style->light_gc[state])
-			gdk_gc_ref(style->light_gc[state]);
-	}
-	OUTPUT:
-	RETVAL
-
-Gtk::Gdk::GC
-dark_gc(style, state, new_gc=0)
-	Gtk::Style	style
-	Gtk::StateType	state
-	Gtk::Gdk::GC	new_gc
-	CODE:
-	RETVAL = style->dark_gc[state];
-	if (items>2) {
-		if (style->dark_gc[state])
-			gdk_gc_unref(style->dark_gc[state]);
-		style->dark_gc[state] = new_gc;
-		if (style->dark_gc[state])
-			gdk_gc_ref(style->dark_gc[state]);
-	}
-	OUTPUT:
-	RETVAL
-
-Gtk::Gdk::GC
-mid_gc(style, state, new_gc=0)
-	Gtk::Style	style
-	Gtk::StateType	state
-	Gtk::Gdk::GC	new_gc
-	CODE:
-	RETVAL = style->mid_gc[state];
-	if (items>2) {
-		if (style->mid_gc[state])
-			gdk_gc_unref(style->mid_gc[state]);
-		style->mid_gc[state] = new_gc;
-		if (style->mid_gc[state])
-			gdk_gc_ref(style->mid_gc[state]);
-	}
-	OUTPUT:
-	RETVAL
-
-Gtk::Gdk::GC
-text_gc(style, state, new_gc=0)
-	Gtk::Style	style
-	Gtk::StateType	state
-	Gtk::Gdk::GC	new_gc
-	CODE:
-	RETVAL = style->text_gc[state];
-	if (items>2) {
-		if (style->text_gc[state])
-			gdk_gc_unref(style->text_gc[state]);
-		style->text_gc[state] = new_gc;
-		if (style->text_gc[state])
-			gdk_gc_ref(style->text_gc[state]);
-	}
-	OUTPUT:
-	RETVAL
-
-Gtk::Gdk::GC
-base_gc(style, state, new_gc=0)
-	Gtk::Style	style
-	Gtk::StateType	state
-	Gtk::Gdk::GC	new_gc
-	CODE:
-	RETVAL = style->base_gc[state];
-	if (items>2) {
-		if (style->base_gc[state])
-			gdk_gc_unref(style->base_gc[state]);
-		style->base_gc[state] = new_gc;
-		if (style->base_gc[state])
-			gdk_gc_ref(style->base_gc[state]);
+	switch (ix) {
+	case 0: HANDLE_NEW_GC(fg_gc[state]); break;
+	case 1: HANDLE_NEW_GC(bg_gc[state]); break;
+	case 2: HANDLE_NEW_GC(light_gc[state]); break;
+	case 3: HANDLE_NEW_GC(dark_gc[state]); break;
+	case 4: HANDLE_NEW_GC(mid_gc[state]); break;
+	case 5: HANDLE_NEW_GC(text_gc[state]); break;
+	case 6: HANDLE_NEW_GC(base_gc[state]); break;
 	}
 	OUTPUT:
 	RETVAL
@@ -1995,31 +1947,16 @@ Gtk::Gdk::GC
 black_gc(style, new_gc=0)
 	Gtk::Style	style
 	Gtk::Gdk::GC	new_gc
+	ALIAS:
+		Gtk::Style::black_gc = 0
+		Gtk::Style::white_gc = 1
 	CODE:
-	RETVAL = style->black_gc;
-	if (items>1) {
-		if (style->black_gc)
-			gdk_gc_unref(style->black_gc);
-		style->black_gc = new_gc;
-		if (style->black_gc)
-			gdk_gc_ref(style->black_gc);
+	if (ix == 0) {
+		HANDLE_NEW_GC(black_gc);
+	} else if (ix == 1) {
+		HANDLE_NEW_GC(white_gc);
 	}
-	OUTPUT:
-	RETVAL
-
-Gtk::Gdk::GC
-white_gc(style, new_gc=0)
-	Gtk::Style	style
-	Gtk::Gdk::GC	new_gc
-	CODE:
-	RETVAL = style->white_gc;
-	if (items>1) {
-		if (style->white_gc)
-			gdk_gc_unref(style->white_gc);
-		style->white_gc = new_gc;
-		if (style->white_gc)
-			gdk_gc_ref(style->white_gc);
-	}
+#undef HANDLE_NEW_GC
 	OUTPUT:
 	RETVAL
 
@@ -2194,8 +2131,23 @@ _PerlTypeFromGtk(gtktype)
 	{
 		char * s;
 		if ((s = ptname_for_gtname(gtktype))) {
-			PUSHs(sv_2mortal(newSVpv(s, 0)));
+			XPUSHs (sv_2mortal(newSVpv(s, 0)));
 		}
+	}
+
+void
+_get_packages (Class)
+	SV	*Class
+	PPCODE:
+	{
+		GList * p = pgtk_get_packages ();
+		GList *tmp = p;
+
+		while (tmp) {
+			XPUSHs(sv_2mortal(newSVpv((char*)tmp->data, 0)));
+			tmp = tmp->next;
+		}
+		g_list_free (p);
 	}
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk		PREFIX = gdk_
@@ -2243,7 +2195,7 @@ init(Class)
 				XPUSHs(sv_2mortal(newSVsv(&PL_sv_undef)));
 				if (argv)
 					free(argv);
-				return;
+				XSRETURN_UNDEF;
 			} else if (ix == 0) {
 				gdk_init(&argc, &argv);
 			}
@@ -2383,7 +2335,6 @@ gdk_get_use_xshm(Class=0)
 	RETVAL = gdk_get_use_xshm();
 	OUTPUT:
 	RETVAL
-
 
 int
 gdk_time_get(Class=0)
@@ -2809,7 +2760,7 @@ get_pixel(colorc, red, green, blue)
 		int failed = 0;
 		unsigned long result = gdk_color_context_get_pixel(colorc, red, green, blue, &failed);
 		if (!failed) {
-			PUSHs(sv_2mortal(newSViv(result)));
+			XPUSHs(sv_2mortal(newSViv(result)));
 		}
 	}
 
@@ -2860,25 +2811,31 @@ new_foreign(Class, anid)
 	OUTPUT:
 	RETVAL
 
-
- #DESC: Destroy a window.
 void
 gdk_window_destroy(window)
 	Gtk::Gdk::Window	window
-
- #DESC: Show a window on the screen.
-void
-gdk_window_show(window)
-	Gtk::Gdk::Window	window
-
- #DESC: Hide a window.
-void
-gdk_window_hide(window)
-	Gtk::Gdk::Window	window
-
-void
-gdk_window_withdraw(window)
-	Gtk::Gdk::Window	window
+	ALIAS:
+		Gtk::Gdk::Window::destroy = 0
+		Gtk::Gdk::Window::show = 1
+		Gtk::Gdk::Window::hide = 2
+		Gtk::Gdk::Window::clear = 3
+		Gtk::Gdk::Window::withdraw = 4
+		Gtk::Gdk::Window::raise = 5
+		Gtk::Gdk::Window::lower = 6
+		Gtk::Gdk::Window::merge_child_shapes = 7
+		Gtk::Gdk::Window::set_child_shapes = 8
+	CODE:
+	switch (ix) {
+	case 0: gdk_window_destroy(window); break;
+	case 1: gdk_window_show(window); break;
+	case 2: gdk_window_hide(window); break;
+	case 3: gdk_window_clear(window); break;
+	case 4: gdk_window_withdraw(window); break;
+	case 5: gdk_window_raise(window); break;
+	case 6: gdk_window_lower(window); break;
+	case 7: gdk_window_merge_child_shapes(window); break;
+	case 8: gdk_window_set_child_shapes(window); break;
+	}
 
  #DESC: Move the window to the new x and y coordinates.
 void
@@ -2926,11 +2883,6 @@ gdk_window_set_role(window, role)
 
 #endif
 
- #DESC: Clear the background of the window.
-void
-gdk_window_clear(window)
-	Gtk::Gdk::Window	window
-
  #DESC: Clear the specified area of the background of the window.
 void
 gdk_window_clear_area(window, x, y, width, height)
@@ -2962,16 +2914,6 @@ gdk_window_copy_area(window, gc, x, y, source_window, source_x, source_y, width,
 	int	source_y
 	int	width
 	int	height
-
- #DESC: Raise the window in front of all the others.
-void
-gdk_window_raise(window)
-	Gtk::Gdk::Window	window
-
- #DESC: Lower the window behind all the others.
-void
-gdk_window_lower(window)
-	Gtk::Gdk::Window	window
 
  #DESC: Set if the window manager should handle this window or not.
 void
@@ -3231,14 +3173,6 @@ gboolean
 gdk_window_is_viewable (window)
 	Gtk::Gdk::Window	window
 
-void
-gdk_window_merge_child_shapes (window)
-	Gtk::Gdk::Window	window
-
-void
-gdk_window_set_child_shapes (window)
-	Gtk::Gdk::Window	window
-
  #DESC: Set the specified colormap for the window.
 void
 gdk_window_set_colormap (window, colormap)
@@ -3301,7 +3235,7 @@ unsigned long
 XWINDOW(window)
 	Gtk::Gdk::Window	window
 	CODE:
-	RETVAL = GDK_WINDOW_XWINDOW(window);
+	RETVAL = (unsigned long)GDK_WINDOW_XWINDOW(window);
 	OUTPUT:
 	RETVAL
 
@@ -3309,7 +3243,7 @@ unsigned long
 XDISPLAY(window)
 	Gtk::Gdk::Window	window
 	CODE:
-	RETVAL = GDK_WINDOW_XDISPLAY(window);
+	RETVAL = (unsigned long)GDK_WINDOW_XDISPLAY(window);
 	OUTPUT:
 	RETVAL
 
@@ -3608,7 +3542,7 @@ gdk_color_alloc(colormap, color)
 		GdkColor col = *color;
 		int result = gdk_color_alloc(colormap, &col);
 		if (result)
-			PUSHs(sv_2mortal(newSVGdkColor(&col)));
+			XPUSHs(sv_2mortal(newSVGdkColor(&col)));
 	}
 
 void
@@ -3626,7 +3560,7 @@ gdk_color_white(colormap)
 		GdkColor col;
 		int result = gdk_color_white(colormap, &col);
 		if (result)
-			PUSHs(sv_2mortal(newSVGdkColor(&col)));
+			XPUSHs(sv_2mortal(newSVGdkColor(&col)));
 	}
 
  #DESC: Get the black color from $colormap.
@@ -3639,7 +3573,7 @@ gdk_color_black(colormap)
 		GdkColor col;
 		int result = gdk_color_black(colormap, &col);
 		if (result)
-			PUSHs(sv_2mortal(newSVGdkColor(&col)));
+			XPUSHs(sv_2mortal(newSVGdkColor(&col)));
 	}
 
 
@@ -3705,7 +3639,7 @@ parse_color(Class, name)
 		GdkColor col;
 		int result = gdk_color_parse(name, &col);
 		if (result)
-			PUSHs(sv_2mortal(newSVGdkColor(&col)));
+			XPUSHs(sv_2mortal(newSVGdkColor(&col)));
 	}
 
  #DESC: Find out if two colors are equal.
@@ -3978,22 +3912,22 @@ create_from_data(Class, window, data, width, height)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::GC	PREFIX = gdk_gc_
 
- #DESC: Create a new graphic context for use with $window having the specified
+ #DESC: Create a new graphic context for use with $pixmap having the specified
  #attributes. If the attributes are not specified, use default values.
  #ARG: $values Gtk::Gdk::GCValues (GC attributes, optional)
 Gtk::Gdk::GC
-new(Class, window, values=0)
+new(Class, pixmap, values=0)
 	SV *	Class
-	Gtk::Gdk::Window	window
+	Gtk::Gdk::Pixmap	pixmap
 	SV *	values
 	CODE:
 	if (items>2) {
 		GdkGCValuesMask m;
 		GdkGCValues * v = SvGdkGCValues(values, 0, &m);
-		RETVAL = gdk_gc_new_with_values(window, v, m);
+		RETVAL = gdk_gc_new_with_values(pixmap, v, m);
 	}
 	else
-		RETVAL = gdk_gc_new(window);
+		RETVAL = gdk_gc_new(pixmap);
 	OUTPUT:
 	RETVAL
 
@@ -4178,7 +4112,7 @@ unsigned long
 XVISUAL(visual)
 	Gtk::Gdk::Visual	visual
 	CODE:
-	RETVAL = GDK_VISUAL_XVISUAL(visual);
+	RETVAL = (unsigned long)GDK_VISUAL_XVISUAL(visual);
 	OUTPUT:
 	RETVAL
 	
@@ -4359,7 +4293,7 @@ gdk_property_get(Class, window, property, type, offset, length, pdelete)
 		int result = gdk_property_get(window, property, type, offset, length, pdelete, &actual_type, &actual_format, &actual_length, &data);
 		if (result) {
 			EXTEND(sp,1);
-			PUSHs(sv_2mortal(newSVpv(data,0)));
+			PUSHs(sv_2mortal(newSVpv(data, actual_length)));
 			if (GIMME == G_ARRAY) {
 				EXTEND(sp,2);
 				PUSHs(sv_2mortal(newSVGdkAtom(actual_type)));
@@ -4377,6 +4311,16 @@ gdk_property_delete(Class, window, property)
 	Gtk::Gdk::Atom	property
 	CODE:
 	gdk_property_delete(window, property);
+
+void
+gdk_property_change (window, property, type, format, mode, data, nelements)
+	Gtk::Gdk::Window	window
+	Gtk::Gdk::Atom	property
+	Gtk::Gdk::Atom	type
+	int	format
+	Gtk::Gdk::PropMode	mode
+	char *	data
+	int	nelements
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Selection	PREFIX = gdk_selection_
 
@@ -4631,7 +4575,5 @@ gdk_regions_xor (region, regionb)
 	Gtk::Gdk::Region regionb
 
 INCLUDE: ../build/boxed.xsh
-
-INCLUDE: ../build/objects.xsh
 
 INCLUDE: ../build/extension.xsh

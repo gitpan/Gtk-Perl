@@ -29,26 +29,9 @@ gtk_menu_item_set_submenu(menu_item, child)
 	Gtk::Widget	child
 
 void
-gtk_menu_item_remove_submenu (menu_item)
-	Gtk::MenuItem   menu_item
-
-void
 gtk_menu_item_set_placement(menu_item, placement)
 	Gtk::MenuItem	menu_item
 	Gtk::SubmenuPlacement	placement
-
-#if GTK_HVER < 0x010100
-
-void
-gtk_menu_item_accelerator_size(menu_item)
-	Gtk::MenuItem	menu_item
-
-void
-gtk_menu_item_accelerator_text(menu_item, buffer)
-	Gtk::MenuItem	menu_item
-	char *	buffer
-
-#endif
 
 void
 gtk_menu_item_configure(menu_item, show_toggle, show_submenu)
@@ -57,19 +40,21 @@ gtk_menu_item_configure(menu_item, show_toggle, show_submenu)
 	bool	show_submenu
 
 void
-gtk_menu_item_select(menu_item)
-	Gtk::MenuItem	menu_item
-
-void
-gtk_menu_item_deselect(menu_item)
-	Gtk::MenuItem	menu_item
-
-void
-gtk_menu_item_activate(menu_item)
-	Gtk::MenuItem	menu_item
-
-void
-gtk_menu_item_right_justify(menu_item)
-	Gtk::MenuItem	menu_item
+gtk_menu_item_remove_submenu (menu_item)
+	Gtk::MenuItem   menu_item
+	ALIAS:
+		Gtk::MenuItem::remove_submenu = 0
+		Gtk::MenuItem::select = 1
+		Gtk::MenuItem::deselect = 2
+		Gtk::MenuItem::activate = 3
+		Gtk::MenuItem::right_justify = 4
+	CODE:
+	switch (ix) {
+	case 0: gtk_menu_item_remove_submenu (menu_item); break;
+	case 1: gtk_menu_item_select (menu_item); break;
+	case 2: gtk_menu_item_deselect (menu_item); break;
+	case 3: gtk_menu_item_activate (menu_item); break;
+	case 4: gtk_menu_item_right_justify (menu_item); break;
+	}
 
 #endif

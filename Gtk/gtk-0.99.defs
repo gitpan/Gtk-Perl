@@ -2280,7 +2280,7 @@
 
 ;; ScrolledWidow
 
-(define-object GtkScrolledWindow (GtkContainer))
+(define-object GtkScrolledWindow (GtkBin))
 
 (define-func gtk_scrolled_window_new
   GtkWidget

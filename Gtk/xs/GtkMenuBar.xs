@@ -21,11 +21,14 @@ void
 gtk_menu_bar_append(menubar, child)
 	Gtk::MenuBar	menubar
 	Gtk::Widget	child
-
-void
-gtk_menu_bar_prepend(menubar, child)
-	Gtk::MenuBar	menubar
-	Gtk::Widget	child
+	ALIAS:
+		Gtk::MenuBar::append = 0
+		Gtk::MenuBar::prepend = 1
+	CODE:
+	if (ix == 0)
+		gtk_menu_bar_append(menubar, child);
+	else if (ix == 1)
+		gtk_menu_bar_prepend(menubar, child);
 
 void
 gtk_menu_bar_insert(menubar, child, position)

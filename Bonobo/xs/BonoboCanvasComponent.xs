@@ -18,9 +18,8 @@ bonobo_canvas_component_object_create (object)
 	Bonobo::Object	object
 
 Bonobo::CanvasComponent
-bonobo_canvas_component_construct (comp, corba_canvas_comp, item)
+bonobo_canvas_component_construct (comp, item)
 	Bonobo::CanvasComponent	comp
-	CORBA::Object	corba_canvas_comp
 	Gnome::CanvasItem	item
 
 Bonobo::CanvasComponent

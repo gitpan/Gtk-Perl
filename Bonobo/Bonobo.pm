@@ -16,7 +16,7 @@ use CORBA::ORBit
 
 use Carp;
 
-$VERSION = '0.7005';
+$VERSION = '0.7006';
 
 @ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export

@@ -44,7 +44,7 @@ html_save (const HTMLEngine *engine, const char *data, guint len, gpointer user_
 	ENTER;
 	SAVETMPS;
 
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 
 	XPUSHs(sv_2mortal(newSVpvn(data, len)));
 

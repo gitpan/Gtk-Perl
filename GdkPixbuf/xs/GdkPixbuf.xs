@@ -71,8 +71,12 @@ gdk_pixbuf_new_from_data (Class, data, colorspace, has_alpha, bits_per_sample, w
 		STRLEN len;
 		char *datas = SvPV(data, len);
 		char *datap = malloc(len);
+		if (!datap)
+			croak("Out of memory");
 		memcpy(datap, datas, len);
-		RETVAL = gdk_pixbuf_new_from_data (datap, colorspace, has_alpha, bits_per_sample, width, height, rowstride, free, datap);
+		/* uhm: change this to work from the data in the SV */
+		RETVAL = gdk_pixbuf_new_from_data (datap, colorspace, has_alpha, 
+			bits_per_sample, width, height, rowstride, (GdkPixbufDestroyNotify)free, datap);
 	}
 	OUTPUT:
 	RETVAL
@@ -85,6 +89,8 @@ gdk_pixbuf_new_from_xpm_data (Class, data, ...)
 	{
 		char ** lines = (char**)malloc(sizeof(char*)*(items-1));
 		int i;
+		if (!lines)
+			croak("Out of memory");
 		for(i=1;i<items;i++)
 			lines[i-1] = SvPV(ST(i),PL_na);
 		RETVAL = gdk_pixbuf_new_from_xpm_data (lines);
@@ -96,12 +102,34 @@ gdk_pixbuf_copy (pixbuf)
 	Gtk::Gdk::Pixbuf	pixbuf
 
 Gtk::Gdk::Pixbuf
-gdk_pixbuf_add_alpha (pixbuf, substitute_color, r, g, b)
+gdk_pixbuf_add_alpha (pixbuf, ...)
 	Gtk::Gdk::Pixbuf	pixbuf
-	bool	substitute_color
-	int	r
-	int	g
-	int	b
+	CODE:
+	{
+		int	r;
+		int	g;
+		int	b;
+		gboolean subst = items > 1;
+		int i = 1;
+		switch (items) {
+		case 2:
+			r = g = b = SvIV(ST(1));
+			break;
+		case 5:
+			i = 2;
+			/* continues */
+		case 4:
+			r = SvIV(ST(i)); i++;
+			g = SvIV(ST(i)); i++;
+			b = SvIV(ST(i)); i++;
+			break;
+		default:
+			croak("Usage: Gtk::Gdk::Pixbuf:add_alpha(pixbuf[, rgbval|(r, g, b)])");
+		}
+		RETVAL = gdk_pixbuf_add_alpha (pixbuf, subst, r, g, b);
+	}
+	OUTPUT:
+	RETVAL
 
 void
 gdk_pixbuf_render_threshold_alpha (pixbuf, bitmap, src_x, src_y, dest_x, dest_y, width, height, alpha_threshold)
@@ -116,7 +144,7 @@ gdk_pixbuf_render_threshold_alpha (pixbuf, bitmap, src_x, src_y, dest_x, dest_y,
 	int	alpha_threshold
 
 void
-gdk_pixbuf_render_to_drawable (pixbuf, drawable, gc, src_x, src_y, dest_x, dest_y, width, height, dither, x_dither, y_dither)
+gdk_pixbuf_render_to_drawable (pixbuf, drawable, gc, src_x, src_y, dest_x, dest_y, width, height, dither=GDK_RGB_DITHER_NORMAL, x_dither=0, y_dither=0)
 	Gtk::Gdk::Pixbuf	pixbuf
 	Gtk::Gdk::Pixmap	drawable
 	Gtk::Gdk::GC	gc
@@ -131,7 +159,7 @@ gdk_pixbuf_render_to_drawable (pixbuf, drawable, gc, src_x, src_y, dest_x, dest_
 	int	y_dither
 
 void
-gdk_pixbuf_render_to_drawable_alpha (pixbuf, drawable, src_x, src_y, dest_x, dest_y, width, height, alpha_mode, alpha_threshold, dither, x_dither, y_dither)
+gdk_pixbuf_render_to_drawable_alpha (pixbuf, drawable, src_x, src_y, dest_x, dest_y, width, height, alpha_mode, alpha_threshold, dither=GDK_RGB_DITHER_NORMAL, x_dither=0, y_dither=0)
 	Gtk::Gdk::Pixbuf	pixbuf
 	Gtk::Gdk::Pixmap	drawable
 	int	src_x

@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 use ExtUtils::MakeMaker;
+use Config;
 
 # data structure to handle sub-module detection and dependencies
 # the key in the hash is the tag name
@@ -17,19 +18,20 @@ use ExtUtils::MakeMaker;
 	gdkimlib => {order => 2, dir => 'GdkImlib', 
 		check => sub {cconfig('imlib-config --version', '1\.9\.') && `imlib-config --libs-gdk`}},
 	gtkglarea => {order => 2, dir => 'GtkGLArea',
-		check => sub {cconfig('gtk-config --version', '1\.2\.')}},
+		check => sub {ccompile('#include <gtkgl/gtkglarea.h>', "", `gtk-config --cflags`,
+					"-lgtkgl  -lGL -lGLU " . `gtk-config --libs`)}},
 	gdkpixbuf => {order => 2, dir => 'GdkPixbuf',
-		check => sub {cconfig('gdk-pixbuf-config --version', '0\.9\.')}},
+		check => sub {cconfig('gdk-pixbuf-config --version', '0\.(9|1\d)\.?')}},
 	gtkhtml => {order => 2, dir => 'GtkHTML',
-		check => sub {cconfig('gnome-config --modversion gtkhtml', 'gtkhtml-0\.[8]')}},
+		check => sub {cconfig('gnome-config --modversion gtkhtml', 'gtkhtml-0\.[89]')}},
 	gtkxmhtml => {order => 2, dir => 'GtkXmHTML',
 		check => sub {cconfig('gnome-config --libs gtkxmhtml', '-lgtkxmhtml')}},
 	gnome => {order => 3, dir => 'Gnome',
-		check => sub {cconfig('gnome-config --version', '1\.2\.')}},
+		check => sub {cconfig('gnome-config --version', '1\.[234]\.')}},
 	gnomeprint => {order => 4, dir => 'GnomePrint',
-		check => sub {cconfig('gnome-config --modversion print', 'gnome-print-0\.25')}},
+		check => sub {cconfig('gnome-config --modversion print', 'gnome-print-0\.2[5-8]')}},
 	applets => {order => 4, dir => 'Applet',
-		check => sub {cconfig('gnome-config --modversion applets', 'applets-1\.2\.') &&
+		check => sub {cconfig('gnome-config --modversion applets', 'applets-1\.[234]\.') &&
 			# --modversion capplet is broken
 			cconfig('gnome-config --modversion capplet', 'capplet-')}},
 	glade => {order => 4, dir => 'Glade',
@@ -95,6 +97,7 @@ WriteMakefile (
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
 	'linkext' => {LINKTYPE => ''},
 	'clean' => {FILES => join(' ', @clean)},
+	'PREREQ_PM' => {'XML::Writer'=>0, 'XML::Parser' => 0},
 );
 
 # subdirs are handled here because we need to build dependent
@@ -118,7 +121,7 @@ sub MY::postamble {
 			-cd $d && \$(TEST_F) Makefile && \$(MAKE)  realclean
 
 		$d/Makefile: $d/Makefile.PL
-			cd $d && \$(PERL) Makefile.PL
+			cd $d && \$(PERL) Makefile.PL \$(PASTHRU)
 
 		EOM
 	}
@@ -135,7 +138,22 @@ sub cconfig {
 
 sub ccompile {
 	my ($headers, $main, $cflags, $libs) = @_;
-	# fill in
+	my $fname = "temctest";
+	my $r;
+	chomp($cflags, $libs);
+	open(CTEST, ">$fname.c") || return 0;
+	print CTEST <<"EOTEST";
+$headers
+
+int main (int argc, char* argv[]) {
+$main;
+}
+EOTEST
+	close(CTEST);
+	$r = system("$Config{cc} -o $fname $fname.c $cflags $libs 2>/dev/null 1>/dev/null");
+	warn("RUNNING: $Config{cc} -o $fname $fname.c $cflags $libs\n") if $ENV{VERBOSE};
+	unlink($fname, "$fname.c");
+	return $r == 0;
 }
 
 sub Usage {

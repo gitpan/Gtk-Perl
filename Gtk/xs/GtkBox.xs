@@ -15,24 +15,27 @@ gtk_box_pack_start(box, child, expand, fill, padding)
 	int	expand
 	int	fill
 	int	padding
-
-void
-gtk_box_pack_end(box, child, expand, fill, padding)
-	Gtk::Box	box
-	Gtk::Widget	child
-	int	expand
-	int	fill
-	int	padding
+	ALIAS:
+		Gtk::Box::pack_start = 0
+		Gtk::Box::pack_end = 1
+	CODE:
+	if (ix == 0)
+		gtk_box_pack_start(box, child, expand, fill, padding);
+	else if (ix == 1)
+		gtk_box_pack_end(box, child, expand, fill, padding);
 
 void
 gtk_box_pack_start_defaults(box, child)
 	Gtk::Box	box
 	Gtk::Widget	child
-
-void
-gtk_box_pack_end_defaults(box, child)
-	Gtk::Box	box
-	Gtk::Widget	child
+	ALIAS:
+		Gtk::Box::pack_start_defaults = 0
+		Gtk::Box::pack_end_defaults = 1
+	CODE:
+	if (ix == 0)
+		gtk_box_pack_start_defaults(box, child);
+	else if (ix == 1)
+		gtk_box_pack_end_defaults(box, child);
 
 void
 gtk_box_set_homogeneous(box, homogeneous)
@@ -109,32 +112,18 @@ widget(child)
 int
 padding(child)
 	Gtk::BoxChild	child
+	ALIAS:
+		Gtk::BoxChild::padding = 0
+		Gtk::BoxChild::expand = 1
+		Gtk::BoxChild::fill = 2
+		Gtk::BoxChild::pack = 3
 	CODE:
-	RETVAL = child->padding;
-	OUTPUT:
-	RETVAL
-
-int
-expand(child)
-	Gtk::BoxChild	child
-	CODE:
-	RETVAL = child->expand;
-	OUTPUT:
-	RETVAL
-
-int
-fill(child)
-	Gtk::BoxChild	child
-	CODE:
-	RETVAL = child->fill;
-	OUTPUT:
-	RETVAL
-
-int
-pack(child)
-	Gtk::BoxChild	child
-	CODE:
-	RETVAL = child->pack;
+	switch (ix) {
+	case 0: RETVAL = child->padding; break;
+	case 1: RETVAL = child->expand; break;
+	case 2: RETVAL = child->fill; break;
+	case 3: RETVAL = child->pack; break;
+	}
 	OUTPUT:
 	RETVAL
 

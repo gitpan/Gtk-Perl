@@ -1,4 +1,4 @@
-(define-object GtkGLArea (GtkWidget) (cast GTK_GL_AREA))
+(define-object GtkGLArea (GtkDrawingArea) (cast GTK_GL_AREA))
 
 (define-boxed GdkGLContext
 	gdk_gl_context_ref

@@ -1,3 +1,4 @@
+ldscript
 Applet/GnomeApplet.pm
 Applet/Makefile.PL
 Applet/pkg.defs
@@ -30,6 +31,7 @@ Glade/pkg.defs
 Glade/pkg.pl
 Glade/pkg.typemap
 Glade/samples/glade.pl
+Glade/samples/3DRings.xpm
 Glade/samples/test.glade
 Glade/xs/GladeXML.xs
 Gnome/Gnome.pm
@@ -54,6 +56,7 @@ Gnome/samples/button.pl
 Gnome/samples/calculator.pl
 Gnome/samples/canvas.pl
 Gnome/samples/colorpicker.pl
+Gnome/samples/config.pl
 Gnome/samples/dial.pl
 Gnome/samples/druid.pl
 Gnome/samples/gnome-dns.pl
@@ -139,6 +142,7 @@ Gtk/Gdk.pm
 Gtk/GdkTypes.c
 Gtk/GdkTypes.h
 Gtk/Gtk.pm
+Gtk/GtkCListModel.pm
 Gtk/GtkColorSelectButton.pm
 Gtk/GtkTypes.c
 Gtk/GtkTypes.h
@@ -177,6 +181,7 @@ Gtk/ppport.h
 Gtk/samples/chart-demo.pl
 Gtk/samples/demo_inherit.pl
 Gtk/samples/gslide.pl
+Gtk/samples/gtkrctest.pl
 Gtk/samples/init-cb.pl
 Gtk/samples/oldtest.pl
 Gtk/samples/progress.pl
@@ -235,7 +240,6 @@ Gtk/xs/GtkClock.xs
 Gtk/xs/GtkColorSelection.xs
 Gtk/xs/GtkColorSelectionDialog.xs
 Gtk/xs/GtkCombo.xs
-Gtk/xs/GtkContainer-1.1.xs
 Gtk/xs/GtkContainer.xs
 Gtk/xs/GtkCurve.xs
 Gtk/xs/GtkData.xs
@@ -356,6 +360,7 @@ test.pl
 tools/gendefs.pl
 tools/gendoc.pl
 tools/genext.pl
+tools/gpdoc2pod
 Bonobo/Bonobo.pm
 Bonobo/Makefile.PL
 Bonobo/bonobo-perl.h
@@ -423,8 +428,10 @@ GnomePrint/xs/GnomePrinterWidget.xs
 GnomePrint/xs/GnomeRFont.xs
 Gtk/LWP.pm
 Gtk/cookbook.pod
+Gtk/objects.pod
 Gtk/http.pm
 Gtk/io.pm
+Gtk/lazy.pm
 Gtk/samples/watchvar.pl
 GtkHTML/Simple.pm
 GtkHTML/pkg.pl

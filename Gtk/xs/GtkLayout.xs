@@ -25,13 +25,14 @@ gtk_layout_put(layout, widget, x, y)
 	Gtk::Widget	widget
 	int		x
 	int		y
-
-void
-gtk_layout_move(layout, widget, x, y)
-	Gtk::Layout	layout
-	Gtk::Widget	widget
-	int		x
-	int		y
+	ALIAS:
+		Gtk::Layout::put = 0
+		Gtk::Layout::move = 1
+	CODE:
+	if (ix == 0)
+		gtk_layout_put(layout, widget, x, y);
+	else if (ix == 1)
+		gtk_layout_move(layout, widget, x, y);
 
 void
 gtk_layout_set_size(layout, width, height)
@@ -76,35 +77,20 @@ bin_window (layout)
 guint
 width (layout)
 	Gtk::Layout	layout
+	ALIAS:
+		Gtk::Layout::width = 0
+		Gtk::Layout::height = 1
+		Gtk::Layout::xoffset = 2
+		Gtk::Layout::yoffset = 3
 	CODE:
-	RETVAL = layout->width;
+	switch (ix) {
+	case 0: RETVAL = layout->width; break;
+	case 1: RETVAL = layout->height; break;
+	case 2: RETVAL = layout->xoffset; break;
+	case 3: RETVAL = layout->yoffset; break;
+	}
 	OUTPUT:
 	RETVAL
-
-guint
-height (layout)
-	Gtk::Layout	layout
-	CODE:
-	RETVAL = layout->height;
-	OUTPUT:
-	RETVAL
-
-guint
-xoffset (layout)
-	Gtk::Layout	layout
-	CODE:
-	RETVAL = layout->xoffset;
-	OUTPUT:
-	RETVAL
-
-guint
-yoffset (layout)
-	Gtk::Layout	layout
-	CODE:
-	RETVAL = layout->yoffset;
-	OUTPUT:
-	RETVAL
-
 
 #endif
 

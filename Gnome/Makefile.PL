@@ -1,4 +1,5 @@
 use ExtUtils::MakeMaker;
+use Config;
 use blib '../Gtk';
 use blib '../GdkImlib';
 use Cwd;
@@ -38,7 +39,9 @@ $gnome->save_config('build/Files.pm');
 $gnome->install('build/Files.pm');
 
 $gnome->add_pm ('Gnome.pm' => '$(INST_ARCHLIBDIR)/Gnome.pm',
-	'build/GnomeTypes.pm' => '$(INST_ARCHLIBDIR)/Gnome/Types.pm');
+	'build/GnomeTypes.pm' => '$(INST_ARCHLIBDIR)/Gnome/Types.pm',
+	'build/GnomeTypesLazy.pm' => '$(INST_ARCHLIBDIR)/Gnome/TypesLazy.pm',
+	);
 
 $gnome->add_c ('build/GnomeDefs.c');
 $gnome->add_defs ('pkg.defs', 'pkg-zvt.defs');
@@ -63,10 +66,11 @@ foreach ($gnome->get_headers) {
 	push @a, '-i', $_;
 }
 
-$gnome->add_xs(gendefs::gendefs(@a));
+$gnome->add_xs(gendefs::gendefs('-L', @a));
 
 $depend = { 'build/GnomeDefs.c' => 'build/GnomeDefs.h build/PerlGnomeInt.h' };
 
+$gnome->add_boot("Gnome::DialogUtil", "Gnome::DNS", "Gnome::Geometry", "Gnome::ICE");
 $gnome->install (qw(build/GnomeDefs.h build/PerlGnomeInt.h));
 $gnome->write_ext('build/extension.xsh');
 
@@ -80,7 +84,8 @@ $gnome->add_clean ( qw(
 
 # documentation
 gendefs::gen_doc('gnome');
-system("../tools/gendoc.pl", "-t", 'gnome', keys %ExtUtils::Depends::xs);
+system($Config{perlpath}, "../tools/gendoc.pl", "-t", 'gnome', $gnome->get_xs);
+system($Config{perlpath}, "../tools/gpdoc2pod", "-t", 'Gnome');
 
 WriteMakefile(
 	'NAME'      => 'Gnome',
@@ -90,6 +95,10 @@ WriteMakefile(
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
 	'OPTIMIZE' => '-O2 -g',
 	'depend' => $depend,
+	'MAN3PODS' => {
+		'build/perl-gnome-ref.pod' => '$(INST_MAN3DIR)/Gnome::reference.3pm',
+		'Gnome.pm' => '$(INST_MAN3DIR)/Gnome.3pm',
+		},
 	$gnome->get_makefile_vars,
 );
 
@@ -105,7 +114,7 @@ build/PerlGnomeExt.h build/PerlGnomeExt.c build/PerlGnomeInt.h: build/GnomeDefs.
 	$(PERL) ../tools/genext.pl Gnome </dev/null
 
 gendoc:
-	../tools/gendoc.pl -t gnome $(XS_FILES)
+	$(PERL) ../tools/gendoc.pl -t gnome $(XS_FILES)
 
 ';
 

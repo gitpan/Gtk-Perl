@@ -21,23 +21,26 @@ void
 gtk_tree_append(tree, child)
 	Gtk::Tree	tree
 	Gtk::Widget	child
-
-void
-gtk_tree_prepend(tree, child)
-	Gtk::Tree	tree
-	Gtk::Widget	child
+	ALIAS:
+		Gtk::Tree::append = 0
+		Gtk::Tree::prepend = 1
+		Gtk::Tree::select_child = 2
+		Gtk::Tree::unselect_child = 3
+		Gtk::Tree::remove_item = 4
+	CODE:
+	switch (ix) {
+	case 0: gtk_tree_append(tree, child); break;
+	case 1: gtk_tree_prepend(tree, child); break;
+	case 2: gtk_tree_select_child(tree, child); break;
+	case 3: gtk_tree_unselect_child(tree, child); break;
+	case 4: gtk_tree_remove_item(tree, child); break;
+	}
 
 void
 gtk_tree_insert(tree, child, position)
 	Gtk::Tree	tree
 	Gtk::Widget	child
 	int	position
-
-# FIXME: DEPRECATED
-void
-gtk_tree_remove_item(tree, child)
-	Gtk::Tree	tree
-	Gtk::Widget	child
 
 void
 gtk_tree_remove_items(tree, ...)
@@ -67,21 +70,14 @@ void
 gtk_tree_select_item(tree, item)
 	Gtk::Tree	tree
 	int		item
-
-void
-gtk_tree_unselect_item(tree, item)
-	Gtk::Tree	tree
-	int		item
-
-void
-gtk_tree_select_child(tree, child)
-	Gtk::Tree	tree
-	Gtk::Widget	child
-
-void
-gtk_tree_unselect_child(tree, child)
-	Gtk::Tree	tree
-	Gtk::Widget	child
+	ALIAS:
+		Gtk::Tree::select_item = 0
+		Gtk::Tree::unselect_item = 1
+	CODE:
+	if (ix == 0)
+		gtk_tree_select_item(tree, item);
+	else if (ix == 1)
+		gtk_tree_unselect_item(tree, item);
 
 int
 gtk_tree_child_position(tree, child)

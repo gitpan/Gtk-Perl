@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
 use Data::Dumper;
+use XML::Writer;
 
 use constant GTK_HVER => 0x010208;
 use constant GNOME_HVER => 0x010038;
@@ -45,15 +46,17 @@ $tag = 'gtk';
 
 $use_pod = 0;
 
-eval {require XML::Writer};
-if ($@) {
-	$use_pod = 1;
-} else {
-	1;
-}
+#eval {require XML::Writer};
+#if ($@) {
+#	$use_pod = 1;
+#} else {
+#	1;
+#}
 #$use_pod = 1;
 
-if ($ARGV[0] eq '-t') {
+# warn "GOT ARGS: @ARGV\n";
+
+if (@ARGV && $ARGV[0] eq '-t') {
 	shift;
 	$tag = shift || 'gtk';
 }
@@ -73,6 +76,17 @@ foreach (@ARGV) {
 			if ($current{'PROTO'}) {
 				# print STDERR "STORING: $current{'PROTO'} in $current{'PACKAGE'}\n";
 				$funcs{$current{'PACKAGE'}}->{$current{'PROTO'}} = {%current};
+				if ($current{ALIASES}) {
+					foreach (@{$current{ALIASES}}) {
+						/([a-z:]+)::(\w+)/i && do {
+							$current{'PACKAGE'} = $1;
+							$current{'PROTO'} = $2;
+							next if exists $funcs{$current{'PACKAGE'}}->{$current{'PROTO'}};
+							$funcs{$current{'PACKAGE'}}->{$current{'PROTO'}} = {%current};
+							#warn "created alias $current{'PACKAGE'} $current{'PROTO'}\n";
+						};
+					}
+				}
 			}
 			%current = ();
 			next;
@@ -82,7 +96,7 @@ foreach (@ARGV) {
 			$package = $1 if /PACKAGE\s*=\s*(\S+)/;
 			$prefix = '';
 			$prefix = $1 if /PREFIX\s*=\s*([_a-zA-Z][a-zA-Z0-9_]*)?\s*/;
-			# print STDERR "PACKAGE = $package\nPREFIX = $prefix\n";
+			# warn "PACKAGE = $package\nPREFIX = $prefix\n";
 			next;
 		}
 		next unless $package;
@@ -211,6 +225,19 @@ sub handle_proto {
 		$comment = 'may be undef' if $type =~ /OrNULL/;
 		crunch_type($type);
 		$current{'ARG'}->{$param} = [$type, $comment, exists $defaults{$param}?$defaults{$param}:''];
+	}
+	# handle aliases
+	if (!exists($current{ALIASES}) && defined($retval) && $retval =~ /^\s*ALIAS:/) {
+		while(defined ($retval=<F>)) {
+			last if $retval =~ /^\s*$/;
+			last if $retval =~ /^\s*\w+:\s*$/;
+			if ($retval =~ /\s*([a-z:]+)::(\w+)\s*=/i) {
+				$protopkg = $current{PACKAGE} || $package;
+				next if ($current{PROTO} eq $2 && $protopkg eq $1);
+				# warn "found ALIAS $2 in package $1 for $current{PROTO}\n";
+				push @{$current{ALIASES}}, "${1}::$2";
+			}
+		}
 	}
 	return $retval;
 }

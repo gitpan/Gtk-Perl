@@ -62,16 +62,14 @@ gtk_statusbar_messages(statusbar)
 Gtk::Widget_Up
 frame(statusbar)
 	Gtk::Statusbar statusbar
+	ALIAS:
+		Gtk::Statusbar::frame = 0
+		Gtk::Statusbar::label = 1
 	CODE:
-	RETVAL = statusbar->frame;
-	OUTPUT:
-	RETVAL
-
-Gtk::Widget_Up
-label(statusbar)
-	Gtk::Statusbar statusbar
-	CODE:
-	RETVAL = statusbar->label;
+	if (ix == 0)
+		RETVAL = statusbar->frame;
+	else if (ix == 1)
+		RETVAL = statusbar->label;
 	OUTPUT:
 	RETVAL
 

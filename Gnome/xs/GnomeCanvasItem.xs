@@ -79,7 +79,7 @@ MODULE = Gnome::CanvasItem		PACKAGE = Gnome::CanvasItem		PREFIX = gnome_canvas_i
 
 #ifdef GNOME_CANVAS
 
-Gnome::CanvasItem_Sink_Up
+Gtk::Object_Sink_Up
 gnome_canvas_item_new(Class, parent, type, ...)
 	Gnome::CanvasGroup	parent
 	SV*	type
@@ -186,53 +186,34 @@ gnome_canvas_item_affine_relative (item, aff0, aff1, aff2, aff3, aff4, aff5)
 	double	aff3
 	double	aff4
 	double	aff5
+	ALIAS:
+		Gnome::CanvasItem::affine_relative = 0
+		Gnome::CanvasItem::affine_absolute = 1
 	CODE:
 	{
 		double affine[6];
 		affine[0] = aff0; affine[1] = aff1; affine[2] = aff2;
 		affine[3] = aff3; affine[4] = aff4; affine[5] = aff5;
-		gnome_canvas_item_affine_relative(item, affine);
+		if (ix == 0)
+			gnome_canvas_item_affine_relative(item, affine);
+		else if (ix == 1)
+			gnome_canvas_item_affine_absolute(item, affine);
 	}
-
-void
-gnome_canvas_item_affine_absolute (item, aff0, aff1, aff2, aff3, aff4, aff5)
-	Gnome::CanvasItem	item
-	double	aff0
-	double	aff1
-	double	aff2
-	double	aff3
-	double	aff4
-	double	aff5
-	CODE:
-	{
-		double affine[6];
-		affine[0] = aff0; affine[1] = aff1; affine[2] = aff2;
-		affine[3] = aff3; affine[4] = aff4; affine[5] = aff5;
-		gnome_canvas_item_affine_absolute(item, affine);
-	}
-
 
 void
 gnome_canvas_item_i2w_affine (item)
 	Gnome::CanvasItem	item
+	ALIAS:
+		Gnome::CanvasItem::i2w_affine = 0
+		Gnome::CanvasItem::i2c_affine = 1
 	PPCODE:
 	{
 		double affine[6];
 		int i;
-		gnome_canvas_item_i2w_affine(item, affine);
-		EXTEND(sp, 6);
-		for(i=0; i < 6; ++i)
-			PUSHs(sv_2mortal(newSVnv(affine[i])));
-	}
-
-void
-gnome_canvas_item_i2c_affine (item)
-	Gnome::CanvasItem	item
-	PPCODE:
-	{
-		double affine[6];
-		int i;
-		gnome_canvas_item_i2c_affine(item, affine);
+		if (ix == 0)
+			gnome_canvas_item_i2w_affine(item, affine);
+		else if (ix == 1)
+			gnome_canvas_item_i2c_affine (item, affine);
 		EXTEND(sp, 6);
 		for(i=0; i < 6; ++i)
 			PUSHs(sv_2mortal(newSVnv(affine[i])));
@@ -263,27 +244,34 @@ void
 gnome_canvas_item_raise(item, positions)
 	Gnome::CanvasItem	item
 	int	positions
-
-void
-gnome_canvas_item_lower(item, positions)
-	Gnome::CanvasItem	item
-	int	positions
+	ALIAS:
+		Gnome::CanvasItem::raise = 0
+		Gnome::CanvasItem::lower = 1
+	CODE:
+	if (ix == 0)
+		gnome_canvas_item_raise(item, positions);
+	else if (ix == 1)
+		gnome_canvas_item_lower(item, positions);
 
 void
 gnome_canvas_item_raise_to_top(item)
 	Gnome::CanvasItem	item
-
-void
-gnome_canvas_item_lower_to_bottom(item)
-	Gnome::CanvasItem	item
-
-void
-gnome_canvas_item_show(item)
-	Gnome::CanvasItem	item
-
-void
-gnome_canvas_item_hide(item)
-	Gnome::CanvasItem	item
+	ALIAS:
+		Gnome::CanvasItem::raise_to_top = 0
+		Gnome::CanvasItem::lower_to_bottom = 1
+		Gnome::CanvasItem::show = 2
+		Gnome::CanvasItem::hide = 3
+		Gnome::CanvasItem::grab_focus = 4
+		Gnome::CanvasItem::request_update = 5
+	CODE:
+	switch (ix) {
+	case 0: gnome_canvas_item_raise_to_top(item); break;
+	case 1: gnome_canvas_item_lower_to_bottom(item); break;
+	case 2: gnome_canvas_item_show(item); break;
+	case 3: gnome_canvas_item_hide(item); break;
+	case 4: gnome_canvas_item_grab_focus(item); break;
+	case 5: gnome_canvas_item_request_update(item); break;
+	}
 
 int
 gnome_canvas_item_grab(item, event_mask, cursor, time)
@@ -303,10 +291,6 @@ gnome_canvas_item_reparent (item, new_group)
 	Gnome::CanvasGroup	new_group
 
 void
-gnome_canvas_item_grab_focus (item)
-	Gnome::CanvasItem	item
-
-void
 gnome_canvas_item_get_bounds (item)
 	Gnome::CanvasItem	item
 	PPCODE:
@@ -321,30 +305,19 @@ gnome_canvas_item_get_bounds (item)
 	}
 
 void
-gnome_canvas_item_request_update (item)
-	Gnome::CanvasItem	item
-
-void
 gnome_canvas_item_w2i(item, x, y)
 	Gnome::CanvasItem	item
 	double	x
 	double	y
+	ALIAS:
+		Gnome::CanvasItem::w2i = 0
+		Gnome::CanvasItem::i2w = 1
 	PPCODE:
 	{
-		gnome_canvas_item_w2i(item, &x, &y);
-		EXTEND(sp,2);
-		PUSHs(sv_2mortal(newSVnv(x)));
-		PUSHs(sv_2mortal(newSVnv(y)));
-	}
-
-void
-gnome_canvas_item_i2w(item, x, y)
-	Gnome::CanvasItem	item
-	double	x
-	double	y
-	PPCODE:
-	{
-		gnome_canvas_item_i2w(item, &x, &y);
+		if (ix == 0)
+			gnome_canvas_item_w2i(item, &x, &y);
+		else if (ix == 1)
+			gnome_canvas_item_i2w(item, &x, &y);
 		EXTEND(sp,2);
 		PUSHs(sv_2mortal(newSVnv(x)));
 		PUSHs(sv_2mortal(newSVnv(y)));

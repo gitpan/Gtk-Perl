@@ -505,6 +505,13 @@ SvGnomeUIInfo(SV *data, GnomeUIInfo *info)
 MODULE = Gnome		PACKAGE = Gnome		PREFIX = gnome_
 
 void
+_boot_all ()
+	CODE:
+	{
+#include "Gnomeobjects.xsh"
+	}
+
+void
 init(Class, app_id, app_version="X.X", options=NULL)
 	char *  app_id
 	char *  app_version
@@ -513,6 +520,12 @@ init(Class, app_id, app_version="X.X", options=NULL)
 	{
 		GnomeInit_internal(app_id, app_version, options);
 	}
+
+void
+gnome_accelerators_sync (Class)
+	SV *	Class
+	CODE:
+	gnome_accelerators_sync();
 
 Gtk::Button_Sink
 gnome_stock_button(btype)
@@ -545,6 +558,336 @@ CODE:
 OUTPUT:
 	RETVAL
 
+gstring
+gnome_libdir_file(Class, filename)
+	SV *	Class
+	char* filename
+	ALIAS:
+		Gnome::libdir_file = 0
+		Gnome::datadir_file = 1
+		Gnome::pixmap_file = 2
+		Gnome::unconditional_libdir_file = 3
+		Gnome::unconditional_datadir_file = 4
+		Gnome::unconditional_pixmap_file = 5
+		Gnome::sound_file = 6
+		Gnome::unconditional_sound_file = 7
+	CODE:
+	switch (ix) {
+	case 0: RETVAL = gnome_libdir_file (filename); break;
+	case 1: RETVAL = gnome_datadir_file (filename); break;
+	case 2: RETVAL = gnome_pixmap_file (filename); break;
+	case 3: RETVAL = gnome_unconditional_libdir_file (filename); break;
+	case 4: RETVAL = gnome_unconditional_datadir_file (filename); break;
+	case 5: RETVAL = gnome_unconditional_pixmap_file (filename); break;
+	case 6: RETVAL = gnome_sound_file (filename); break;
+	case 7: RETVAL = gnome_unconditional_sound_file (filename); break;
+	}
+	OUTPUT:
+	RETVAL
+
+MODULE = Gnome		PACKAGE = Gnome::Config		PREFIX = gnome_config_
+
+gstring
+gnome_config_get_string (Class, path)
+	SV *	Class
+	char *	path
+	ALIAS:
+		Gnome::Config::get_string = 0
+		Gnome::Config::private_get_string = 1
+	CODE:
+	if (ix == 0)
+		RETVAL = gnome_config_get_string (path);
+	else
+		RETVAL = gnome_config_private_get_string (path);
+	OUTPUT:
+	RETVAL
+
+gstring
+gnome_config_get_translated_string (Class, path)
+	SV *	Class
+	char *	path
+	ALIAS:
+		Gnome::Config::get_translated_string = 0
+		Gnome::Config::private_get_translated_string = 1
+	CODE:
+	if (ix == 0)
+		RETVAL = gnome_config_get_translated_string (path);
+	else
+		RETVAL = gnome_config_private_get_translated_string (path);
+	OUTPUT:
+	RETVAL
+
+int
+gnome_config_get_int (Class, path)
+	SV *	Class
+	char *	path
+	ALIAS:
+		Gnome::Config::get_int = 0
+		Gnome::Config::private_get_int = 1
+	CODE:
+	if (ix == 0)
+		RETVAL = gnome_config_get_int (path);
+	else
+		RETVAL = gnome_config_private_get_int (path);
+	OUTPUT:
+	RETVAL
+
+bool
+gnome_config_get_bool (Class, path)
+	SV *	Class
+	char *	path
+	ALIAS:
+		Gnome::Config::get_bool = 0
+		Gnome::Config::private_get_bool = 1
+	CODE:
+	if (ix == 0)
+		RETVAL = gnome_config_get_bool (path);
+	else
+		RETVAL = gnome_config_private_get_bool (path);
+	OUTPUT:
+	RETVAL
+
+double
+gnome_config_get_float (Class, path)
+	SV *	Class
+	char *	path
+	ALIAS:
+		Gnome::Config::get_float = 0
+		Gnome::Config::private_get_float = 1
+	CODE:
+	if (ix == 0)
+		RETVAL = gnome_config_get_float (path);
+	else
+		RETVAL = gnome_config_private_get_float (path);
+	OUTPUT:
+	RETVAL
+
+void
+gnome_config_set_string (Class, path, value)
+	SV *	Class
+	char *	path
+	char *	value
+	ALIAS:
+		Gnome::Config::set_string = 0
+		Gnome::Config::private_set_string = 1
+	CODE:
+	if (ix == 0)
+		gnome_config_set_string (path, value);
+	else if (ix == 1)
+		gnome_config_private_set_string (path, value);
+
+void
+gnome_config_set_translated_string (Class, path, value)
+	SV *	Class
+	char *	path
+	char *	value
+	ALIAS:
+		Gnome::Config::set_translated_string = 0
+		Gnome::Config::private_translated_set_string = 1
+	CODE:
+	if (ix == 0)
+		gnome_config_set_translated_string (path, value);
+	else if (ix == 1)
+		gnome_config_private_set_translated_string (path, value);
+
+void
+gnome_config_set_bool (Class, path, value)
+	SV *	Class
+	char *	path
+	bool	value
+	ALIAS:
+		Gnome::Config::set_bool = 0
+		Gnome::Config::private_set_bool = 1
+	CODE:
+	if (ix == 0)
+		gnome_config_set_bool (path, value);
+	else if (ix == 1)
+		gnome_config_private_set_bool (path, value);
+
+void
+gnome_config_set_float (Class, path, value)
+	SV *	Class
+	char *	path
+	double	value
+	ALIAS:
+		Gnome::Config::set_float = 0
+		Gnome::Config::private_set_float = 1
+	CODE:
+	if (ix == 0)
+		gnome_config_set_float (path, value);
+	else if (ix == 1)
+		gnome_config_private_set_float (path, value);
+
+void
+gnome_config_set_int (Class, path, value)
+	SV *	Class
+	char *	path
+	int	value
+	ALIAS:
+		Gnome::Config::set_int = 0
+		Gnome::Config::private_set_int = 1
+	CODE:
+	if (ix == 0)
+		gnome_config_set_int (path, value);
+	else if (ix == 1)
+		gnome_config_private_set_int (path, value);
+
+int  
+gnome_config_has_section (Class, path)
+	SV *	Class
+	char* path
+	ALIAS:
+		Gnome::Config::has_section = 0
+		Gnome::Config::private_has_section = 1
+	CODE:
+	if (ix == 0)
+		RETVAL = gnome_config_has_section (path);
+	else if (ix == 1)
+		RETVAL = gnome_config_private_has_section (path);
+	OUTPUT:
+	RETVAL
+
+void
+gnome_config_drop_all (Class)
+	SV *	Class
+	ALIAS:
+		Gnome::Config::drop_all = 0
+		Gnome::Config::sync = 1
+		Gnome::Config::pop_prefix = 2
+	CODE:
+	switch (ix) {
+	case 0: gnome_config_drop_all(); break;
+	case 1: gnome_config_sync(); break;
+	case 2: gnome_config_pop_prefix(); break;
+	}
+
+void
+gnome_config_push_prefix (Class, path)
+	SV *	Class
+	char *	path
+	ALIAS:
+		Gnome::Config::push_prefix = 0
+		Gnome::Config::clean_section = 1
+		Gnome::Config::clean_key = 2
+		Gnome::Config::clean_file = 3
+		Gnome::Config::drop_file = 4
+		Gnome::Config::sync_file = 5
+		Gnome::Config::private_clean_section = 6
+		Gnome::Config::private_clean_key = 7
+		Gnome::Config::private_clean_file = 8
+		Gnome::Config::private_drop_file = 9
+		Gnome::Config::private_sync_file = 10
+	CODE:
+	switch (ix) {
+	case 0: gnome_config_push_prefix (path); break;
+	case 1: gnome_config_clean_section (path); break;
+	case 2: gnome_config_clean_key (path); break;
+	case 3: gnome_config_clean_file (path); break;
+	case 4: gnome_config_drop_file (path); break;
+	case 5: gnome_config_sync_file (path); break;
+	case 6: gnome_config_private_clean_section (path); break;
+	case 7: gnome_config_private_clean_key (path); break;
+	case 8: gnome_config_private_clean_file (path); break;
+	case 9: gnome_config_private_drop_file (path); break;
+	case 10: gnome_config_private_sync_file (path); break;
+	}
+
+void
+section_contents (Class, path)
+	SV *	Class
+	char *	path
+	ALIAS:
+		Gnome::Config::section_contents = 0
+		Gnome::Config::sections = 1
+		Gnome::Config::private_section_contents = 2
+		Gnome::Config::private_sections = 3
+	PPCODE:
+	{
+		void* iter = 0;
+		char *key = NULL, *val = NULL;
+		int sections = 0;
+		switch (ix) {
+		case 0: iter = gnome_config_init_iterator (path); break;
+		case 1: iter = gnome_config_init_iterator_sections(path); sections++; break;
+		case 2: iter = gnome_config_private_init_iterator (path); break;
+		case 3: iter = gnome_config_private_init_iterator_sections(path); sections++; break;
+		}
+		while ((iter=gnome_config_iterator_next (iter, &key, sections?NULL:&val))) {
+			EXTEND(SP, 1);
+			PUSHs(sv_2mortal(newSVpv(key, 0)));
+			if (!sections) {
+				EXTEND(SP, 1);
+				PUSHs(sv_2mortal(newSVpv(val?val:"", 0)));
+			}
+		}
+	}
+
+
+MODULE = Gnome		PACKAGE = Gnome::Paper	PREFIX = gnome_paper_
+
+void
+name_list (Class)
+	SV *	Class
+	PPCODE:
+	{
+		GList * p = gnome_paper_name_list ();
+		GList * tmp = p;
+		while (tmp) {
+			EXTEND(SP, 1);
+			PUSHs(sv_2mortal(newSVpv((char*)tmp->data, 0)));
+			tmp = tmp->next;
+		}
+	}
+
+char*
+with_size (Class, pswidth, psheight)
+	SV *	Class
+	double pswidth
+	double psheight
+	CODE:
+	{
+		GnomePaper* p = gnome_paper_with_size (pswidth, psheight);
+		RETVAL = p ? gnome_paper_name(p) : NULL;
+	}
+	OUTPUT:
+	RETVAL
+
+char*
+name_default (Class)
+	SV *	Class
+	CODE:
+	RETVAL = gnome_paper_name_default ();
+	OUTPUT:
+	RETVAL
+
+double
+pswidth (Class, paper)
+	SV *	Class
+	char *	paper
+	ALIAS:
+		Gnome::Paper::pswidth = 0
+		Gnome::Paper::psheight = 1
+		Gnome::Paper::lmargin = 2
+		Gnome::Paper::tmargin = 3
+		Gnome::Paper::rmargin = 4
+		Gnome::Paper::bmargin = 5
+	CODE:
+	{
+		GnomePaper *p = gnome_paper_with_name (paper);
+		RETVAL = 0;
+		if (p) {
+			switch (ix) {
+			case 0: RETVAL = gnome_paper_pswidth (p); break;
+			case 1: RETVAL = gnome_paper_psheight (p); break;
+			case 2: RETVAL = gnome_paper_lmargin (p); break;
+			case 3: RETVAL = gnome_paper_tmargin (p); break;
+			case 4: RETVAL = gnome_paper_rmargin (p); break;
+			case 5: RETVAL = gnome_paper_bmargin (p); break;
+			}
+		}
+	}
+	OUTPUT:
+	RETVAL
 
 MODULE = Gnome		PACKAGE = Gnome::Preferences	PREFIX = gnome_preferences_
 
@@ -704,8 +1047,6 @@ gnome_preferences_set_disable_imlib_cache (value)
 	int value
 
 INCLUDE: ../build/boxed.xsh
-
-INCLUDE: ../build/objects.xsh
 
 INCLUDE: ../build/extension.xsh
 

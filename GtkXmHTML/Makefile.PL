@@ -1,4 +1,5 @@
 use ExtUtils::MakeMaker;
+use Config;
 use File::Basename;
 use blib '..';
 use Cwd;
@@ -63,7 +64,7 @@ $xm->add_clean ( qw(
 
 # documentation
 gendefs::gen_doc('gtkxmhtml');
-system("../tools/gendoc.pl", "-t", 'gtkxmhtml', keys %ExtUtils::Depends::xs);
+system($Config{perlpath}, "../tools/gendoc.pl", "-t", 'gtkxmhtml', $xm->get_xs);
 
 WriteMakefile(
 	'NAME'      => 'Gtk::XmHTML',
@@ -85,7 +86,7 @@ build/PerlGtkXmHTMLExt.h build/PerlGtkXmHTMLExt.c build/PerlGtkXmHTMLInt.h: buil
 	$(PERL) ../tools/genext.pl GtkXmHTML </dev/null
 
 gendoc:
-	../tools/gendoc.pl -t gtkxmhtml $(XS_FILES)
+	$(PERL) ../tools/gendoc.pl -t gtkxmhtml $(XS_FILES)
 
 ';
 

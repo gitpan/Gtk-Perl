@@ -18,7 +18,7 @@ child(widget, newvalue=0)
 	if (newvalue) {
 		if (widget->child)
 			gtk_container_remove(GTK_CONTAINER(widget), widget->child);
-		gtk_container_add(GTK_CONTAINER(widget), widget->child);
+		gtk_container_add(GTK_CONTAINER(widget), newvalue);
 	}
 	OUTPUT:
 	RETVAL

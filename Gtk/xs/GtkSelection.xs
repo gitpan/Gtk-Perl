@@ -5,33 +5,6 @@
 
 #include "GtkDefs.h"
 
-static void selection_handler(GtkWidget *widget, GtkSelectionData *selection_data,
-		       gpointer data)
-{
-	AV * args = (AV *)data;
-	SV * handler = *av_fetch(args, 0, 0);
-	int i;
-	dSP;
-
-	PUSHMARK(sp);
-	for (i=1;i<=av_len(args);i++)
-		XPUSHs(sv_2mortal(newSVsv(*av_fetch(args, i, 0))));
-	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(widget),0)));
-	XPUSHs(sv_2mortal(newSVGtkSelectionDataRef(selection_data)));
-	PUTBACK;
-
-	perl_call_sv(handler, G_DISCARD);
-}
-
-
-static void selection_handler_remove (gpointer data)
-{
-	AV * args = (AV *)data;
-	SvREFCNT_dec(args);
-}
-
-/* FIXME: Lots still to do, and check marshalling of handler */
-
 MODULE = Gtk::Selection		PACKAGE = Gtk::Widget	PREFIX = gtk_
 
 int
@@ -40,25 +13,27 @@ gtk_selection_owner_set(widget, atom, time)
 	Gtk::Gdk::Atom	atom
 	int	time
 
-#if GTK_HVER < 0x010103
-
 void
-gtk_selection_add_handler(widget, selection, target, handler, ...)
+gtk_selection_add_target (widget, selection, target, info)
 	Gtk::Widget	widget
 	Gtk::Gdk::Atom	selection
 	Gtk::Gdk::Atom	target
-	SV *	handler
+	unsigned int	info
+
+void
+gtk_selection_add_targets (widget, selection, ...)
+	Gtk::Widget	widget
+	Gtk::Gdk::Atom	selection
 	CODE:
 	{
-		AV * args = newAV();
-		
-		PackCallbackST(args, 3);
-		
-		gtk_selection_add_handler_full(widget, selection, target, selection_handler, 
-			0, (gpointer)args, selection_handler_remove);
+		int nt = items - 2;
+		GtkTargetEntry *targets = (GtkTargetEntry *)g_malloc(sizeof(GtkTargetEntry)*nt);
+		int i;
+		for (i=2; i <items;++i)
+			targets[i-2] = *SvGtkTargetEntry(ST(i));
+		gtk_selection_add_targets (widget, selection, targets, nt);
+		g_free(targets);
 	}
-
-#endif
 
 int
 gtk_selection_convert(widget, selection, target, time)
@@ -70,3 +45,29 @@ gtk_selection_convert(widget, selection, target, time)
 void
 gtk_selection_remove_all(widget)
 	Gtk::Widget widget
+
+int
+gtk_selection_clear (widget, event)
+	Gtk::Widget	widget
+	Gtk::Gdk::Event	event
+
+int
+gtk_selection_request (widget, event)
+	Gtk::Widget	widget
+	Gtk::Gdk::Event	event
+
+int
+gtk_selection_incr_event (window, event)
+	Gtk::Gdk::Window	window
+	Gtk::Gdk::Event	event
+
+int
+gtk_selection_notify (widget, event)
+	Gtk::Widget	widget
+	Gtk::Gdk::Event	event
+
+int
+gtk_selection_property_notify (widget, event)
+	Gtk::Widget	widget
+	Gtk::Gdk::Event event
+

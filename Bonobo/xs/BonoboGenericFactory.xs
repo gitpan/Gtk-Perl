@@ -23,7 +23,7 @@ factory_handler(BonoboGenericFactory *Factory, void *data) {
 
 	ENTER;
 	SAVETMPS;
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	for (i=1;i<=av_len(stuff);i++)
 		XPUSHs(sv_2mortal(newSVsv(*av_fetch(stuff, i, 0))));
 	PUTBACK;

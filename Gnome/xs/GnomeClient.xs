@@ -14,7 +14,7 @@ static void interaction_handler(GnomeClient * client, gint key, GnomeDialogType 
     int i;
     dSP;
 
-    PUSHMARK(sp);
+    PUSHMARK(SP);
     for (i=1;i<=av_len(args);i++)
             XPUSHs(sv_2mortal(newSVsv(*av_fetch(args, i, 0))));
 
@@ -33,67 +33,83 @@ MODULE = Gnome::Client		PACKAGE = Gnome::Client		PREFIX = gnome_client_
 Gnome::Client_Sink
 master(Class)
 	SV *	Class
+	ALIAS:
+		Gnome::Client::master = 0
+		Gnome::Client::cloned = 1
+		Gnome::Client::new = 2
+		Gnome::Client::new_without_connection = 3
 	CODE:
-	RETVAL = GNOME_CLIENT(gnome_master_client());
-	OUTPUT:
-	RETVAL
-
-Gnome::Client_Sink
-cloned(Class)
-	SV *	Class
-	CODE:
-	RETVAL = GNOME_CLIENT(gnome_cloned_client());
-	OUTPUT:
-	RETVAL
-
-Gnome::Client_Sink
-new(Class)
-	SV *	Class
-	CODE:
-	RETVAL = GNOME_CLIENT(gnome_client_new());
-	OUTPUT:
-	RETVAL
-
-Gnome::Client_Sink
-new_without_connection(Class)
-	SV *	Class
-	CODE:
-	RETVAL = GNOME_CLIENT(gnome_client_new_without_connection());
+	switch (ix) {
+	case 0: RETVAL = GNOME_CLIENT(gnome_master_client()); break;
+	case 1: RETVAL = GNOME_CLIENT(gnome_cloned_client()); break;
+	case 2: RETVAL = GNOME_CLIENT(gnome_client_new()); break;
+	case 3: RETVAL = GNOME_CLIENT(gnome_client_new_without_connection()); break;
+	}
 	OUTPUT:
 	RETVAL
 
 void
 gnome_client_connect(client)
 	Gnome::Client	client
+	ALIAS:
+		Gnome::Client::connect = 0
+		Gnome::Client::disconnect = 1
+		Gnome::Client::request_phase_2 = 2
+		Gnome::Client::flush = 3
+	CODE:
+	switch (ix) {
+	case 0: gnome_client_connect(client); break;
+	case 1: gnome_client_disconnect(client); break;
+	case 2: gnome_client_request_phase_2(client); break;
+	case 3: gnome_client_flush(client); break;
+	}
 
 void
-gnome_client_disconnect(client)
+gnome_client_set_id(client, value)
 	Gnome::Client	client
-
-void
-gnome_client_set_id(client, client_id)
-	Gnome::Client	client
-	char *	client_id
+	char *	value
+	ALIAS:
+		Gnome::Client::set_id = 0
+		Gnome::Client::set_current_directory = 1
+		Gnome::Client::set_program = 2
+		Gnome::Client::set_user_id = 3
+		Gnome::Client::set_global_config_prefix = 4
+	CODE:
+	switch (ix) {
+	case 0: gnome_client_set_id(client, value); break;
+	case 1: gnome_client_set_current_directory(client, value); break;
+	case 2: gnome_client_set_program(client, value); break;
+	case 3: gnome_client_set_user_id(client, value); break;
+	case 4: gnome_client_set_global_config_prefix(client, value); break;
+	}
 
 char *
 gnome_client_get_id(client)
 	Gnome::Client	client
-
-char *
-gnome_client_get_previous_id(client)
-	Gnome::Client	client
-
-char *
-gnome_client_get_config_prefix(client)
-	Gnome::Client	client
-
-char *
-gnome_client_get_global_config_prefix(client)
-	Gnome::Client	client
+	ALIAS:
+		Gnome::Client::get_id = 0
+		Gnome::Client::get_previous_id = 1
+		Gnome::Client::get_config_prefix = 2
+		Gnome::Client::get_global_config_prefix = 3
+	CODE:
+	switch (ix) {
+	case 0: RETVAL = gnome_client_get_id(client); break;
+	case 1: RETVAL = gnome_client_get_previous_id(client); break;
+	case 2: RETVAL = gnome_client_get_config_prefix(client); break;
+	case 3: RETVAL = gnome_client_get_global_config_prefix(client); break;
+	}
+	OUTPUT:
+	RETVAL
 
 void
 gnome_client_set_clone_command(client, ...)
 	Gnome::Client	client
+	ALIAS:
+		Gnome::Client::set_clone_command = 0
+		Gnome::Client::set_discard_command = 1
+		Gnome::Client::set_restart_command = 2
+		Gnome::Client::set_resign_command = 3
+		Gnome::Client::set_shutdown_command = 4
 	CODE:
 	{
 		char ** a = (char**)malloc(sizeof(char*) + items);
@@ -101,30 +117,15 @@ gnome_client_set_clone_command(client, ...)
 		for(i=1;i<items;i++)
 			a[i-1] = SvPV(ST(i), PL_na);
 		a[i-1] = 0;
-		gnome_client_set_clone_command(client, items-1, a);
+		switch (ix) {
+		case 0: gnome_client_set_clone_command(client, items-1, a); break;
+		case 1: gnome_client_set_discard_command(client, items-1, a); break;
+		case 2: gnome_client_set_restart_command(client, items-1, a); break;
+		case 3: gnome_client_set_resign_command(client, items-1, a); break;
+		case 4: gnome_client_set_shutdown_command(client, items-1, a); break;
+		}
 		free(a);
 	}
-
-void
-gnome_client_set_current_directory(client, dir)
-	Gnome::Client	client
-	char *	dir
-
-void
-gnome_client_set_discard_command(client, ...)
-	Gnome::Client	client
-	CODE:
-	{
-		char ** a = (char**)malloc(sizeof(char*) + items);
-		int i;
-		for(i=1;i<items;i++)
-			a[i-1] = SvPV(ST(i), PL_na);
-		a[i-1] = 0;
-		gnome_client_set_discard_command(client, items-1, a);
-		free(a);
-	}
-
-#if GNOME_HVER >= 0x010200
 
 void
 gnome_client_set_environment(client, name, value)
@@ -132,62 +133,10 @@ gnome_client_set_environment(client, name, value)
 	char *name
 	char *value
 
-#else
-
-void
-gnome_client_set_environment(client, ...)
-	Gnome::Client	client
-	CODE:
-	{
-		char ** a = (char**)malloc(sizeof(char*) + items);
-		int i;
-		for(i=1;i<items;i++)
-			a[i-1] = SvPV(ST(i), PL_na);
-		a[i-1] = 0;
-		gnome_client_set_environment(client, items-1, a);
-		free(a);
-	}
-
-#endif
-
 void
 gnome_client_set_process_id(client, pid)
 	Gnome::Client	client
 	int	pid
-
-void
-gnome_client_set_program(client, program)
-	Gnome::Client	client
-	char *	program
-
-
-void
-gnome_client_set_restart_command(client, ...)
-	Gnome::Client	client
-	CODE:
-	{
-		char ** a = (char**)malloc(sizeof(char*) + items);
-		int i;
-		for(i=1;i<items;i++)
-			a[i-1] = SvPV(ST(i), PL_na);
-		a[i-1] = 0;
-		gnome_client_set_restart_command(client, items-1, a);
-		free(a);
-	}
-
-void
-gnome_client_set_resign_command(client, ...)
-	Gnome::Client	client
-	CODE:
-	{
-		char ** a = (char**)malloc(sizeof(char*) + items);
-		int i;
-		for(i=1;i<items;i++)
-			a[i-1] = SvPV(ST(i), PL_na);
-		a[i-1] = 0;
-		gnome_client_set_resign_command(client, items-1, a);
-		free(a);
-	}
 
 void
 gnome_client_set_restart_style(client, style)
@@ -195,27 +144,19 @@ gnome_client_set_restart_style(client, style)
 	Gnome::RestartStyle	style
 
 void
-gnome_client_set_shutdown_command(client, ...)
+gnome_client_save_any_dialog (client, dialog)
 	Gnome::Client	client
-	CODE:
-	{
-		char ** a = (char**)malloc(sizeof(char*) + items);
-		int i;
-		for(i=1;i<items;i++)
-			a[i-1] = SvPV(ST(i), PL_na);
-		a[i-1] = 0;
-		gnome_client_set_shutdown_command(client, items-1, a);
-		free(a);
-	}
+	Gnome::Dialog	dialog
 
 void
-gnome_client_set_user_id(client, id)
+gnome_client_save_error_dialog (client, dialog)
 	Gnome::Client	client
-	char *	id
+	Gnome::Dialog	dialog
 
 void
-gnome_client_request_phase_2(client)
+gnome_client_set_priority (client, priority)
 	Gnome::Client	client
+	guint	priority
 
 void
 gnome_client_request_interaction(client, dialog, handler, ...)
@@ -245,6 +186,12 @@ gnome_client_request_save(client, save_style, shutdown, interact_style, fast, gl
 	Gnome::InteractStyle	interact_style
 	bool	fast
 	bool	global
+
+void
+gnome_client_disable_master_connection (Class)
+	SV *	Class
+	CODE:
+	gnome_client_disable_master_connection ();
 
 
 #endif

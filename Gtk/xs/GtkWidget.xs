@@ -51,14 +51,78 @@ allocation(widget)
 void
 gtk_widget_destroy(widget)
 	Gtk::Widget	widget
-
-void
-gtk_widget_ref(widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_unref(widget)
-	Gtk::Widget	widget
+	ALIAS:
+		Gtk::Widget::destroy = 0
+		Gtk::Widget::ref = 1
+		Gtk::Widget::unref = 2
+		Gtk::Widget::unparent = 3
+		Gtk::Widget::show = 4
+		Gtk::Widget::show_now = 5
+		Gtk::Widget::show_all = 6
+		Gtk::Widget::hide = 7
+		Gtk::Widget::hide_all = 8
+		Gtk::Widget::map = 9
+		Gtk::Widget::unmap = 10
+		Gtk::Widget::realize = 11
+		Gtk::Widget::unrealize = 12
+		Gtk::Widget::queue_draw = 13
+		Gtk::Widget::queue_resize = 14
+		Gtk::Widget::draw_focus = 15
+		Gtk::Widget::draw_default = 16
+		Gtk::Widget::activate = 17
+		Gtk::Widget::grab_focus = 18
+		Gtk::Widget::grab_default = 19
+		Gtk::Widget::grab_add = 20
+		Gtk::Widget::grab_remove = 21
+		Gtk::Widget::drag_highlight = 22
+		Gtk::Widget::drag_unhighlight = 23
+		Gtk::Widget::drag_dest_unset = 24
+		Gtk::Widget::drag_source_unset = 25
+		Gtk::Widget::unlock_accelerators = 26
+		Gtk::Widget::set_rc_style = 27
+		Gtk::Widget::restore_default_style = 28
+		Gtk::Widget::reset_shapes = 29
+		Gtk::Widget::reset_rc_styles = 30
+		Gtk::Widget::queue_clear = 31
+		Gtk::Widget::lock_accelerators = 32
+		Gtk::Widget::ensure_style = 33
+	CODE:
+	switch (ix) {
+	case 0: gtk_widget_destroy (widget); break;
+	case 1: gtk_widget_ref (widget); break;
+	case 2: gtk_widget_unref (widget); break;
+	case 3: gtk_widget_unparent (widget); break;
+	case 4: gtk_widget_show (widget); break;
+	case 5: gtk_widget_show_now (widget); break;
+	case 6: gtk_widget_show_all (widget); break;
+	case 7: gtk_widget_hide (widget); break;
+	case 8: gtk_widget_hide_all (widget); break;
+	case 9: gtk_widget_map (widget); break;
+	case 10: gtk_widget_unmap (widget); break;
+	case 11: gtk_widget_realize (widget); break;
+	case 12: gtk_widget_unrealize (widget); break;
+	case 13: gtk_widget_queue_draw (widget); break;
+	case 14: gtk_widget_queue_resize (widget); break;
+	case 15: gtk_widget_draw_focus (widget); break;
+	case 16: gtk_widget_draw_default (widget); break;
+	case 17: gtk_widget_activate (widget); break;
+	case 18: gtk_widget_grab_focus (widget); break;
+	case 19: gtk_widget_grab_default (widget); break;
+	case 20: gtk_grab_add (widget); break;
+	case 21: gtk_grab_remove (widget); break;
+	case 22: gtk_drag_highlight (widget); break;
+	case 23: gtk_drag_unhighlight (widget); break;
+	case 24: gtk_drag_dest_unset (widget); break;
+	case 25: gtk_drag_source_unset (widget); break;
+	case 26: gtk_widget_unlock_accelerators (widget); break;
+	case 27: gtk_widget_set_rc_style (widget); break;
+	case 28: gtk_widget_restore_default_style (widget); break;
+	case 29: gtk_widget_reset_shapes (widget); break;
+	case 30: gtk_widget_reset_rc_styles (widget); break;
+	case 31: gtk_widget_queue_clear (widget); break;
+	case 32: gtk_widget_lock_accelerators (widget); break;
+	case 33: gtk_widget_ensure_style (widget); break;
+	}
 
 void
 gtk_widget_destroyed(widget, ref)
@@ -72,82 +136,14 @@ gtk_widget_destroyed(widget, ref)
 	}
 
 void
-gtk_widget_unparent(widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_show(widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_show_now(widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_show_all(widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_hide(widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_hide_all(widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_map(widget)
-	Gtk::Widget	widget
-	
-void
-gtk_widget_unmap(widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_realize(widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_unrealize(widget)
-	Gtk::Widget	widget
-
-void
 gtk_widget_draw(widget, area)
 	Gtk::Widget	widget
 	Gtk::Gdk::Rectangle	area
-
-void
-gtk_widget_queue_draw(widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_queue_resize(widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_draw_focus(widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_draw_default(widget)
-	Gtk::Widget	widget
-
-#if GTK_HVER < 0x010106
-
-void
-gtk_widget_draw_children(widget)
-	Gtk::Widget	widget
-
-#endif
 
 int
 gtk_widget_event(widget, event)
 	Gtk::Widget	widget
 	Gtk::Gdk::Event	event
-
-void
-gtk_widget_activate(widget)
-	Gtk::Widget	widget
 
 void
 gtk_widget_reparent(widget, reparent)
@@ -175,22 +171,6 @@ gtk_widget_intersect(widget, area)
 	}
 	OUTPUT:
 	RETVAL
-
-#if GTK_HVER < 0x010105
-
-void
-gtk_widget_basic(widget)
-	Gtk::Widget	widget
-
-#endif
-
-void
-gtk_widget_grab_focus(widget)
-	Gtk::Widget	widget
-
-void
-gtk_widget_grab_default(widget)
-	Gtk::Widget	widget
 
 void
 gtk_widget_set_name(widget, name)
@@ -317,20 +297,16 @@ gtk_widget_push_style(Class, style)
 void
 gtk_widget_pop_colormap(Class)
 	SV *	Class
+	ALIAS:
+		Gtk::Widget::pop_colormap = 0
+		Gtk::Widget::pop_visual = 1
+		Gtk::Widget::pop_style = 2
 	CODE:
-	gtk_widget_pop_colormap();
-
-void
-gtk_widget_pop_visual(Class)
-	SV *	Class
-	CODE:
-	gtk_widget_pop_visual();
-
-void
-gtk_widget_pop_style(Class)
-	SV *	Class
-	CODE:
-	gtk_widget_pop_style();
+	switch (ix) {
+	case 0: gtk_widget_pop_colormap(); break;
+	case 1: gtk_widget_pop_visual(); break;
+	case 2: gtk_widget_pop_style(); break;
+	}
 
 void
 gtk_widget_set_default_colormap(Class, colormap)
@@ -404,21 +380,28 @@ int
 gtk_widget_visible(widget, newvalue=0)
 	Gtk::Widget	widget
 	int	newvalue
+	ALIAS:
+		Gtk::Widget::visible = 0
+		Gtk::Widget::mapped = 1
+		Gtk::Widget::realized = 2
+		Gtk::Widget::sensitive = 3
+		Gtk::Widget::parent_sensitive = 4
+		Gtk::Widget::no_window = 5
+		Gtk::Widget::has_focus = 6
+		Gtk::Widget::can_focus = 7
+		Gtk::Widget::has_default = 8
+		Gtk::Widget::can_default = 9
 	CODE:
-	RETVAL = GTK_WIDGET_VISIBLE(widget);
-	if (items>1)
-		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_VISIBLE, newvalue);
-	OUTPUT:
-	RETVAL
-
-int
-gtk_widget_mapped(widget, newvalue=0)
-	Gtk::Widget	widget
-	int	newvalue
-	CODE:
-	RETVAL = GTK_WIDGET_MAPPED(widget);
-	if (items>1)
-		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_MAPPED, newvalue);
+	{
+		static const int flagval[] = {
+			GTK_VISIBLE, GTK_MAPPED, GTK_REALIZED, GTK_SENSITIVE,
+			GTK_PARENT_SENSITIVE, GTK_NO_WINDOW, GTK_HAS_FOCUS,
+			GTK_CAN_FOCUS, GTK_HAS_DEFAULT, GTK_CAN_DEFAULT
+		};
+		RETVAL = GTK_WIDGET_FLAGS(widget) & flagval[ix];
+		if (items>1)
+			MY_GTK_WIDGET_SET_FLAGS(widget, flagval[ix], newvalue);
+	}
 	OUTPUT:
 	RETVAL
 
@@ -438,100 +421,10 @@ gtk_widget_unmapped(widget, newvalue=0)
 #endif 
 
 int
-gtk_widget_realized(widget, newvalue=0)
-	Gtk::Widget	widget
-	int	newvalue
-	CODE:
-	RETVAL = GTK_WIDGET_REALIZED(widget);
-	if (items>1)
-		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_REALIZED, newvalue);
-	OUTPUT:
-	RETVAL
-
-int
-gtk_widget_sensitive(widget, newvalue=0)
-	Gtk::Widget	widget
-	int	newvalue
-	CODE:
-	RETVAL = GTK_WIDGET_SENSITIVE(widget);
-	if (items>1)
-		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_SENSITIVE, newvalue);
-	OUTPUT:
-	RETVAL
-
-int
-gtk_widget_parent_sensitive(widget, newvalue=0)
-	Gtk::Widget	widget
-	int	newvalue
-	CODE:
-	RETVAL = GTK_WIDGET_PARENT_SENSITIVE(widget);
-	if (items>1)
-		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_PARENT_SENSITIVE, newvalue);
-	OUTPUT:
-	RETVAL
-
-int
 gtk_widget_is_sensitive(widget)
 	Gtk::Widget	widget
 	CODE:
 	RETVAL = GTK_WIDGET_IS_SENSITIVE(widget);
-	OUTPUT:
-	RETVAL
-
-int
-gtk_widget_no_window(widget, newvalue=0)
-	Gtk::Widget	widget
-	int	newvalue
-	CODE:
-	RETVAL = GTK_WIDGET_NO_WINDOW(widget);
-	if (items>1)
-		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_NO_WINDOW, newvalue);
-	OUTPUT:
-	RETVAL
-
-int
-gtk_widget_has_focus(widget, newvalue=0)
-	Gtk::Widget	widget
-	int	newvalue
-	CODE:
-	RETVAL = GTK_WIDGET_HAS_FOCUS(widget);
-	if (items>1)
-		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_HAS_FOCUS, newvalue);
-	OUTPUT:
-	RETVAL
-
-
-int
-gtk_widget_can_focus(widget, newvalue=0)
-	Gtk::Widget	widget
-	int	newvalue
-	CODE:
-	RETVAL = GTK_WIDGET_CAN_FOCUS(widget);
-	if (items>1)
-		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_CAN_FOCUS, newvalue);
-	OUTPUT:
-	RETVAL
-
-int
-gtk_widget_has_default(widget, newvalue=0)
-	Gtk::Widget	widget
-	int	newvalue
-	CODE:
-	RETVAL = GTK_WIDGET_HAS_DEFAULT(widget);
-	if (items>1)
-		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_HAS_DEFAULT, newvalue);
-	OUTPUT:
-	RETVAL
-
-
-int
-gtk_widget_can_default(widget, newvalue=0)
-	Gtk::Widget	widget
-	int	newvalue
-	CODE:
-	RETVAL = GTK_WIDGET_CAN_DEFAULT(widget);
-	if (items>1)
-		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_CAN_DEFAULT, newvalue);
 	OUTPUT:
 	RETVAL
 
@@ -568,21 +461,6 @@ gtk_widget_anchored(widget, newvalue=0)
 	RETVAL = GTK_WIDGET_ANCHORED(widget);
 	if (items>1)
 		GTK_WIDGET_SET_FLAGS(widget, GTK_ANCHORED);
-	OUTPUT:
-	RETVAL
-
-#endif
-
-#if GTK_HVER < 0x010105
-
-int
-gtk_widget_BASIC(widget, newvalue=0)
-	Gtk::Widget	widget
-	int	newvalue
-	CODE:
-	RETVAL = GTK_WIDGET_BASIC(widget);
-	if (items>1)
-		MY_GTK_WIDGET_SET_FLAGS(widget, GTK_BASIC, newvalue);
 	OUTPUT:
 	RETVAL
 
@@ -628,18 +506,6 @@ motion_notify_event(widget, event)
 	OUTPUT:
 	RETVAL
 
-
-void
-grab_add(widget)
-	Gtk::Widget	widget
-	CODE:
-	gtk_grab_add(widget);
-
-void
-grab_remove(widget)
-	Gtk::Widget	widget
-	CODE:
-	gtk_grab_remove(widget);
 
 Gtk::Widget_Sink_Up
 new_from_pointer(klass, pointer)

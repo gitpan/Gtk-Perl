@@ -7,7 +7,7 @@
 #include "GnomeDefs.h"
 
 
-static void callback(guint32 ip_addr, void * data)
+static void dns_callback(guint32 ip_addr, void * data)
 {
 	AV * args = (AV*)data;
     SV * handler = *av_fetch(args, 0, 0);
@@ -15,7 +15,7 @@ static void callback(guint32 ip_addr, void * data)
     int i;
     dSP;
 
-    PUSHMARK(sp);
+    PUSHMARK(SP);
     for (i=1;i<=av_len(args);i++)
             XPUSHs(sv_2mortal(newSVsv(*av_fetch(args, i, 0))));
     
@@ -47,7 +47,7 @@ gnome_dns_lookup(Class, hostname, callback, ...)
 	{
 		AV * args = newAV();
 		PackCallbackST(args, 2);
-		RETVAL = gnome_dns_lookup(hostname, callback, args);
+		RETVAL = gnome_dns_lookup(hostname, dns_callback, args);
 	}
 	OUTPUT:
 	RETVAL

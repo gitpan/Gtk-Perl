@@ -1,4 +1,5 @@
 use ExtUtils::MakeMaker;
+use Config;
 use blib '../Gtk';
 use Cwd;
 require '../Depends.pm';
@@ -17,7 +18,8 @@ $gpb->add_headers (qw( <gdk-pixbuf/gdk-pixbuf-loader.h> ));
 $gpb->save_config( 'build/Files.pm');
 $gpb->install( 'build/Files.pm');
 
-$gpb->add_pm('GdkPixbuf.pm' => '$(INST_ARCHLIBDIR)/Pixbuf.pm');
+$gpb->add_pm('GdkPixbuf.pm' => '$(INST_ARCHLIBDIR)/Pixbuf.pm',
+	'build/GdkPixbufTypes.pm' => '$(INST_ARCHLIBDIR)/Pixbuf/Types.pm');
 
 $gpb->add_c('build/GdkPixbufDefs.c');
 $gpb->add_defs('pkg.defs');
@@ -52,13 +54,17 @@ GdkPixbufDefs.o  PerlGdkPixbufExt.h  objects.xsh
 
 # documentation
 gendefs::gen_doc('gdkpixbuf');
-system("../tools/gendoc.pl", "-t", 'gdkpixbuf', keys %ExtUtils::Depends::xs);
+system($Config{perlpath}, "../tools/gendoc.pl", "-t", 'gdkpixbuf', $gpb->get_xs);
+system($Config{perlpath}, "../tools/gpdoc2pod", "-t", 'GdkPixbuf');
 
 WriteMakefile(
 	'NAME'      => 'Gtk::Gdk::Pixbuf',
 	'VERSION_FROM'	=> 'GdkPixbuf.pm',
 	'XSOPT' => '-noversioncheck',
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
+	'MAN3PODS' => {
+		'build/perl-gdkpixbuf-ref.pod' => '$(INST_MAN3DIR)/Gtk::Gdk::Pixbuf::reference.3pm',
+		},
 	$gpb->get_makefile_vars,
 );
 
@@ -74,7 +80,7 @@ build/PerlGdkPixbufExt.h build/PerlGdkPixbufExt.c build/PerlGdkPixbufInt.h: buil
 	$(PERL) ../tools/genext.pl GdkPixbuf </dev/null
 
 gendoc:
-	../tools/gendoc.pl -t gdkpixbuf $(XS_FILES)
+	$(PERL) ../tools/gendoc.pl -t gdkpixbuf $(XS_FILES)
 
 ';
 

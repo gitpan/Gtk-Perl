@@ -306,6 +306,12 @@
   (triangle GTK_CTREE_EXPANDER_TRIANGLE)
   (circular GTK_CTREE_EXPANDER_CIRCULAR))
 
+(define-flags GtkRcFlags
+  (fg GTK_RC_FG)
+  (bg GTK_RC_BG)
+  (text GTK_RC_TEXT)
+  (base GTK_RC_BASE))
+
 (export-enum GdkAxisUse)
 (export-enum GdkByteOrder)
 (export-enum GdkCapStyle)
@@ -375,6 +381,7 @@
 (export-flags GtkPackerOptions)
 (export-flags GtkSpinButtonUpdatePolicy)
 (export-flags GtkTargetFlags)
+(export-flags GtkRcFlags)
 (export-struct GdkColor)
 (export-struct GdkEvent)
 (export-boxed GdkFont)

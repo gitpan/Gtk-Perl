@@ -7,6 +7,7 @@
 
 #include "GnomePrintDefs.h"
 #include "GnomeDefs.h"
+#include "GtkDefs.h"
 
 MODULE = Gnome::PrintPreview		PACKAGE = Gnome::PrintPreview		PREFIX = gnome_print_preview_
 

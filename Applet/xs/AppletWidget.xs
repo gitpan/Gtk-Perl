@@ -21,7 +21,7 @@ static void start_new_callback(const char * param, gpointer data)
         ENTER;
         SAVETMPS;
 
-        PUSHMARK(sp);
+        PUSHMARK(SP);
         for (i=1;i<=av_len(args);i++)
                 XPUSHs(sv_2mortal(newSVsv(*av_fetch(args, i, 0))));
         if (param)
@@ -33,6 +33,50 @@ static void start_new_callback(const char * param, gpointer data)
         FREETMPS;
         LEAVE;	
 }
+
+static void
+applet_handler (AppletWidget *applet, gpointer data) {
+	AV * args = (AV*)data;
+	SV * handler = *av_fetch(args, 0, 0);
+	int i;
+	dSP;
+
+	ENTER;
+	SAVETMPS;
+
+	PUSHMARK(SP);
+	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(applet), 0)));
+	for (i=1;i<=av_len(args);i++)
+		XPUSHs(sv_2mortal(newSVsv(*av_fetch(args, i, 0))));
+	PUTBACK;
+
+	perl_call_sv(handler, G_DISCARD);
+
+	FREETMPS;
+	LEAVE;	
+}
+
+/* workaround bugs in applet widget signal code */
+#define sp (*_sp)
+static int fixup_signals(SV ** * _sp, int match, GtkObject * object, char * signame, int nparams, GtkArg * args, GtkType return_type)
+{
+	dTHR;
+	if (match == 0) {
+		args[0].type = GTK_TYPE_INT;
+		args[1].type = GTK_TYPE_STRING;
+		args[2].type = GTK_TYPE_GDK_COLOR;
+	} else {
+		args[0].type = GTK_TYPE_INT;
+	}
+	return 2;
+}
+static int fixup_status_u(SV ** * _sp, int match, GtkObject * object, char * signame, int nparams, GtkArg * args, GtkType return_type)
+{
+	dTHR;
+	args[0].type = GTK_TYPE_WIDGET;
+	return 2;
+}
+#undef sp
 
 void AppletInit_internal(char * app_id, char *version, int panel)
 {
@@ -75,6 +119,14 @@ void AppletInit_internal(char * app_id, char *version, int panel)
 			GnomeApplet_InstallTypedefs();
 			GnomeApplet_InstallObjects();
 
+			{
+				static char * names[] = {"back-change", "change-orient", 0};
+				AddSignalHelperParts(applet_widget_get_type(), names, fixup_signals, 0);
+			}
+			{
+				static char * names[] = {"build-plug", 0};
+				AddSignalHelperParts(status_docklet_get_type(), names, fixup_status_u, 0);
+			}
 		}
 }
 
@@ -128,25 +180,127 @@ applet_widget_add(aw, widget)
 	Gnome::AppletWidget	aw
 	Gtk::Widget	widget
 
-#if 0
+void
+applet_widget_add_full (applet, widget, bind_events)
+	Gnome::AppletWidget	applet
+	Gtk::Widget	widget
+	bool	bind_events
 
 void
-applet_widget_remove_from_panel(aw)
-	Gnome::AppletWidget	aw
+applet_widget_bind_events (applet, widget)
+	Gnome::AppletWidget	applet
+	Gtk::Widget	widget
 
-#endif
+void
+applet_widget_remove(aw)
+	Gnome::AppletWidget	aw
 
 void
 applet_widget_sync_config(aw)
 	Gnome::AppletWidget	aw
 
-#if 0
+
+void
+applet_widget_register_callback (applet, name, menutext, handler, ...)
+	Gnome::AppletWidget	applet
+	char *	name
+	char *	menutext
+	SV *	handler
+	CODE:
+	{
+		AV *args = newAV();
+		PackCallbackST(args, 3);
+		applet_widget_register_callback (applet, name, menutext, applet_handler, args);
+	}
+
+void
+applet_widget_register_stock_callback (applet, name, stock_type, menutext, handler, ...)
+	Gnome::AppletWidget	applet
+	char *	name
+	char *	stock_type
+	char *	menutext
+	SV *	handler
+	CODE:
+	{
+		AV *args = newAV();
+		PackCallbackST(args, 4);
+		applet_widget_register_stock_callback (applet, name, stock_type, menutext, applet_handler, args);
+	}
+
+void
+applet_widget_unregister_callback (applet, name)
+	Gnome::AppletWidget	applet
+	char *	name
+
+void
+applet_widget_register_callback_dir (applet, name, menutext)
+	Gnome::AppletWidget	applet
+	char *	name
+	char *	menutext
+
+void
+applet_widget_register_stock_callback_dir (applet, name, stock_type, menutext)
+	Gnome::AppletWidget	applet
+	char *	name
+	char *	stock_type
+	char *	menutext
+
+void
+applet_widget_unregister_callback_dir (applet, name)
+	Gnome::AppletWidget	applet
+	char *	name
+
+void
+applet_widget_callback_set_sensitive (applet, name, sensitive)
+	Gnome::AppletWidget	applet
+	char *	name
+	bool	sensitive
 
 Gnome::Panel::OrientType
 applet_widget_get_panel_orient(aw)
 	Gnome::AppletWidget	aw
 
-#endif
+int
+applet_widget_get_panel_pixel_size (applet)
+	Gnome::AppletWidget	applet
+
+int
+applet_widget_get_free_space (applet)
+	Gnome::AppletWidget	applet
+
+void
+applet_widget_send_position (applet, enable)
+	Gnome::AppletWidget	applet
+	bool	enable
+
+void
+applet_widget_send_draw (applet, enable)
+	Gnome::AppletWidget	applet
+	bool	enable
+
+void
+applet_widget_queue_resize (applet)
+	Gnome::AppletWidget	applet
+
+void
+applet_widget_abort_load (applet)
+	Gnome::AppletWidget	applet
+
+char*
+privcfgpath (applet)
+	Gnome::AppletWidget	applet
+	CODE:
+	RETVAL = applet->privcfgpath;
+	OUTPUT:
+	RETVAL
+
+char*
+globcfgpath (applet)
+	Gnome::AppletWidget	applet
+	CODE:
+	RETVAL = applet->globcfgpath;
+	OUTPUT:
+	RETVAL
 
 int
 applet_widget_get_applet_count(Class)
@@ -159,6 +313,11 @@ void
 applet_widget_gtk_main(Class)
 	CODE:
 	applet_widget_gtk_main();
+
+void
+applet_widget_gtk_main_quit(Class)
+	CODE:
+	applet_widget_gtk_main_quit();
 
 #endif
 

@@ -83,5 +83,22 @@ gnome_font_get_underline_thickness (font)
 # missing unsized font stuff and displayfont stuff
 # they will lead to memleaks
 
+#if 1
+
+Gtk::Gdk::Font
+get_gdk_font (font)
+	Gnome::Font	font
+	CODE: 
+	{
+		GnomeDisplayFont *df = gnome_font_get_display_font (font);
+		RETVAL = gnome_display_font_get_gdk_font (df);
+		gdk_font_ref (RETVAL);
+		gnome_display_font_unref (df);
+	}
+	OUTPUT:
+	RETVAL
+
+#endif
+
 #endif
 

@@ -1,4 +1,5 @@
 use ExtUtils::MakeMaker;
+use Config;
 use File::Basename;
 use blib '..';
 use blib '../Gnome';
@@ -11,8 +12,8 @@ $gp = new ExtUtils::Depends ('Gnome::Applet', 'Gtk', 'Gtk::Gdk::ImlibImage', 'Gn
 
 mkdir('build', 0777);
 
-$gp->set_inc (`gnome-config --cflags applets capplet`);
-$gp->set_libs (`gnome-config --libs applets capplet`);
+$gp->set_inc (`gnome-config --cflags docklets applets capplet`);
+$gp->set_libs (`gnome-config --libs docklets applets capplet`);
 
 $gp->add_typemaps (cwd() . '/pkg.typemap', cwd().'/build/GnomeAppletTypemap');
 
@@ -25,7 +26,7 @@ $gp->add_pm('GnomeApplet.pm' => '$(INST_ARCHLIBDIR)/Applet.pm',
 $gp->add_xs ('xs/Applet.xs');
 $gp->add_c ('build/GnomeAppletDefs.c');
 $gp->add_defs ('pkg.defs');
-$gp->add_headers (qw( <applet-widget.h> <capplet-widget.h>));
+$gp->add_headers (qw( <applet-widget.h> <capplet-widget.h> <status-docklet.h>));
 
 #$gp->add_xs ('xs/GnomeApplet.xs');
 
@@ -65,7 +66,8 @@ $gp->add_clean( qw(
 
 # documentation
 gendefs::gen_doc('gnomeapplet');
-system("../tools/gendoc.pl", "-t", 'gnomeapplet', keys %ExtUtils::Depends::xs);
+system($Config{perlpath}, "../tools/gendoc.pl", "-t", 'gnomeapplet', $gp->get_xs);
+system($Config{perlpath}, "../tools/gpdoc2pod", "-t", 'GnomeApplet');
 
 WriteMakefile(
 	'NAME'      => 'Gnome::Applet',
@@ -73,6 +75,9 @@ WriteMakefile(
 	'XSOPT' => '-noversioncheck',
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
 	'clean' => {FILES => join(' ', @clean) },
+	'MAN3PODS' => {
+		'build/perl-gnomeapplet-ref.pod' => '$(INST_MAN3DIR)/Gnome::Applet::reference.3pm',
+		},
 	$gp->get_makefile_vars,
 );
 
@@ -88,7 +93,7 @@ build/PerlGnomeAppletExt.h build/PerlGnomeAppletExt.c build/PerlGnomeAppletInt.h
 	$(PERL) ../tools/genext.pl GnomeApplet </dev/null
 
 gendoc:
-	../tools/gendoc.pl -t gnomeapplet $(XS_FILES)
+	$(PERL) ../tools/gendoc.pl -t gnomeapplet $(XS_FILES)
 
 ';
 

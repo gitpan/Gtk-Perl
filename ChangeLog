@@ -1,3 +1,208 @@
+Tue Mar 27 12:21:04 CEST 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/Makefile.PL: install also the helper tools.
+	* Applet/*: added support for docklets.
+	* Released 0.7006.
+
+Fri Mar 23 18:07:14 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/Makefile.PL: install the cookbook as Gtk::cookbook and
+	install also Gtk::lazy.
+	* */Makefile.PL: applied patch by Christian Borup <borup@borup.com>
+	to use the perl in $Config{perlpath} to execute helper scripts.
+	* Gtk/xs/Gtk.xs: fixes some uses of PUSHs instead of XPUSHs and
+	return instead of XSRETURN_UNDEF.
+	* Gtk/cookbook.pod: typo fix.
+	* */*.pm: removed some useles uses of Autoloader and Carp.
+	* tools/gendefs.pl, Gtk/Gtk.pm: optimize lazy loading some more.
+	* GnomePrint/xs/GnomePrint.xs: include needed headers.
+	* Gnome/Gnome.pm: provide some pod documentation.
+
+Thu Mar 22 18:31:53 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/Gtk-1.2.xs: added break after case stmt that escaped.
+	* Gtk/xs/GtkSelection.xs: updates.
+	* Gtk/samples/testselection.pl: update example to 1.2.
+	* Gtk/gtk-0.99.typemap: GdkAtom is an unsigned int.
+
+Thu Mar 22 15:31:39 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gnome/xs/Gnome.xs: Gnome::Config fixes + test file.
+
+Thu Mar 22 13:41:57 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/cookbook.pod: added an entry validation recipe.
+	* Gtk/objects.xs: added missing files.
+
+Wed Mar 21 14:13:44 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/Gtk.xs: the insert_text signal in GtkEditable expects the
+	new position returned from the handler.
+
+Wed Mar 21 13:23:06 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gnome/*, GnomePrint/*: lazy laoding enabled for Gnome and
+	Gnome::Print too.
+
+Wed Mar 21 11:57:22 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* tools/gendefs.pl, Gtk/Gtk.pm, Gtk/xs/Gtk.xs: lazy loading is now
+	a run-time option instead of compile time and boots properly also the parent
+	packages (using less memory than before too:-). Currently enabled only in 
+	the Gtk module: this saves quite a bit of memory (XS functions for each widget
+	class are created only when needed).
+
+Wed Mar 21 09:44:27 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/GtkWidget.xs: fixed typo.
+
+Tue Mar 20 18:56:47 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/Gtk.xs: added property_change. GC can be created from pixmaps too.
+	* Gnome/xs/GnomeLess.xs: updates.
+	* Gnome/xs/GnomeClient.xs: updates and code optimizations.
+	* Gnome/xs/GnomeCanvasItem.xs: typo fix.
+	* Gnome/xs/GnomeCanvas.xs: updates.
+	* Gnome/xs/GnomeApp.xs: new dialog and utility functions.
+	* Gnome/xs/Gnome.xs: config and paper updates.
+
+Mon Mar 19 17:36:46 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/gtk-0.99.typemap: fix entries where perl already
+	mortalizes objects.
+	* Gnome/xs/GnomeCanvasItem.xs: code optimization.
+
+Mon Mar 19 13:24:57 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gnome/xs/GnomeDialogUtil.xs: allow undef for parent and return
+	a proper Gnome::Dialog.
+	* Gtk/xs/Gtk.xs: fix white and black gc and color accessors.
+
+Mon Mar 19 10:25:13 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/GtkTypes.[ch],Gtk/gtk-0.99.typemap: better garbage collector 
+	and more namespace cleanups.
+	* Gtk/objects.pod: information about signals and arguments.
+	* Gtk/gtk-0.99.defs: fixed parent of GtkScrolledWindow.
+	* */*.pm: upped version to 0.7006.
+	* Gtk/xs/Gtk.xs, Gtk/xs/GtkObject.xs: add the ability to query
+	packages, signals and object arguments.
+	* GtkGLArea/pkg.defs: fixed parent of GtkGLArea.
+	* tools/gendoc.pl: handle ALIASes.
+	* tools/gpdoc2pod: quote '>'.
+	* Gtk/xs/GtkButton.xs,GtkAdjustment.xs,GtkBox.xs,GtkClist.xs,GtkCombo.xs,
+	GtkEditable.xs,GtkEntry.xs ...: optimize code generation (about 60 KB saved
+	in text size, gives also a nice loading speedup).
+
+Mon Mar 12 22:29:54 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Makefile.PL: handle also new versions of some packages.
+	* Gtk/Makefile.PL: fix keysym hash creation with new Gtk.
+	* GdkPixbuf/xs/GdkPixbuf.xs: make some interfaces more DWIM
+	anche check for some out of memory conditions.
+	* GdkPixbuf/Makefile.PL, GdkPixbuf/GdkPixbuf.pm: apply patch
+	from Christian Borup <borup@borup.com> to properlly handle
+	GdkPixbufLoader.
+
+Sun Mar 11 15:37:37 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/GtkBin.xs: fix child settor.
+	* Gtk/xs/GtkButton: remove child accessor.
+	* Gnome/xs/GnomeCanvas.xs: add pixels_per_unit accessor.
+	* Gtk/xs/GtkCList.xs: the bitmap is optional now.
+	* tools/gendoc.pl: require XML::Writer.
+	* tool/gpdoc2pod: create the pod from the XML file.
+	* Gtk/GtkCListModel.pm: MVC thingie for Gtk::CList and a tied array.
+	* */Makefile.PL: install pod reference manpages.
+	* Gtk/xs/Gtk.xs: watch_add watches the referenced scalar if handed a reference.
+
+Tue Mar  6 16:49:08 CET 2001 Paolo Molaro <lupus@ximian.com
+
+	* */*.xs: fixes usage of the PUSHMARK macro.
+	* GnomePrint/xs/GnomePrintPreview.xs: missing include.
+	* Gtk/GtkTypes.c: make sure we store only strings that will
+	not vanish under us.
+
+Mon Mar  5 16:46:00 CET 2001 Paolo Molaro <lupus@ximian.com
+
+	* Gtk/gtk-0.99.typemap: correct entries for unsigned integers.
+	* Bonobo/*: updates and new UI stuff. Show usage of the PropertyBag.
+	Bug fixes.
+
+Sat Mar  3 20:26:47 CET 2001 Paolo Molaro <lupus@ximian.com
+
+	* Gtk/xs/GtkMenu.xs, Gtk/xs/GtkOptionMenu.xs: fix return types of
+	gtk_option_menu_get_menu() and gtk_menu_get_active() as pointed out
+	by Dave Carrigan <dave@rudedog.org>.
+	* Gtk/gtk-0.99.typemap: always bless GtkObjects in the right package.
+	* Gtk/xs/GtkEditable.xs: added accessors for selection position fields.
+
+Wed Feb 28 19:25:45 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/Gtk.xs: added facilities to modify a Gtk::RcStyle
+	(test program in Gtk/samples/gtkrctest.pl).
+
+Tue Feb 27 23:40:08 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gnome/Makefile.PL: XS boot all the needed modules (was lost in the
+	Makefile.PL rewrite).
+	* Gnome/xs/GnomeDNS.xs: fix callback argument.
+
+Tue Feb 27 17:52:09 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Glade/*: improved libglade support: Gnome widget support loaded
+	only when the Gnome module is used. Added support to dynamically
+	load gnomedb and bonobo. Added support for new style custom widget
+	creation handler. Updated test accordingly.
+
+Mon Feb 26 19:32:30 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/GdkTypes.c: fix handling of GdkEvent.
+	* */Makefile.PL: fixed doc generation on a number of submodules.
+
+Mon Feb 26 13:17:46 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* ldscript: added ld version script to reduce number of exported
+	symbols in the modules.
+	* Gtk/xs/Gtk.xs: yet another missing cast.
+	* Makefile.PL: shut up autodetection compilations.
+
+Sun Feb 25 19:18:49 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Applet/xs/AppletWidget.xs, Applet/samples/applet.pl: updated to latest
+	applet widget library. Added workaround for buggy applet widget signals.
+	Sample code updated to show some of the new features.
+	* Gtk/MisTypes.c: warn instead of croak()ing when dealing with missing
+	enum and flags registrations.
+
+Fri Feb 23 22:14:47 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gnome/xs/GtkDial.xs: revert to a previous version that was
+	accidentaly removed.
+	* Makefile.PL: actually autodetect GtkGLArea.
+
+Fri Feb 23 16:29:53 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/GtkContainer.xs: added forall() method and a bunch of
+	missing other as well: these are marked non-public, but could be
+	useful for custom widget implementations.
+	* Gtk/xs/GtkContainer-1.1.xs: remove old cruft.
+	* Bonobo/README: small HOWTO.
+
+Fri Feb 23 12:40:18 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/GtkEditable.xs: make the default < 0 value in insert_text()
+	work even if gtk+ doesn't support it (yet).
+
+Thu Feb 22 22:36:47 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Bonobo/*: updates for bonobo 0.37.
+
+Thu Feb 22 14:32:36 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Glade/xs/GladeXML.xs: fix new_from_memory() data length.
+	* Gtk/xs/Gtk.xs: cast to shut up picky compilers.
+
 Mon Feb 19 20:25:04 CET 2001 Paolo Molaro <lupus@ximian.com>
 
 	* Gtk/cookbook.pod: add recipe from Pat Eyler <pate@gnu.org>.

@@ -438,6 +438,49 @@ then write updates to the status bar as you do things.
 When you're done initializing, you can create the main window then
 delete the splash page.
 
+=head2 Validating input in a text entry
+
+B<Problem:>
+
+You want to restrict the characters inserted in a text entry field to a
+set of valid ones.
+
+B<Solution:>
+
+Connect to the C<text-insert> signal, check the text for invalid characters
+and insert only the valid ones.
+
+	use Gtk -init;
+
+	my $window = new Gtk::Window;
+	$window->signal_connect('destroy', sub {Gtk->main_quit});
+	my $entry = new Gtk::Entry;
+	# we store the signal connection id in the entry for later
+	$entry->{signalid} = $entry->signal_connect (
+		insert_text => \&validate);
+	$window->add($entry);
+	$window->show_all;
+	Gtk->main;
+
+	# We allow only uppercase characters in the entry
+	sub validate {
+		my ($entry, $text, $len, $pos) = @_;
+		my $newtext = uc $text;
+		$newtext =~ s/[^A-Z]//g;
+		if (length($newtext)) {
+			# we temporarily block this handler to avoid recursion
+			$entry->signal_handler_block($entry->{signalid});
+			$pos = $entry->insert_text($newtext, $pos);
+			$entry->signal_handler_unblock($entry->{signalid});
+		}
+		# we already inserted the text if it was valid: no need
+		# for the entry to process this signal emission
+		$entry->signal_emit_stop_by_name('insert-text');
+		# return the new position of the cursor here
+		$pos;
+	}
+
+
 =head1 AUTHOR
 
 Paolo Molaro

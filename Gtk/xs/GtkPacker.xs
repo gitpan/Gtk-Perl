@@ -144,48 +144,22 @@ options(packerchild)
 int
 use_default(packerchild)
 	Gtk::PackerChild	packerchild
+	ALIAS:
+		Gtk::PackerChild::use_default = 0
+		Gtk::PackerChild::border_width = 1
+		Gtk::PackerChild::pad_x = 2
+		Gtk::PackerChild::pad_y = 3
+		Gtk::PackerChild::ipad_x = 4
+		Gtk::PackerChild::ipad_y = 5
 	CODE:
-	RETVAL = packerchild->use_default;
-	OUTPUT:
-	RETVAL
-
-int
-border_width(packerchild)
-	Gtk::PackerChild	packerchild
-	CODE:
-	RETVAL = packerchild->border_width;
-	OUTPUT:
-	RETVAL
-
-int
-pad_x(packerchild)
-	Gtk::PackerChild	packerchild
-	CODE:
-	RETVAL = packerchild->pad_x;
-	OUTPUT:
-	RETVAL
-
-int
-pad_y(packerchild)
-	Gtk::PackerChild	packerchild
-	CODE:
-	RETVAL = packerchild->pad_y;
-	OUTPUT:
-	RETVAL
-
-int
-ipad_x(packerchild)
-	Gtk::PackerChild	packerchild
-	CODE:
-	RETVAL = packerchild->i_pad_x;
-	OUTPUT:
-	RETVAL
-
-int
-ipad_y(packerchild)
-	Gtk::PackerChild	packerchild
-	CODE:
-	RETVAL = packerchild->i_pad_y;
+	switch (ix) {
+	case 0: RETVAL = packerchild->use_default; break;
+	case 1: RETVAL = packerchild->border_width; break;
+	case 2: RETVAL = packerchild->pad_x; break;
+	case 3: RETVAL = packerchild->pad_y; break;
+	case 4: RETVAL = packerchild->i_pad_x; break;
+	case 5: RETVAL = packerchild->i_pad_y; break;
+	}
 	OUTPUT:
 	RETVAL
 

@@ -46,7 +46,7 @@ my_clist_compare(GtkCList * clist, gconstpointer a, gconstpointer b) {
 
 	ENTER;
 	SAVETMPS;
-	PUSHMARK(sp);
+	PUSHMARK(SP);
 	/* we may want to push all the columns text in an array ref ... */
 	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(clist), 0)));
 	XPUSHs(sv_2mortal(t1?newSVpv(t1, 0):newSVsv(&PL_sv_undef)));
@@ -118,10 +118,6 @@ sort_column (clist)
 	RETVAL
 
 void
-gtk_clist_sort (clist)
-	Gtk::CList	clist
-
-void
 gtk_clist_set_auto_sort (clist, auto_sort=TRUE)
 	Gtk::CList	clist
 	bool		auto_sort
@@ -158,10 +154,6 @@ gtk_clist_row_move (clist, source_row, dest_row)
 	Gtk::CList  clist
 	gint	source_row
 	gint	dest_row
-
-void
-gtk_clist_select_all (clist)
-	Gtk::CList  clist
 
 void
 gtk_clist_set_button_actions (clist, button, button_actions)
@@ -207,14 +199,6 @@ gtk_clist_swap_rows (clist, row1, row2)
 	Gtk::CList	clist
 	gint	row1
 	gint	row2
-
-void
-gtk_clist_undo_selection (clist)
-	Gtk::CList	clist
-
-void
-gtk_clist_unselect_all (clist)
-	Gtk::CList	clist
 
  #ARG: ... list (additional arguments to the compare function)
  #ARG: $handler subroutine (a compare subroutine that will get the text of the sort_column column of each of the rows being compared)
