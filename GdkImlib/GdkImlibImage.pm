@@ -6,7 +6,7 @@ require Gtk;
 require Exporter;
 require DynaLoader;
 
-$VERSION = "0.7008";
+$VERSION = "0.7009";
 
 @ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export
@@ -21,7 +21,7 @@ $VERSION = "0.7008";
 
 # Autoload methods go after __END__, and are processed by the autosplit program.
 
-sub dl_load_flags {0x01}
+sub dl_load_flags {Gtk::dl_load_flags()}
 
 bootstrap Gtk::Gdk::ImlibImage;
 

@@ -14,7 +14,7 @@ new(Class, adjustment)
 	SV *	Class
 	Gtk::Adjustment	adjustment
 	CODE:
-	RETVAL = (GtkScrollbar*)(gtk_vscrollbar_new(adjustment));
+	RETVAL = (GtkVScrollbar*)(gtk_vscrollbar_new(adjustment));
 	OUTPUT:
 	RETVAL
 

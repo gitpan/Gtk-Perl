@@ -10,7 +10,7 @@ require AutoLoader;
 use Carp;
 use strict;
 
-$Gtk::GladeXML::VERSION = '0.7008';
+$Gtk::GladeXML::VERSION = '0.7009';
 
 @Gtk::GladeXML::ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export
@@ -27,7 +27,7 @@ bootstrap Gtk::GladeXML;
 
 require Gtk::GladeXML::Types;
 
-sub dl_load_flags {0x01}
+sub dl_load_flags {Gtk::dl_load_flags()}
 
 my $verbose = 0;
 

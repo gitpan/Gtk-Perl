@@ -60,8 +60,8 @@ sub testrgb_rgb_test {
 			      $drawing_area->style->white_gc,
 			      0, 0, WIDTH, HEIGHT,
 			      $dither ? 'max' : 'none',
-			      Gtk::constsubstr($buf, $offset), WIDTH * 3);
-			      #substr($buf, $offset), WIDTH * 3);
+				  #Gtk::constsubstr($buf, $offset), WIDTH * 3);
+			      substr($buf, $offset), WIDTH * 3);
 			      #$buf, WIDTH * 3);
 	}
       $total_time = time () - $start_time;
@@ -82,8 +82,8 @@ sub testrgb_rgb_test {
 			       $drawing_area->style->white_gc,
 			       0, 0, WIDTH, HEIGHT,
 			       $dither ? 'max' : 'none',
-			       Gtk::constsubstr($buf, $offset), WIDTH);
-			       #substr($buf, $offset), WIDTH);
+				   #Gtk::constsubstr($buf, $offset), WIDTH);
+			       substr($buf, $offset), WIDTH);
 			       #$buf, WIDTH);
 	}
       $total_time = time () - $start_time;

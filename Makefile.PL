@@ -22,15 +22,15 @@ use Config;
 		check => sub {ccompile('#include <gtkgl/gtkglarea.h>', "", `gtk-config --cflags`,
 					"-lgtkgl  -lGL -lGLU " . `gtk-config --libs`)}},
 	gdkpixbuf => {order => 2, dir => 'GdkPixbuf', depends => [qw(gtk)],
-		check => sub {cconfig('gdk-pixbuf-config --version', '0\.(8|9|1\d)\.?')}},
+		check => sub {cconfig('gdk-pixbuf-config --version', '0\.(8|9|1\d|2\d)\.?')}},
 	gtkhtml => {order => 2, dir => 'GtkHTML', depends => [qw(gtk)],
-		check => sub {cconfig('gnome-config --modversion gtkhtml', 'gtkhtml-0\.[89]')}},
+		check => sub {cconfig('gnome-config --modversion gtkhtml', 'gtkhtml-0\.(8|9|10|11|12|13|14|15)')}},
 	gtkxmhtml => {order => 2, dir => 'GtkXmHTML', depends => [qw(gtk)],
 		check => sub {cconfig('gnome-config --libs gtkxmhtml', '-lgtkxmhtml')}},
 	gnome => {order => 3, dir => 'Gnome', depends => [qw(gdkimlib)],
 		check => sub {cconfig('gnome-config --version', '1\.[234]\.')}},
 	gnomeprint => {order => 4, dir => 'GnomePrint', depends => [qw(gnome gdkpixbuf)],
-		check => sub {cconfig('gnome-config --modversion print', 'gnome-print-0\.2[5-9]')}},
+		check => sub {cconfig('gnome-config --modversion print', 'gnome-print-0\.(2[5-9]|[3-9][0-9])')}},
 	applets => {order => 4, dir => 'Applet', depends => [qw(gnome)],
 		check => sub {cconfig('gnome-config --modversion applets', 'applets-1\.[234]\.') &&
 			# --modversion capplet is broken
@@ -171,4 +171,5 @@ sub Usage {
 	$out .= "If a package is misdetected and you still want it to compile \nuse --with-pkgname-force.\n";
 	$out .= "To disable autodetection of modules use --without-guessing.\n";
 }
+
 

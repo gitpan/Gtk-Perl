@@ -819,7 +819,7 @@ static GSourceFuncs watch_var_funcs = {
 };
 
 static I32
-watch_var_val (IV ix, SV *sv) {
+watch_var_val (pTHX_ IV ix, SV *sv) {
 	if (!SvPOK(sv) && SvPOKp(sv))
 		SvPOK_on(sv);
 	if (!SvNOK(sv) && SvNOKp(sv))
@@ -830,7 +830,7 @@ watch_var_val (IV ix, SV *sv) {
 }
 
 static I32
-watch_var_set (IV ix, SV *sv) {
+watch_var_set (pTHX_ IV ix, SV *sv) {
 	watch_var_data *wvd = (watch_var_data*)ix;
 	if (!SvPOK(sv) && SvPOKp(sv))
 		SvPOK_on(sv);
@@ -3268,6 +3268,52 @@ gdk_window_set_static_gravities (window, use_static)
 
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Window		PREFIX = gdk_
+
+ #OUTPUT: list
+ #RETURNS: the data, the type (a Gtk::Gdk::Atom) and the format (integer)
+void
+gdk_property_get(window, property, type, offset, length, pdelete)
+	Gtk::Gdk::Window	window
+	Gtk::Gdk::Atom	property
+	Gtk::Gdk::Atom	type
+	int	offset
+	int	length
+	int	pdelete
+	PPCODE:
+	{
+		guchar * data;
+		GdkAtom actual_type;
+		int actual_format, actual_length;
+		int result = gdk_property_get(window, property, type, offset, length, pdelete, &actual_type, &actual_format, &actual_length, &data);
+		if (result) {
+			EXTEND(sp,1);
+			PUSHs(sv_2mortal(newSVpv(data, actual_length)));
+			if (GIMME == G_ARRAY) {
+				EXTEND(sp,2);
+				PUSHs(sv_2mortal(newSVGdkAtom(actual_type)));
+				PUSHs(sv_2mortal(newSViv(actual_format)));
+			}
+			g_free(data);
+		}
+	}
+
+ #DESC: Delete the property $property from $window.
+void
+gdk_property_delete(window, property)
+	Gtk::Gdk::Window	window
+	Gtk::Gdk::Atom	property
+	CODE:
+	gdk_property_delete(window, property);
+
+void
+gdk_property_change (window, property, type, format, mode, data, nelements)
+	Gtk::Gdk::Window	window
+	Gtk::Gdk::Atom	property
+	Gtk::Gdk::Atom	type
+	int	format
+	Gtk::Gdk::PropMode	mode
+	char *	data
+	int	nelements
 
 #if GTK_HVER >= 0x010200
 

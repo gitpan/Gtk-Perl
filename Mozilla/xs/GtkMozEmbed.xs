@@ -96,7 +96,7 @@ gtk_moz_embed_render_data (embed, data, len, base_uri, mime_type)
 	CODE:
 	{
 		STRLEN len;
-		char * p = SvPV(data);
+		char * p = SvPV(data, len);
 		gtk_moz_embed_render_data (embed, p, len,  base_uri, mime_type);
 	}
 
@@ -114,7 +114,7 @@ gtk_moz_embed_append_data (embed, data, len)
 	CODE:
 	{
 		STRLEN len;
-		char * p = SvPV(data);
+		char * p = SvPV(data, len);
 		gtk_moz_embed_append_data (embed, p, len);
 	}
 

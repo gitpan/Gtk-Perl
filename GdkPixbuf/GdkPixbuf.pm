@@ -6,13 +6,13 @@ require Exporter;
 require DynaLoader;
 require Gtk::Gdk::Pixbuf::Types;
 
-$VERSION = "0.7008";
+$VERSION = "0.7009";
 
 @ISA = qw(Exporter DynaLoader);
 @EXPORT = qw();
 @EXPORT_OK = qw();
 
-sub dl_load_flags {0x01}
+sub dl_load_flags {Gtk::dl_load_flags()}
 
 bootstrap Gtk::Gdk::Pixbuf;
 

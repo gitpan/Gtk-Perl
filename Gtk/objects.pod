@@ -1,4 +1,6 @@
-=head1 NAME Gtk enums, flags, object types, arguments and signals
+=head1 NAME 
+
+Gtk enums, flags, object types, arguments and signals
 
 =head1 Gnome::About (Gnome::Dialog)
 

@@ -405,8 +405,11 @@ close(T);
 
 use Config;
 
-$c = "$Config{cc} $::inc gtktypexp.c $::libs -o gtktypexp";
-open(T, "|$c 2> /dev/null && ./gtktypexp > gtktypexp.out 2> /dev/null");
+#this two lines break the build on debian sparc: investigate
+#$c = "$Config{cc} $::inc gtktypexp.c $::libs -o gtktypexp";
+#open(T, "|$c 2> /dev/null && ./gtktypexp > gtktypexp.out 2> /dev/null");
+system("$Config{cc} $::inc gtktypexp.c $::libs -o gtktypexp");
+open(T, "|./gtktypexp > gtktypexp.out 2> /dev/null");
 foreach my $hasht ((\%enum, \%flags, \%struct, \%boxed)) {
 	foreach (keys %{$hasht}) {
 		print T "$_\n";

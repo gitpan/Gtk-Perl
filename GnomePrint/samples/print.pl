@@ -27,13 +27,20 @@ $context->concat($width, 0, 0, -$height, 250, 200);
 $context->grayimage($image, $width, $height);
 $context->grestore;
 $context->gsave;
-$image = pack("C*", 0..$width-1) x ($height*3);
+@data = ();
+sub max ($$) {$_[0] < $_[1]? $_[1]: $_[0]}
+for (0 .. $width-1) {
+	push @data, $_, 256-$_, max($_, (256-$_)/2);
+}
+$image = pack("C*", @data) x $height;
 $context->concat($width, 0, 0, -$height, 250, 300);
 $context->rgbimage($image, $width, $height, $width);
 $context->grestore;
 
-$context->moveto(250, 350);
+$context->gsave;
+$context->concat($width, 0, 0, -$height, 250, 350);
 $context->pixbuf($pixbuf);
+$context->grestore;
 
 $context->moveto(100, 100);
 $context->lineto(200, 200);

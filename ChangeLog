@@ -1,3 +1,53 @@
+Mon Jun 30 00:43:56 CEST 2003 Marc Lehmann <pcg@goof.com>
+
+	* 0.7009 release.
+        * Gtk/xs/Gtk.xs: fix thread perl incompatibility.
+        * Gtk/xs/GtkVScrollbar.xs: fix typoe.
+
+Tue Jun 17 11:32:32 CEST 2003 Marc Lehmann <pcg@goof.com>
+
+	* 0.7009 release candidate 0.
+        * yeaeee, it's been two almost years.. here is a maintainance
+          patch that tries to incorporate various bugfixes from lots of
+          different sources. This patch (unlike the 0.7009 release)
+          adds no new features.
+        * Gtk/objects.pod, fix formatting.
+        * Gtk/xs/Gtk-1.2.xs: don't allow NULL geometry_widget.
+        * GtkHTML/pkg.defs: add GTK_HTML_COMMAND_SET_MARK.
+        * Makefile.PL: recognize more versions of pixbuf and gnome.
+        * tools/gendoc.pl: add *_HVER here and set it in the Makefiles.
+        * **/Makefile.PL: Fix CCCMD everywhere (fixes 5.8 compile problems).
+        * Gtk/GdkTypes.c, Gtk/GtkTypes.c: Don't call SvROK on undefined values.
+
+Sun Nov 18 22:26:13 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* */*.pm: unified handling of package::dl_load_flags amd made
+	HP/UX not complain.
+	* tools/gendoc.pl: allow the setting of preprocessor macros from the
+	command-line.
+
+Sun Nov 18 17:53:10 CET 2001 Paolo Molaro <lupus@ximian.com>
+
+	* */*.pm: update version.
+	* Makefile.PL: update version checks for some modules.
+	* Gtk/GdkTypes.c, Gtk/GtkTypes.c, Gtk/MiscTypes.c: check a reference with SvROK().
+	* Gtk/xs/Gtk-1.2.xs: allow an undef geometry_widget in 
+	gtk_window_set_geometry_hints().
+	* Gtk/xs/Gtk.xs: X property functions can now be called directly with
+	a Gtk::Gdk::Window reference.
+	* GtkHTML/xs/GtkHTML.xs: updates for new version of libgtkhtml.
+
+2001-09-25  Vladimir Vukicevic  <vladimir@ximian.com>
+
+	* Gal/xs/ETree*.xs: Added start of bindings.
+
+	* Gal/xs/ETable.xs, Gal/xs/EtableHeader.xs,
+	Gal/xs/EtableScrolled.xs: fixed minor compile warnings
+
+	* Gal/samples/etree.pl, Gal/GnomeGalTypes.h: Added
+
+	* Gal/Makefile.PL, Gal/pkg.defs, Gal/pkg.typemap: added etree bits
+
 Fri Jun 29 21:02:18 CEST 2001 Paolo Molaro <lupus@ximian.com>
 
 	* */*.pm: update version number.

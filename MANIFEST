@@ -438,7 +438,6 @@ Gtk/io.pm
 Gtk/lazy.pm
 Gtk/samples/watchvar.pl
 GtkHTML/Simple.pm
-GtkHTML/pkg.pl
 Mozilla/GtkMozEmbed.pm
 Mozilla/Makefile.PL
 Mozilla/README

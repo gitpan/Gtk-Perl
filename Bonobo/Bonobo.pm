@@ -13,7 +13,7 @@ use CORBA::ORBit
 
 require Carp;
 
-$VERSION = '0.7008';
+$VERSION = '0.7009';
 
 my $orb =  CORBA::ORB_init("orbit-local-orb");
 my $poa = $orb->resolve_initial_references("RootPOA");
@@ -31,7 +31,7 @@ my $poa = $orb->resolve_initial_references("RootPOA");
 
 require Bonobo::Types;
 
-sub dl_load_flags {0x01}
+sub dl_load_flags {Gtk::dl_load_flags()}
 
 bootstrap Bonobo $VERSION;
 

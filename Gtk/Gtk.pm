@@ -49,7 +49,7 @@ require AutoLoader;
 
 require Carp;
 
-$VERSION = '0.7008';
+$VERSION = '0.7009';
 
 @ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export
@@ -71,7 +71,9 @@ sub import {
 }
 
 # use RTLD_GLOBAL
-sub dl_load_flags {0x01}
+# unfortunately there is no way to know what platforms don't support this from
+# within perl...
+sub dl_load_flags {$^O =~ /hp/i ? 0: 0x01}
 
 bootstrap Gtk;
 

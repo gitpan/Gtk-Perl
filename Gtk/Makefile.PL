@@ -190,7 +190,7 @@ gendoc:
 sub MY::c_o {
 	package MY; # so that "SUPER" works right
 	my $inherited = shift->SUPER::c_o(@_);
-	$inherited =~ s/CCCMD.*$/$&\n\t\@if test -f `basename \$*.o` -a "`basename \$*.o`" != "\$*.o"; then mv `basename \$*.o` \$*.o; fi/m;
+	$inherited =~ s/CCCMD.*$/$&\n\t\@if test -f `basename \$*.o` -a "`basename \$*.o`" != "\$*.o"; then mv `basename \$*.o` \$*.o; fi/mg;
     $inherited;
 }
 
