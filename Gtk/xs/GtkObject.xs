@@ -525,6 +525,20 @@ signal_handler_pending(self, handler_id, may_be_blocked)
 		OUTPUT:
 		RETVAL
 
+#if GTK_HVER >= 0x010110
+
+int
+signal_handler_pending_by_id(self, handler_id, may_be_blocked)
+		Gtk::Object     self
+		unsigned int    handler_id
+		bool    may_be_blocked
+		CODE:
+		RETVAL= gtk_signal_handler_pending_by_id(self, handler_id, may_be_blocked);
+		OUTPUT:
+		RETVAL
+
+#endif
+
 unsigned int
 _object_type(self)
 		SV *	self

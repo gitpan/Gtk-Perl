@@ -48,5 +48,20 @@ add_with_viewport(self, widget)
 	OUTPUT:
 	RETVAL
 
+Gtk::Widget_Up
+hscrollbar(self)
+	Gtk::ScrolledWindow	self
+	CODE:
+	RETVAL = self->hscrollbar;
+	OUTPUT:
+	RETVAL
+
+Gtk::Widget_Up
+vscrollbar(self)
+	Gtk::ScrolledWindow	self
+	CODE:
+	RETVAL = self->vscrollbar;
+	OUTPUT:
+	RETVAL
 
 #endif

@@ -72,6 +72,9 @@ Programming guidelines:
 
 BUGS:
 
+	Resize of swatch inside ColorSelectButton is delayed (at least with
+	gtk+ 1.2.2).
+
 	Selection handling (and/or atoms?) is out to lunch, dinner, breakfest,
 	etc.
 

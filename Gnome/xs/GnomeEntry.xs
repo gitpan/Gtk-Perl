@@ -47,5 +47,10 @@ void
 gnome_entry_load_history(entry)
 	Gnome::Entry	entry
 
+void
+gnome_entry_set_max_saved (entry, max_saved)
+	Gnome::Entry	entry
+	unsigned int	max_saved
+
 #endif
 

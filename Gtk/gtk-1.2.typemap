@@ -1,0 +1,4 @@
+TYPEMAP
+
+Gtk::ItemFactory::Entry		T_SimpleVal
+

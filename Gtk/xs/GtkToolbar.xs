@@ -157,4 +157,17 @@ gtk_toolbar_set_tooltips(toolbar, enable)
 	Gtk::Toolbar    toolbar
 	bool enable
 
+#if GTK_HVER > 0x010101
+
+void
+gtk_toolbar_set_button_relief(toolbar, relief)
+	Gtk::Toolbar	toolbar
+	Gtk::ReliefStyle	relief
+
+Gtk::ReliefStyle
+gtk_toolbar_get_button_relief(toolbar)
+	Gtk::Toolbar	toolbar
+
+#endif
+
 #endif

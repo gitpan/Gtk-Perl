@@ -12,8 +12,8 @@ MODULE = Gtk::Viewport		PACKAGE = Gtk::Viewport		PREFIX = gtk_viewport_
 Gtk::Viewport_Sink
 new(Class, hadjustment, vadjustment)
 	SV *	Class
-	Gtk::Adjustment	hadjustment
-	Gtk::Adjustment	vadjustment
+	Gtk::Adjustment_OrNULL	hadjustment
+	Gtk::Adjustment_OrNULL	vadjustment
 	CODE:
 	RETVAL = GTK_VIEWPORT(gtk_viewport_new(hadjustment, vadjustment));
 	OUTPUT:

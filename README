@@ -30,7 +30,7 @@ the file "COPYING".
 
 
 Usage information: this package was designed to work Gtk+ versions 0.99.10
-through 1.2.0, though there is no guarantee it will work with any other
+through 1.2.3, though there is no guarantee it will work with any other
 distributions, or indeed even those ones. To build, fully build and install
 Gtk in your system (and glib too, if necessary), then run 'perl
 Makefile.PL', and 'make test', and then 'make install' if all went well.
@@ -58,8 +58,8 @@ be invoked before any other Gtk functions.
 
 Please bring information regarding bugs and other issues to
 <gtk-list@redhat.com> (before posting, you will need to subscribe to the
-list by sending 'subscribe' to gtk-list-request@redhat.com) or the author,
-at <kjahds@kjahds.com>. I cannot guarantee, at the moment, that any
+list by sending 'subscribe' to gtk-list-request@redhat.com) or the primary
+author, at <kjahds@kjahds.com>. I cannot guarantee, at the moment, that any
 particular problem will be fixed.
 
 Good Luck,

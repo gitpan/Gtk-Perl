@@ -9,6 +9,8 @@ use Gnome;
 use Gtk::XmHTML;
 use LWP::UserAgent;
 
+init Gnome "html.pl";
+
 $ua = new LWP::UserAgent;
 $request = new HTTP::Request('GET', shift(@ARGV) || 'www.altavista.digital.com');
 

@@ -559,16 +559,29 @@ constant(name,arg)
 	char *		name
 	int		arg
 
+ #DESC: Perform a garbage collection run.
 void
 gc(Class)
 	SV *	Class
 	CODE:
 	GCGtkObjects();
 
+ #PROTO: init_check
+ #DESC:
+ # Initialize the Gtk module checking for a connection to the display.
+ #RETURNS: a TRUE value on success and undef on failure.
+ #SEEALSO: Gtk::init
+ #OUTPUT: bool
+ #PARAMS:Class
+
+ # DESC: Initialize the Gtk module.
+ # Parses the args out of @ARGV.
 void
 init(Class)
-	SV *	Class
-	CODE:
+	SV * Class
+	ALIAS:
+		Gtk::init_check = 1
+	PPCODE:
 	{
 	int argc;
 	char ** argv;
@@ -604,7 +617,20 @@ init(Class)
 			}
 			
 			i = argc;
+#if GTK_HVER >= 0x010110
+			if ( ix == 1 && !gtk_init_check(&argc, &argv) ) {
+				g_warning("Cannot init gtk");
+				XPUSHs(sv_2mortal(newSVsv(&PL_sv_undef)));
+				if (argv)
+					free(argv);
+				return;
+			} else if ( ix == 0 ) {
+				gtk_init(&argc, &argv);
+			}
+#else
 			gtk_init(&argc, &argv);
+#endif
+			XPUSHs(sv_2mortal(newSViv(1)));
 
 			did_we_init_gtk = 1;
 			did_we_init_gdk = 1;
@@ -618,7 +644,7 @@ init(Class)
 		GtkInit_internal();
 	}
 
-
+ #DESC: Run an instance of the main loop.
 void
 main(Class)
 	SV *	Class
@@ -646,6 +672,7 @@ major_version(Class)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Exits the program with status as the result code.
 void
 exit(Class, status)
 	SV *	Class
@@ -653,12 +680,15 @@ exit(Class, status)
 	CODE:
 	gtk_exit(status);
 
+ #DESC: Exits the program with status as the result code
+ #(useful after a fork() call).
 void
 _exit(Class, status)
 	int	status
 	CODE:
 	_exit(status);
 
+ #DESC: Add widget to the grab list (events are sent to this widgets first).
 void
 gtk_grab_add(Class, widget)
 	SV *	Class
@@ -666,6 +696,7 @@ gtk_grab_add(Class, widget)
 	CODE:
 	gtk_grab_add(widget);
 
+ #DESC: Remove widget to the grab list.
 void
 gtk_grab_remove(Class, widget)
 	SV *	Class
@@ -673,6 +704,7 @@ gtk_grab_remove(Class, widget)
 	CODE:
 	gtk_grab_remove(widget);
 
+ #DESC: Get current grabbing widget.
 Gtk::Widget
 gtk_grab_get_current(Class)
 	SV* Class
@@ -681,12 +713,16 @@ gtk_grab_get_current(Class)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Quit the main loop.
 void
 main_quit(Class)
 	SV *	Class
 	CODE:
 	gtk_main_quit();
 
+ #DESC: Utility function that always return a FALSE value.
+ #Most useful in some signal handler.
+ #OUTPUT: boolean
 int
 false(...)
 	CODE:
@@ -694,6 +730,9 @@ false(...)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Utility function that always return a TRUE value.
+ #Most useful in some signal handler.
+ #OUTPUT: boolean
 int
 true(...)
 	CODE:
@@ -701,6 +740,9 @@ true(...)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Tells the library to use the locale support.
+ #This function must be called before any of the init ones.
+ #SEEALSO: Gtk::init, Gtk:init_check, Gtk::Gdk::init, Gtk::Gdk::init_check
 char *
 set_locale(Class)
 	CODE:
@@ -708,6 +750,7 @@ set_locale(Class)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Returns the current main loop level (main loops can be nested).
 int
 main_level(Class)
 	CODE:
@@ -715,6 +758,7 @@ main_level(Class)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Performs a (blocking) iteration of the main loop.
 int
 main_iteration(Class)
 	CODE:
@@ -722,6 +766,7 @@ main_iteration(Class)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Performs a (optionally blocking) iteration of the main loop.
 int
 main_iteration_do(Class, blocking)
 	bool	blocking
@@ -730,25 +775,36 @@ main_iteration_do(Class, blocking)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Print text using Gtk+'s output facilities. 
 void
 print(Class, text)
 	SV *	Class
 	char *	text
 	CODE:
-	g_print(text);
+	g_print("%s", text);
 
+ #DESC: Print text as an error using Gtk+'s output facilities. 
+ #This function also exits the program with an error.
 void
 error(Class, text)
 	char *	text
 	CODE:
-	g_error(text);
+	g_error("%s", text);
 
+ #DESC: Print text as a warning using Gtk+'s output facilities. 
 void
 warning(Class, text)
 	char *	text
 	CODE:
-	g_warning(text);
+	g_warning("%s", text);
 
+ #DESC: Add a timeout handler. interval is the interval in milliseconds.
+ #handler is called every interval milliseconds with the additional
+ #arguments as parameters.
+ #RETURNS: An integer that identifies the handler 
+ #(for use in Gtk::timeout_remove).
+ #ARG: handler subroutine (generic subroutine)
+ #SEEALSO: Gtk::idle_add, Gtk::timeout_remove, Gtk::idle_remove
 int
 timeout_add(Class, interval, handler, ...)
 	int	interval
@@ -770,12 +826,20 @@ timeout_add(Class, interval, handler, ...)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Remove a timeout handler identified by tag.
 void
 timeout_remove(Class, tag)
 	int	tag
 	CODE:
 	gtk_timeout_remove(tag);
 
+ #DESC: Add an idle handler (a function that gets called when the main loop
+ #is not busy servicing toolkit events).
+ #handler is called with the additional arguments as parameters.
+ #RETURNS: An integer that identifies the handler 
+ #(for use in Gtk::idle_remove)..
+ #ARG: handler subroutine (generic subroutine)
+ #SEEALSO: Gtk::idle_remove, Gtk::timeout_remove, Gtk::timeout_add, Gtk::idle_add_priority
 int
 idle_add(Class, handler, ...)
 	SV *	Class
@@ -785,8 +849,8 @@ idle_add(Class, handler, ...)
 		AV * args = newAV();
 		/*SV * arg;
 		int i,j;
-		int type;*/
-		args = newAV();
+		int type;
+		args = newAV();*/
 		
 		PackCallbackST(args, 1);
 		
@@ -797,6 +861,14 @@ idle_add(Class, handler, ...)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Add an idle handler (a function that gets called when the main loop
+ #is not busy servicing toolkit events).
+ #handler is called with the additional arguments as parameters.
+ #The lower the value of priority, the highter the priority of the handler.
+ #RETURNS: An integer that identifies the handler 
+ #(for use in Gtk::idle_remove)..
+ #ARG: handler subroutine (generic subroutine)
+ #SEEALSO: Gtk::idle_remove, Gtk::timeout_remove, Gtk::timeout_add
 int
 idle_add_priority (Class, priority, handler, ...)
 	SV *	Class
@@ -819,6 +891,7 @@ idle_add_priority (Class, priority, handler, ...)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Remove an idle handler identified by tag.
 void
 idle_remove(Class, tag)
 	SV *	Class
@@ -826,6 +899,8 @@ idle_remove(Class, tag)
 	CODE:
 	gtk_idle_remove(tag);
 
+ #DESC: Add an handler to be called at initialization time.
+ #ARG: handler subroutine (generic subroutine)
 void
 init_add(Class, handler, ...)
 	SV *	Class
@@ -843,6 +918,9 @@ init_add(Class, handler, ...)
 		gtk_init_add(init_handler, (gpointer)args);
 	}
 
+ #DESC: Add an handler to be called when the main loop of level
+ #main_level quits.
+ #ARG: handler subroutine (generic subroutine)
 int
 quit_add(Class, main_level, handler, ...)
 	int	main_level
@@ -863,6 +941,7 @@ quit_add(Class, main_level, handler, ...)
 	OUTPUT:
 	RETVAL
 
+ #DESC: Remove the main loop quit handler identified by tag.
 void
 quit_remove(Class, tag)
 	int	tag
@@ -911,6 +990,15 @@ get_event_widget(Class=0, event)
 	{
 		RETVAL = gtk_get_event_widget(event);
 	}
+	OUTPUT:
+	RETVAL
+
+ #DESC: Check if there are any events pending for the toolkit to service.
+int
+events_pending(Class)
+	SV *	Class
+	CODE:
+	RETVAL = gtk_events_pending();
 	OUTPUT:
 	RETVAL
 
@@ -1526,7 +1614,9 @@ constant(name,arg)
 void
 init(Class)
 	SV *	Class
-	CODE:
+	ALIAS:
+		Gtk::Gdk::init_check = 1
+	PPCODE:
 	{
 		if (!did_we_init_gdk && !did_we_init_gtk) {
 			int argc;
@@ -1544,7 +1634,19 @@ init(Class)
 			}
 			
 			i = argc;
+#if GTK_HVER >= 0x010110
+			if ( ix == 1 && !gdk_init_check(&argc, &argv) ) {
+				XPUSHs(sv_2mortal(newSVsv(&PL_sv_undef)));
+				if (argv)
+					free(argv);
+				return;
+			} else if (ix == 0) {
+				gdk_init(&argc, &argv);
+			}
+#else
 			gdk_init(&argc, &argv);
+#endif
+			XPUSHs(sv_2mortal(newSViv(1)));
 
 			did_we_init_gdk = 1;
 			
@@ -1565,6 +1667,24 @@ exit(Class, code)
 	int	code
 	CODE:
 	gdk_exit(code);
+
+#if GTK_HVER >= 0x010110
+
+void
+error_trap_push(Class)
+	SV *	Class
+	CODE:
+	gdk_error_trap_push();
+
+int
+error_trap_pop(Class)
+	SV *	Class
+	CODE:
+	RETVAL = gdk_error_trap_pop();
+	OUTPUT:
+	RETVAL
+
+#endif
 
 int
 events_pending(Class)
@@ -1838,31 +1958,6 @@ gdk_rgb_get_visual(Class)
 
 #endif
 
-MODULE = Gtk		PACKAGE = Gtk::Gdk::Rgb::Cmap				PREFIX = gdk_rgb_cmap_
-
-#if GTK_HVER > 0x010100
-
-Gtk::Gdk::Rgb::Cmap
-gdk_rgb_cmap_new(Class, ...)
-	CODE:
-	{
-		guint32 n_colors = items-1;
-		guint32 * colors = malloc(sizeof(guint32)*items);
-		int i;
-		for(i=0;i<n_colors;i++)
-			colors[i] = SvIV(ST(i+1));
-		RETVAL = gdk_rgb_cmap_new(colors, n_colors);
-		free(colors);
-	}
-	OUTPUT:
-	RETVAL
-
-void
-gdk_rgb_cmap_free(self)
-	Gtk::Gdk::Rgb::Cmap	self
-
-#endif
-
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::ColorContext	PREFIX = gdk_color_context_
 
@@ -1910,6 +2005,7 @@ free(object)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Window	PREFIX = gdk_window_
 
+ #CONSTRUCTOR: yes
 Gtk::Gdk::Window
 new(Self, attr)
 	SV *	Self
@@ -2392,62 +2488,6 @@ gdk_draw_segments(pixmap, gc, x1, y1, x2, y2, ...)
 		free(points);
 	}
 
-MODULE = Gtk		PACKAGE = Gtk::Gdk::Pixmap	PREFIX = gdk_
-
-#if GTK_HVER > 0x010100
-
-void
-gdk_draw_rgb_image (pixmap, gc, x, y, width, height, dith, rgb_buf, rowstride)
-	Gtk::Gdk::Pixmap	pixmap
-	Gtk::Gdk::GC	gc
-	gint	x
-	gint	y
-	gint	width
-	gint	height
-	Gtk::Gdk::Rgb::Dither	dith
-	unsigned char *	rgb_buf
-	gint	rowstride
-
-
-void
-gdk_draw_rgb_32_image (pixmap, gc, x, y, width, height, dith, rgb_buf, rowstride)
-	Gtk::Gdk::Pixmap	pixmap
-	Gtk::Gdk::GC	gc
-	gint	x
-	gint	y
-	gint	width
-	gint	height
-	Gtk::Gdk::Rgb::Dither	dith
-	unsigned char *	rgb_buf
-	gint	rowstride
-
-
-void
-gdk_draw_gray_image (pixmap, gc, x, y, width, height, dith, rgb_buf, rowstride)
-	Gtk::Gdk::Pixmap	pixmap
-	Gtk::Gdk::GC	gc
-	gint	x
-	gint	y
-	gint	width
-	gint	height
-	Gtk::Gdk::Rgb::Dither	dith
-	unsigned char *	rgb_buf
-	gint	rowstride
-
-void
-gdk_draw_indexed_image (pixmap, gc, x, y, width, height, dith, rgb_buf, rowstride, cmap)
-	Gtk::Gdk::Pixmap	pixmap
-	Gtk::Gdk::GC	gc
-	gint	x
-	gint	y
-	gint	width
-	gint	height
-	Gtk::Gdk::Rgb::Dither	dith
-	unsigned char *	rgb_buf
-	gint	rowstride
-	Gtk::Gdk::Rgb::Cmap	cmap
-
-#endif
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Colormap	PREFIX = gdk_colormap_
 
@@ -2597,7 +2637,7 @@ gdk_color_equal(colora, colorb)
 	Gtk::Gdk::Color	colorb
 
 
-MODULE = Gtk		PACKAGE = Gtk::Gdk::Cursor
+MODULE = Gtk		PACKAGE = Gtk::Gdk::Cursor	PREFIX = gdk_cursor_
 
 Gtk::Gdk::Cursor
 new(Class, type)
@@ -3014,6 +3054,7 @@ visuals(Class)
 
 MODULE = Gtk		PACKAGE = Gtk::Gdk::Font	PREFIX = gdk_font_
 
+ #CONSTRUCTOR: yes
 Gtk::Gdk::Font
 load(Class, font_name)
 	SV *	Class
@@ -3023,6 +3064,7 @@ load(Class, font_name)
 	OUTPUT:
 	RETVAL
 
+ #CONSTRUCTOR: yes
 Gtk::Gdk::Font
 fontset_load(Class, fontset_name)
 	SV *	Class
@@ -3239,6 +3281,8 @@ gdk_region_union_with_rect (self, rectangle)
 	Gtk::Gdk::Region self
 	Gtk::Gdk::Rectangle rectangle
 
+MODULE = Gtk		PACKAGE = Gtk::Gdk::Region		PREFIX = gdk_regions_
+
 Gtk::Gdk::Region
 gdk_regions_intersect (self, region)
 	Gtk::Gdk::Region self
@@ -3258,8 +3302,6 @@ Gtk::Gdk::Region
 gdk_regions_xor (self, region)
 	Gtk::Gdk::Region self
 	Gtk::Gdk::Region region
-
-MODULE = Gtk		PACKAGE = Gtk::Gdk::Region		PREFIX = gdk_region_
 
 INCLUDE: ../../build/boxed.xsh
 

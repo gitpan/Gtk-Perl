@@ -49,7 +49,7 @@ void AppletInit_internal(char * app_id, AV * args)
 			}
 
 			i = argc;
-			applet_widget_init(app_id, NULL , argc, argv, 0, &i, "argv0");
+			applet_widget_init(app_id, NULL , argc, argv, NULL, 0, NULL);
 
 			did_we_init_gdk = 1;
 			did_we_init_gtk = 1;

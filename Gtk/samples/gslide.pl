@@ -6,6 +6,7 @@
 # REQUIRES: Gtk
 
 use Gtk;
+use Gtk::Keysyms;
 use Getopt::Std;
 
 sub update_all;
@@ -53,6 +54,8 @@ $gtkwin->signal_connect('button_press_event', sub {
 });
 $gtkwin->signal_connect('key_press_event', sub {
 	my ($w, $e)= @_;
+	# little test for Gtk::Keysyms
+	print "Got control\n" if $e->{'keyval'} == $Gtk::Keysyms{'Control_L'};
 	my ($c) = chr($e->{'keyval'});
 	if ($c eq "n" || $c eq " ") {Gtk->main_quit;}
 	elsif ($c eq "q") {Gtk->exit(0);}

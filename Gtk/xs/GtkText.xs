@@ -70,7 +70,7 @@ void
 gtk_text_insert(text, font, fg, bg, string)
 	Gtk::Text	text
 	Gtk::Gdk::Font_OrNULL	font
-	Gtk::Gdk::Color	fg
+	Gtk::Gdk::Color_OrNULL	fg
 	Gtk::Gdk::Color_OrNULL	bg
 	SV *	string
 	CODE:

@@ -24,6 +24,25 @@ gtk_label_set(self, string)
 	char *	string
 
 void
+gtk_label_set_text(self, string)
+	Gtk::Label	self
+	char *	string
+
+#if GTK_HVER >= 0x010108
+
+void
+gtk_label_set_pattern(self, string)
+	Gtk::Label	self
+	char *	string
+
+void
+gtk_label_set_line_wrap(self, wrap)
+	Gtk::Label 	self
+	bool wrap
+
+#endif
+
+void
 gtk_label_set_justify(self, jtype)
 	Gtk::Label	self
 	Gtk::Justification	jtype
@@ -35,5 +54,15 @@ gtk_label_get(self)
 	gtk_label_get(self, &RETVAL);
 	OUTPUT:
 	RETVAL
+
+#if GTK_HVER >= 0x010101
+
+unsigned int
+gtk_label_parse_uline(self, string)
+	Gtk::Label	self
+	char *	string
+
+
+#endif
 
 #endif

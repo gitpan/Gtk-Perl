@@ -6,7 +6,10 @@
 
 use Gtk;
 
-init Gtk;
+if (!init_check Gtk) {
+	print STDERR "You have to run make test under X\n";
+	exit(0);
+}
 
 # Build list of available sample scripts
 

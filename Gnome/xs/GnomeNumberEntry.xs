@@ -7,7 +7,7 @@
 
 MODULE = Gnome::NumberEntry		PACKAGE = Gnome::NumberEntry		PREFIX = gnome_number_entry_
 
-#ifdef GNOME_FILE_ENTRY
+#ifdef GNOME_NUMBER_ENTRY
 
 Gnome::NumberEntry_Sink
 new(Class, history_id, calc_dialog_title)
@@ -15,7 +15,7 @@ new(Class, history_id, calc_dialog_title)
 	char *	history_id
 	char *	calc_dialog_title
 	CODE:
-	RETVAL = GNOME_FILE_ENTRY(gnome_number_entry_new(history_id, calc_dialog_title));
+	RETVAL = GNOME_NUMBER_ENTRY(gnome_number_entry_new(history_id, calc_dialog_title));
 	OUTPUT:
 	RETVAL
 

@@ -24,7 +24,7 @@ SV * newSVXmAnyCallbackStruct(XmAnyCallbackStruct * e)
 	int n;
 	
 	if (!e)
-		return newSVsv(&sv_undef);
+		return newSVsv(&PL_sv_undef);
  
         h = newHV();
 

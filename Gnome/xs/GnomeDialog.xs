@@ -25,6 +25,7 @@ new(Class, title, ...)
 #ifdef NEW_GNOME
 		RETVAL = GNOME_DIALOG(gnome_dialog_newv(title, b));
 #else
+		/* I don't think this is right... */
 		RETVAL = GNOME_DIALOG(gnome_dialog_new(title, b));
 #endif
 		free(b);
@@ -100,7 +101,7 @@ Gtk::Widget_Sink_Up
 vbox(dialog)
 	Gnome::Dialog dialog
 CODE:
-	RETVAL = GTK_VBOX(dialog->vbox);
+	RETVAL = GTK_WIDGET(dialog->vbox);
 OUTPUT:
 	RETVAL
 

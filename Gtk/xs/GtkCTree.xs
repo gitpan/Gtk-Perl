@@ -160,8 +160,8 @@ gtk_ctree_insert_node(self, parent, sibling, titles, spacing, pixmap_closed, mas
 	Gtk::CTreeNode_OrNULL		sibling
 	SV*			titles
 	int			spacing
-	Gtk::Gdk::Pixmap	pixmap_closed
-	Gtk::Gdk::Bitmap	mask_closed
+	Gtk::Gdk::Pixmap_OrNULL	pixmap_closed
+	Gtk::Gdk::Bitmap_OrNULL	mask_closed
 	Gtk::Gdk::Pixmap_OrNULL	pixmap_opened
 	Gtk::Gdk::Bitmap_OrNULL	mask_opened
 	bool			is_leaf
@@ -264,8 +264,8 @@ void
 gtk_ctree_move(self, node, new_parent, new_sibling)
 	Gtk::CTree	self
 	Gtk::CTreeNode	node
-	Gtk::CTreeNode	new_parent
-	Gtk::CTreeNode	new_sibling
+	Gtk::CTreeNode_OrNULL	new_parent
+	Gtk::CTreeNode_OrNULL	new_sibling
 
 void
 gtk_ctree_expand(self, node)

@@ -36,4 +36,13 @@ sort_column (self)
 	OUTPUT:
 	RETVAL
 
+void
+gtk_clist_sort (self)
+	Gtk::CList	self
+
+void
+gtk_clist_set_auto_sort (self, auto_sort)
+	Gtk::CList	self
+	bool		auto_sort
+
 #endif

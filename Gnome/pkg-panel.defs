@@ -11,8 +11,3 @@
 	(down	ORIENT_DOWN)
 	(left	ORIENT_LEFT)
 	(right	ORIENT_RIGHT))
-
-(define-enum PanelTileType
-	(launcher-tile	LAUNCHER_TILE)
-	(drawer-tile	DRAWER_TILE)
-	(menu-tile	MENU_TILE))

@@ -29,6 +29,7 @@
 (define-object GnomeCanvasRE (GnomeCanvasItem))
 (define-object GnomeCanvasRect (GnomeCanvasRE))
 (define-object GnomeCanvasEllipse (GnomeCanvasRE))
+(define-object GnomeCanvasWidget (GnomeCanvasItem))
 
 ;; post 0.13 widgets
 (define-object GnomeDialog (GtkWindow))
@@ -50,6 +51,49 @@
 (define-object GnomeDEntryEdit (GtkObject))
 (define-object GtkDial (GtkWidget))
 (define-object GnomeNumberEntry (GtkHBox))
+
+;; other stuff in gnome-libs 1.0
+(define-object GnomeFontPicker (GtkButton))
+(define-object GnomeHRef (GtkButton))
+(define-object GnomeIconEntry (GtkVBox))
+(define-object GnomePixmapEntry (GtkVBox))
+(define-object GnomePaperSelector (GtkVBox))
+(define-object GnomeDock (GtkContainer))
+(define-object GnomeDockBand (GtkContainer))
+(define-object GnomeDockItem (GtkBin))
+(define-object GnomeDockLayout (GtkObject))
+(define-object GnomeAnimator (GtkWidget))
+(define-object GtkPixmapMenuItem (GtkMenuItem))
+
+(define-enum GnomeDockPlacement
+	(top GNOME_DOCK_TOP)
+	(right GNOME_DOCK_RIGHT)
+	(bottom GNOME_DOCK_BOTTOM)
+	(left GNOME_DOCK_LEFT)
+	(floating GNOME_DOCK_FLOATING))
+
+(define-enum GnomeDockItemBehavior
+	(normal GNOME_DOCK_ITEM_BEH_NORMAL)
+	(exclusive GNOME_DOCK_ITEM_BEH_EXCLUSIVE)
+	(never-float GNOME_DOCK_ITEM_BEH_NEVER_FLOATING)
+	(never-vertical GNOME_DOCK_ITEM_BEH_NEVER_VERTICAL)
+	(never-horizontal GNOME_DOCK_ITEM_BEH_NEVER_HORIZONTAL)
+	(locked GNOME_DOCK_ITEM_BEH_LOCKED))
+
+(define-enum GnomeAnimatorStatus
+	(stopped GNOME_ANIMATOR_STATUS_STOPPED)
+	(running GNOME_ANIMATOR_STATUS_RUNNING))
+
+(define-enum GnomeAnimatorLoopType
+	(none GNOME_ANIMATOR_LOOP_NONE)
+	(restart GNOME_ANIMATOR_LOOP_RESTART)
+	(ping-pong GNOME_ANIMATOR_LOOP_PING_PONG))
+
+(define-enum GnomeFontPickerMode
+	(pixmap GNOME_FONT_PICKER_MODE_PIXMAP)
+	(font-info GNOME_FONT_PICKER_MODE_FONT_INFO)
+	(user-widget GNOME_FONT_PICKER_MODE_USER_WIDGET)
+	(unknown GNOME_FONT_PICKER_MODE_UNKNOWN))
 
 
 (comment "Old stuff"

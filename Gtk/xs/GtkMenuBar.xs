@@ -33,4 +33,13 @@ gtk_menu_bar_insert(self, child, position)
 	Gtk::Widget	child
 	int	position
 
+# if GTK_HVER >= 0x010105
+
+void
+gtk_menu_bar_set_shadow_type (self, type)
+	Gtk::MenuBar	self
+	Gtk::ShadowType	type
+	
+#endif
+
 #endif

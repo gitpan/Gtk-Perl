@@ -139,6 +139,7 @@ static void     callXS (void (*subaddr)(CV* cv), CV *cv, SV **mark)
 
 void GnomeInit_internal(char * app_id, char * app_version)
 {
+	dTHR;
 		if (!did_we_init_gdk && !did_we_init_gtk && !did_we_init_gnome) {
 			int argc;
 			char ** argv = 0;
@@ -178,7 +179,7 @@ void GnomeInit_internal(char * app_id, char * app_version)
 
 			Gnome_InstallObjects();*/
 
-			printf("Init gnome\n");
+			/*printf("Init gnome\n");*/
 		}
 }
 

@@ -56,6 +56,7 @@ my $dialog_window;
 my $sel_window;
 my $timeout_window;
 my $idle_window;
+my $item_factory_window;
 my $mainloop_window;
 
 # pixmap cache variables
@@ -1052,6 +1053,8 @@ sub make_toolbar {
 	$color = $toplevel->style->bg('normal');
 	
 	$toolbar = new Gtk::Toolbar('horizontal', 'both');
+	$toolbar->set_space_style('line');
+	$toolbar->set_button_relief("none");
 	$button = $toolbar->append_item ( "Horizontal", "Horizontal toolbar layout",
 		"Toolbar/Horizontal", new_pixmap("xpm/test.xpm",$window, $color));
 	$button->signal_connect('clicked', sub {$toolbar->set_orientation('horizontal')});
@@ -3154,6 +3157,96 @@ sub create_menus {
 	}
 }
 
+sub item_factory_cb {
+	my ($widget, $action, @data) = @_;
+
+	print "ItemFactory: activated ", $widget->item_factory_path(), " -> ", $action, "\n";
+}
+
+my @item_factory_entries = (
+	["/_File",	undef,	0,	"<Branch>"],
+	["/File/tearoff1",	undef,	0,	"<Tearoff>"],
+	["/File/_New",	"<control>N",	1],
+	["/File/_Open",	"<control>O",	2],
+	["/File/_Save", "<control>S",	3],
+	["/File/Save _As...",	undef,	4],
+	["/File/sep1",	undef,	0,	"<Separator>"],
+	#["/File/_Quit",	"<control>Q",	5],
+	{
+		'path' => "/File/_Quit", 
+		'accelerator' => "<control>Q",	
+		'action' => 5,
+		'type' => '<Item>'
+	},
+	
+	["/_Preferences",	undef,	0,	"<Branch>"],
+	["/_Preferences/_Color",	undef,	0,	"<Branch>"],
+	["/_Preferences/Color/_Red",	undef,	10,	"<RadioItem>"],
+	["/_Preferences/Color/_Green",	undef,	11,	"<RadioItem>"],
+	["/_Preferences/Color/_Blue",	undef,	12,	"<RadioItem>"],
+	["/_Preferences/_Shape",	undef,	0,	"<Branch>"],
+	["/_Preferences/Shape/_Square",	undef,	20,	"<RadioItem>"],
+	["/_Preferences/Shape/_Rectangle",	undef,	21,	"<RadioItem>"],
+	["/_Preferences/Shape/_Oval",	undef,	22,	"<RadioItem>"],
+
+	["/_Help",	undef,	0,	"<LastBranch>"],
+	["/Help/_About",	undef,	30]
+);
+
+sub create_item_factory {
+	if (!defined $item_factory_window) {
+		my ($accel_group, $item_factory, $box1, $label, $box2);
+		my ($separator, $button, $dummy);
+
+		
+		$item_factory_window = new Gtk::Window('toplevel');
+		signal_connect $item_factory_window destroy => \&destroy_window, \$item_factory_window;
+		signal_connect $item_factory_window "delete-event" => \&destroy_window, \$item_factory_window;
+
+		$accel_group = new Gtk::AccelGroup;
+		$item_factory = new Gtk::ItemFactory('Gtk::MenuBar', "<main>", $accel_group);
+		
+		#$item_factory_window->set_data('<main>', $item_factory);
+		$accel_group->attach($item_factory_window);
+		# $item_factory->create_items();
+		foreach (@item_factory_entries) {
+			$item_factory->create_item($_, \&item_factory_cb);
+		}
+		
+		$item_factory_window->set_title("Item Factory");
+		$item_factory_window->set_border_width(0);
+		
+		$box1 = new Gtk::VBox(0, 0);
+		$item_factory_window->add($box1);
+		$box1->pack_start($item_factory->get_widget('<main>'), 0, 0, 0);
+
+		$label = new Gtk::Label "Type\n<alt>\nto start";
+
+		$label->set_usize(200, 200);
+		$label->set_alignment(0.5, 0.5);
+		$box1->pack_start($label, 1, 1, 0);
+
+		$separator = new Gtk::HSeparator;
+		$box1->pack_start($separator, 0, 1, 0);
+
+		$box2 = new Gtk::VBox(0, 10);
+		$box2->set_border_width(10);
+		$box1->pack_start($box2, 0, 1, 0);
+
+		$button = new Gtk::Button("close");
+		$button->signal_connect('clicked', sub {$item_factory_window->destroy;});
+		$box2->pack_start($button, 1, 1, 0);
+		$button->can_default(1);
+		$button->grab_default;
+
+	}
+	if (!visible $item_factory_window) {
+		show_all $item_factory_window;
+	} else {
+		destroy $item_factory_window;
+	}
+}
+
 sub color_selection_ok {
 	my($widget, $dialog) = @_;
 	
@@ -4511,6 +4604,7 @@ sub create_main_window {
 		'font selection',	( $gtk_1_0 ? undef : \&create_font_selection ),
 		'gamma curve',		\&create_gamma_curve,
 		'handle box',		\&create_handlebox,
+		'item factory',		\&create_item_factory,
 		'list',				\&create_list,
 		'menus',			\&create_menus,
 		'miscellaneous',	undef,

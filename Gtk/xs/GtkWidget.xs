@@ -234,7 +234,7 @@ gtk_widget_set_events(widget, events)
 void
 gtk_widget_set_extension_events(widget, events)
 	Gtk::Widget	widget
-	Gtk::Gdk::EventMask	events
+	Gtk::Gdk::ExtensionMode	events
 
 Gtk::Widget_Up
 gtk_widget_get_toplevel(widget)
@@ -264,11 +264,11 @@ Gtk::Style
 gtk_widget_get_style(widget)
 	Gtk::Widget	widget
 
-int
+Gtk::Gdk::EventMask
 gtk_widget_get_events(widget)
 	Gtk::Widget	widget
 
-int
+Gtk::Gdk::ExtensionMode
 gtk_widget_get_extension_events(widget)
 	Gtk::Widget	widget
 

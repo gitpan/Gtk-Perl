@@ -131,9 +131,13 @@ mkdir("build", 0777);
 
 $typemap = [cwd() . "/build/GtkTypemap"];
 $object = 'build/GtkDefs.o build/PerlGtkExt.o';
-$pm = {'build/GtkTypes.pm' => '$(INST_ARCHLIBDIR)/Gtk/Types.pm'};
+$pm = {
+	'build/GtkTypes.pm' => '$(INST_ARCHLIBDIR)/Gtk/Types.pm',
+	'build/GtkKeysyms.pm' => '$(INST_ARCHLIBDIR)/Gtk/Keysyms.pm'
+};
 
-@clean = qw(build/GtkTypes.pm build/GtkTypemap build/GtkDefs.c build/GtkDefs.h build/Objects.xpl build/boxed.xsh build/extension.xsh build/objects.xsh 
+@clean = qw( build/perl-gtk-ref.pod build/perl-gtk-ds.pod
+	build/GtkTypes.pm build/GtkKeysyms.pm build/GtkTypemap build/GtkDefs.c build/GtkDefs.h build/Objects.xpl build/boxed.xsh build/extension.xsh build/objects.xsh 
 			build/PerlGtkExt.c build/PerlGtkExt.h build/PerlGtkInt.h Gtk/IFiles.pm */*.o */*/*.o);
 
 %xs = ();
@@ -146,6 +150,27 @@ $pm = {'build/GtkTypes.pm' => '$(INST_ARCHLIBDIR)/Gtk/Types.pm'};
 	local($Directory) = "Gtk/";
 	do "Gtk/pkg.pl";
 	$inc .= " -I./Gtk";
+}
+
+# build the keysyms mapping
+{
+	my ($incfile) = `gtk-config --prefix`;
+	chomp($incfile);
+	$incfile .= "/include/gdk/gdkkeysyms.h";
+
+	open(OUT, '>build/GtkKeysyms.pm') || die "Cannot open build/GtkKeysyms.pm: $!";
+	print OUT "# DO NOT EDIT!\n";
+	print OUT "# This file was built by Gtk's Makefile.PL from $incfile.\n";
+	print OUT "\npackage Gtk::Keysyms;\n\n";
+	print OUT "%Gtk::Keysyms = (\n";
+	if (open(IN, $incfile)) {
+		while(<IN>) {
+			print OUT "\t'$1'\t=>\t$2,\n" if /^\s*#\s*define\s+GDK_([a-zA-Z0-9_]+)\s+(\w+)$/;
+		}
+		close(IN);
+	}
+	print OUT ");\n\n1;\n";
+	close(OUT);
 }
 
 sub include_package {
@@ -210,6 +235,10 @@ foreach (sort {$headers{$a} <=> $headers{$b}} keys %headers) {
 #}
 
 add_raw_xs(gendefs::gendefs(@a));
+
+# documentation
+gendefs::gen_doc();
+system("./tools/gendoc.pl", keys %xs);
 
 $xfiles = {};
 

@@ -12,6 +12,8 @@
  Gtk+ 1.1.11: success.
  
  Gtk+ 1.2.0: success.
+
+ Gtk+ 1.2.2: success.
  
  Gnome 0.30 (Bouncing Bonobo): success of the portions that I tried.
  
@@ -27,4 +29,4 @@
 
 
 In addition, this module should has been tested to work with Perl 5.003_07,
-5.004, and 5.005_53.
+5.004, 5.005, and 5.005_53.

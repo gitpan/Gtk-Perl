@@ -1,3 +1,148 @@
+Wed, 18 Aug 1999 22:52:43 PDT Kenneth Albanowski <kjahds@kjahds.com>
+
+	* Point release Gtk-Perl-0.6123.tar.gz
+
+Tue, 17 Aug 1999 09:58:46 +0200 Paolo Molaro <lupus@debian.org>
+
+	* Gnome/xs/GnomeEntry.xs: added gnome_entry_set_max_saved().
+	* Gnome/xs/GnomeFileEntry.xs: added gnome_file_entry_set_modal(),
+	  gnome_file_entry_set_directory(), gnome_file_entry_set_default_path(),
+	  gnome_file_entry_get_full_path().
+	* Gnome/xs/GnomePixmapEntry.xs: duh, I though I had implemented this
+	  already. done now.
+	* Gtk/gtk-1.2.defs: update GdkFunction enumeration.
+	
+Mon, 16 Aug 1999 17:22:36 +0200 Paolo Molaro <lupus@debian.org>
+
+	* Glade/xs/GladeXML.xs, Glade/GladeXML.pm: updates for new version of
+	  libglade (tested with 0.2).
+	* Gtk/xs/GtkMenuBar.xs: added gtk_menu_bar_set_shadow_type.
+
+Sun, 15 Aug 1999 02:15:22 PDT Kenneth Albanowski <kjahds@kjahds.com>
+
+	* Makefile.PL: Move GtkKeysyms.pm to build/ directory, and clean up
+	  it and the pods.
+	* Gnome/xs/GnomeDialog.xs: Clean up a few warnings
+	* Gnome/samples/html.pl: get html sample to run.
+
+Fri, 30 Jul 1999 19:14:58 +0200 Paolo Molaro <lupus@debian.org>
+
+	* Gnome/xs/GnomeNumberEntry.xs: fixed wrong cast and wrong
+	  preprocessor directive (reported by Dermot Musgrove).
+	* Gnome/xs/Gnome.xs: got rid of annoying printf.
+	* Gnome/xs/*.xs: added GnomeFontPicker, GnomeHRef,
+	  GnomeIconEntry, GnomePixmapEntry, GnomePaperSelector,
+	  GnomeDock, GnomeDockItem, GnomeDockBand, GnomeDockLayout,
+	  GtkPixmapMenuItem, GnomeAnimator implemeentations.
+	* Gnome/pkg.pl: #define GNOME_HVER.
+	* Gnome/pkg.defs: added some enumerations.
+
+Fri, 23 Jul 1999 13:07:07 +0200 Paolo Molaro <lupus@debian.org>
+
+	* tools/gendoc.pl: fixes and additions.
+	* Gtk/xs/Gtk.xs: more documentation. Fixes to the print,
+	  error and warning functions (for text with %s in them).
+
+Thu, 22 Jul 1999 15:55:55 +0200 Paolo Molaro <lupus@debian.org>
+
+	* Makefile.PL, tools/gendefs.pl, tools/gendoc.pl:
+	  more reference documentation work.
+
+Thu, 22 Jul 1999 13:48:39 +0200 Paolo Molaro <lupus@debian.org>
+
+	* Gtk/xs/Gtk.xs: fix some Gtk::Gdk::Region and Gtk::Gdk::Cursor
+	  function prefixes (source code incompatible, but rarely used 
+	  features).
+	  Removed code dependente on typemap additions (see Gtk-1.1.xs).
+	* Gtk/xs/Gtk-1.1.xs: new file to hold gtk+ 1.1 features
+	  involving typemap changes (should fix compilation problems with
+	  Gtk+ 1.0)..
+	* Gtk/xs/GtkViewport.xs: allow undef for the adjustments in the
+	  constructor.
+	* Gtk/xs/ScrolledWindow.xs: add accessors for the adjustments.
+
+Wed, 21 Jul 1999 21:21:57 +0200 Paolo Molaro <lupus@debian.org>
+
+	* Gtk/xs/.cvsignore: update.
+	* Gtk/gtk-1.2.typemap: missing from an earlier commit.
+	* Gtk/xs/GtkTearoffMenuItem.xs: added support for the widget.
+	
+Wed, 21 Jul 1999 21:21:57 +0200 Paolo Molaro <lupus@debian.org>
+
+	* tools/gendoc.pl: script to generate the reference manual.
+	  I'm not satisfied with the pod -> text/html output so
+	  maybe it's better to switch to something sgml-based,
+	  but this is a start...
+	* Gtk/xs/Gtk.xs: beginning of documentation.
+
+Sun,  4 Jul 1999 14:37:01 +0200 Paolo Molaro <lupus@debian.org>
+
+	* Gtk/xs/GtkItemFactory.xs: completed support.
+	* Gtk/samples/test.pl: test Gtk::ItemFactory.
+	* Gtk/xs/Gtk.xs: fix leak in idle_add, added aliases
+	  for Gtk::init_check and Gtk::Gdk::init_check.
+	  Added gdk_error_trap_push() and gdk_error_trap_pop().
+	* Gtk/xs/GtkObject.xs: added signal_handler_pending_by_id().
+	* Gtk/xs/GtkHandleBox.xs: added gtk_handle_box_set_snap_edge(),
+	  gtk_handle_box_set_handle_position() and
+	  gtk_handle_box_set_shadow_type().
+	* Gtk/xs/GtkMenu.xs: added gtk_menu_set_tearoff_state() and
+	  gtk_menu_set_title().
+	* test.pl: test init_check.
+
+1999-07-12 12:15:10 EDT Peter Teichman  <pat4@acpub.duke.edu>
+
+	* Gnome/xs/AppletWidget.xs: made --with-gnome-panel work with
+	current panels
+
+Sat, 3 Jul 1999 11:18:31 +0200 Paolo Molaro <lupus@debian.org>
+
+	* Makefile.PL: create Gtk::Keysyms for the mapping between
+	  keysyms and keyvalues
+	* Gtk/GtkLabel.xs: correct typo in gtk version check.
+	  Added gtk_label_parse_uline().
+	* GdkImlib/xs/GdkImlib.xs: added some missing functions:
+	  gdk_imlib_crop_image and gdk_imlib_crop_and_clone_image
+	  from etienne grossmann <etienne@anonimo.isr.ist.utl.pt>,
+	  gdk_imlib_load_alpha, gdk_imlib_create_image_from_drawable,
+	  gdk_imlib_inlined_png_to_image, gdk_imlib_set_cache_info,
+	  gdk_imlib_save_image by me (not tested though).
+	* Gtk/gtk-1.1.6.defs: add GTK_POLICY_NEVER to GtkPolicyType
+	  and GtkToolbarSpaceStyle.
+	* Gtk/samples/gslide.pl: test Gtk::Keysyms.
+	* Gtk/samples/test.pl: test new toolbar features.
+	* Gtk/xs/GtkToolbar.xs: add gtk_toolbar_set_button_relief
+	  and gtk_toolbar_get_button_relief.
+	* Gtk/xs/GtkToolbar-1.1.6.xs: gtk_toolbar_set_space_style.
+
+Thu Jun 17 02:16:22 EEST 1999 Tuomas J. Lukka <lukka@iki.fi>
+	* GtkText: allow null for foreground color in insert
+
+Fri Jun 11 18:28:21 CEST 1999 Marc Lehmann <pcg@goof.com>
+	* GtkXmHTML/GXHTypes.c: portability fix for 5.005.
+
+Tue May 25 21:53:49 CEST 1999
+	* Gnome/xs/Gnome.xs: add missing dTHR.
+
+Fri Apr 30 15:00:00 GMT 1999   Tuomas J. Lukka <lukka@iki.fi>
+	* GtkLabel: add some methods
+
+Sun Apr 25 23:00:00 GMT 1999   Tuomas J. Lukka <lukka@iki.fi>
+	* CTree::move : allow nulls just as in insert_node
+
+Thu Apr 22 18:00:00 GMT 1999   Tuomas J. Lukka <lukka@iki.fi>
+	* CTree::insert_node, allow NULLs for the closed pix/bitmaps
+  	  as well.
+	* add GnomeCanvasWidget
+	
+Tue Apr 27 02:55:08 CEST 1999 Marc Lehmann <pcg@goof.com>
+
+	* add some missing clist functions that I needed.
+
+Tue, 20 Apr 1999 13:54:29 +0200 Paolo Molaro <lupus@debian.org>
+
+	* Gtk/xs/Gtk.xs: added gtk_events_pending.
+
 Mon Apr 19 18:41:06 EDT 1999   Kenneth Albanowski <kjahds@kjahds.com>
 	* Point release Gtk-Perl-0.5121.tar.gz
 

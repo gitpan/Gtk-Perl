@@ -135,4 +135,18 @@ gtk_menu_reposition(self)
 
 #endif
 
+#if GTK_HVER >= 0x01010D
+
+void
+gtk_menu_set_title(self, title)
+	Gtk::Menu	self
+	char *	title
+
+void
+gtk_menu_set_tearoff_state(self, torn_off)
+	Gtk::Menu	self
+	bool	torn_off
+
+#endif
+
 #endif

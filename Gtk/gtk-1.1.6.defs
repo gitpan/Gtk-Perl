@@ -7,4 +7,11 @@
   (action GTK_RUN_ACTION)
   (no-hooks GTK_RUN_NO_HOOKS))
 
+(define-enum GtkPolicyType
+  (always GTK_POLICY_ALWAYS)
+  (never GTK_POLICY_NEVER)
+  (automatic GTK_POLICY_AUTOMATIC))
 
+(define-enum GtkToolbarSpaceStyle
+  (empty GTK_TOOLBAR_SPACE_EMPTY)
+  (line GTK_TOOLBAR_SPACE_LINE))

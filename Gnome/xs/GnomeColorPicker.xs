@@ -60,7 +60,7 @@ gnome_color_picker_get_i8(colorpicker)
 	Gnome::ColorPicker	colorpicker
 	PPCODE:
 	{
-		int r,g,b,a;
+		guint8 r,g,b,a;
 		gnome_color_picker_get_i8(colorpicker, &r, &g, &b, &a);
 		EXTEND(sp, 4);
 		PUSHs(sv_2mortal(newSViv(r)));
@@ -74,7 +74,7 @@ gnome_color_picker_get_i16(colorpicker)
 	Gnome::ColorPicker	colorpicker
 	PPCODE:
 	{
-		int r,g,b,a;
+		guint16 r,g,b,a;
 		gnome_color_picker_get_i16(colorpicker, &r, &g, &b, &a);
 		EXTEND(sp, 4);
 		PUSHs(sv_2mortal(newSViv(r)));

@@ -9,6 +9,7 @@
 #include "GtkDefs.h"
 
 typedef GdkImlibImage * Gtk__Gdk__ImlibImage;
+typedef GdkImlibSaveInfo * Gtk__Gdk__Imlib__SaveInfo;
 typedef GdkImlibColorModifier * Gtk__Gdk__Imlib__ColorModifier;
 
 SV * newSVGdkImlibImage(GdkImlibImage * value) {
@@ -63,6 +64,58 @@ GdkImlibColorModifier * SvGdkImlibColorModifier(SV * data)
 	return m;
 }
 
+SV * newSVGdkImlibSaveInfo(GdkImlibSaveInfo * m)
+{
+	HV * h;
+	SV * r;
+	
+	if (!m)
+		return newSVsv(&PL_sv_undef);
+		
+	h = newHV();
+	r = newRV_inc((SV*)h);
+	SvREFCNT_dec(h);
+
+	hv_store(h, "quality", 7, newSViv(m->quality), 0);
+	hv_store(h, "scaling", 7, newSViv(m->scaling), 0);
+	hv_store(h, "xjustification", 14, newSViv(m->xjustification), 0);
+	hv_store(h, "yjustification", 14, newSViv(m->yjustification), 0);
+	hv_store(h, "page_size", 9, newSViv(m->page_size), 0);
+	hv_store(h, "color", 5, newSViv(m->color), 0);
+	
+	return r;
+}
+
+GdkImlibSaveInfo * SvGdkImlibSaveInfo(SV * data)
+{
+	HV * h;
+	SV ** s;
+	GdkImlibSaveInfo * m;
+
+	if ((!data) || (!SvOK(data)) || (!SvRV(data)) || (SvTYPE(SvRV(data)) != SVt_PVHV))
+		return 0;
+		
+	h = (HV*)SvRV(data);
+
+	m = alloc_temp(sizeof(GdkImlibSaveInfo));
+	
+	memset(m,0,sizeof(GdkImlibSaveInfo));
+
+	if ((s=hv_fetch(h, "quality", 7, 0)) && SvOK(*s))
+		m->quality = SvIV(*s);
+	if ((s=hv_fetch(h, "scaling", 7, 0)) && SvOK(*s))
+		m->scaling = SvIV(*s);
+	if ((s=hv_fetch(h, "xjustification", 14, 0)) && SvOK(*s))
+		m->xjustification = SvIV(*s);
+	if ((s=hv_fetch(h, "yjustification", 14, 0)) && SvOK(*s))
+		m->yjustification = SvIV(*s);
+	if ((s=hv_fetch(h, "page_size", 9, 0)) && SvOK(*s))
+		m->page_size = SvIV(*s);
+	if ((s=hv_fetch(h, "color", 5, 0)) && SvOK(*s))
+		m->color = SvIV(*s);
+
+	return m;
+}
 
 MODULE = Gtk::Gdk::ImlibImage	PACKAGE = Gtk::Gdk::Pixmap
 
@@ -117,6 +170,15 @@ gdk_imlib_load_image(Class, file)
 	char* file
 	CODE:
 	RETVAL = gdk_imlib_load_image(file);
+	OUTPUT:
+	RETVAL
+
+Gtk::Gdk::ImlibImage
+gdk_imlib_load_alpha(Class, file)
+	SV * Class
+	char* file
+	CODE:
+	RETVAL = gdk_imlib_load_alpha(file);
 	OUTPUT:
 	RETVAL
 
@@ -396,6 +458,33 @@ gdk_imlib_create_image_from_data(Class, data, alpha, w, h)
 	RETVAL
 
 Gtk::Gdk::ImlibImage
+gdk_imlib_create_image_from_drawable(Class, gwin, gmask, x, y, width, height)
+	SV *	Class
+	Gtk::Gdk::Window	gwin
+	Gtk::Gdk::Bitmap	gmask
+	int	x
+	int	y
+	int	width
+	int	height
+	CODE:
+	RETVAL = gdk_imlib_create_image_from_drawable(gwin, gmask, x, y, width, height);
+	OUTPUT:
+	RETVAL
+
+Gtk::Gdk::ImlibImage
+gdk_imlib_inlined_png_to_image(Class, data)
+	SV *	Class
+	SV *	data
+	CODE:
+	{
+		STRLEN len;
+		RETVAL = gdk_imlib_inlined_png_to_image(SvPV(data, len), len);
+	}
+	OUTPUT:
+	RETVAL
+
+
+Gtk::Gdk::ImlibImage
 gdk_imlib_clone_image(self)
 	Gtk::Gdk::ImlibImage self
 
@@ -404,6 +493,22 @@ gdk_imlib_clone_scaled_image(self, w, h)
 	Gtk::Gdk::ImlibImage self
 	int w
 	int h
+
+void
+gdk_imlib_crop_image(self, x, y, w, h)
+       Gtk::Gdk::ImlibImage self
+       int x
+       int y
+       int w
+       int h
+
+Gtk::Gdk::ImlibImage
+gdk_imlib_crop_and_clone_image(self, x, y, w, h)
+       Gtk::Gdk::ImlibImage self
+       int x
+       int y
+       int w
+       int h
 
 int
 gdk_imlib_get_fallback(Class)
@@ -483,6 +588,37 @@ gdk_imlib_data_to_pixmap(Class, data, ...)
 		}
 		free(lines);
 	}
+
+void
+gdk_imlib_get_cache_info(Class)
+	SV *	Class
+	PPCODE:
+	{
+		int cache_p, cache_i;
+		gdk_imlib_get_cache_info(&cache_p, &cache_i);
+		/*EXTEND(sp,2);
+		PUSHi(cache_p);
+		PUSHi(cache_i);
+		*/
+	}
+
+void
+gdk_imlib_set_cache_info(Class, cache_pixmaps, cache_images)
+	SV *	Class
+	int	cache_pixmaps
+	int	cache_images
+	CODE:
+	gdk_imlib_set_cache_info(cache_pixmaps, cache_images);
+
+gint
+gdk_imlib_save_image(self, file, info=0)
+	Gtk::Gdk::ImlibImage self
+	char *	file
+	Gtk::Gdk::Imlib::SaveInfo info
+	CODE:
+	RETVAL = gdk_imlib_save_image(self, file, info);
+	OUTPUT:
+	RETVAL
 
 int
 rgb_width(self)

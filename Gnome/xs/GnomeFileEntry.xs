@@ -32,5 +32,26 @@ gnome_file_entry_set_title(fentry, browse_dialog_title)
 	Gnome::FileEntry	fentry
 	char *	browse_dialog_title
 
+void
+gnome_file_entry_set_modal (fentry, is_modal)
+	Gnome::FileEntry	fentry
+	int	is_modal
+
+void
+gnome_file_entry_set_directory (fentry, directory_entry)
+	Gnome::FileEntry	fentry
+	int	directory_entry
+
+void
+gnome_file_entry_set_default_path (fentry, path)
+	Gnome::FileEntry	fentry
+	char *	path
+
+char*
+gnome_file_entry_get_full_path (fentry, file_must_exist)
+	Gnome::FileEntry	fentry
+	int	file_must_exist
+
+
 #endif
 

@@ -120,6 +120,11 @@ gtk_clist_set_column_widget(self, column, widget)
 	int		column
 	Gtk::Widget	widget
 
+Gtk::Widget
+gtk_clist_get_column_widget(self, column)
+	Gtk::CList	self
+	int		column
+
 void
 gtk_clist_set_column_justification(self, column, justification)
 	Gtk::CList	self

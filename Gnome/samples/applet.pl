@@ -5,14 +5,9 @@
 
 use Gnome;
 
-init Gnome "applet.pl";
-
-
-$NAME = 'Applet';
-
 init Gnome::Panel::AppletWidget 'applet.pl';
 
-$a = new Gnome::Panel::AppletWidget;
+$a = new Gnome::Panel::AppletWidget 'applet.pl';
 realize $a;
 
 $b = new Gtk::Button "Button";

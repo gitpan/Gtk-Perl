@@ -15,3 +15,16 @@ $libs = "$libs -L$ENV{GNOME_LIBDIR} $ENV{GNOMEUI_LIBS}"; #hack hack
 
 print "Got libs='$libs' (gn: $ENV{GNOMEUI_LIBS})\n";
 
+$gnome_version = `gnome-config --version`;
+if ( $gnome_version =~ /(\d+)\.(\d+)\.(\d+)/) {
+	$gnome_major = $1;
+	$gnome_minor = $2;
+	$gnome_micro = $3;
+} else {
+	$gnome_major = $gnome_minor = $gnome_micro = 0;
+}
+
+$gnome_hverstr = sprintf("0x%02d%02d%02d", $gnome_major, $gnome_minor, $gnome_micro);
+
+push @defines, "-DGNOME_HVER=$gnome_hverstr";
+
