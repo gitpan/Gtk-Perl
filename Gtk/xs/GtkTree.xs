@@ -46,14 +46,13 @@ gtk_tree_remove_items(tree, ...)
 	{
 		GList * list = 0;
 		int i;
-		for(i=1;i<items;i++) {
+		for(i=items-1;i>0;i--) {
 			GtkObject * o;
 			o = SvGtkObjectRef(ST(i), "Gtk::TreeItem");
 			if (!o)
 				croak("item cannot be undef");
 			list = g_list_prepend(list, GTK_TREE_ITEM(o));
 		}
-		g_list_reverse(list);
 		gtk_tree_remove_items(tree, list);
 		g_list_free(list);
 	}

@@ -15,8 +15,10 @@
 #include "GtkDefs.h"
 
 #define MY_GTK_WIDGET_SET_FLAGS(widget, flag, value) G_STMT_START{ \
-	value?GTK_WIDGET_SET_FLAGS((widget), (flag)) \
-	:GTK_WIDGET_UNSET_FLAGS((widget), (flag)); \
+	if (value) \
+		GTK_WIDGET_SET_FLAGS((widget), (flag));\
+	else \
+		GTK_WIDGET_UNSET_FLAGS((widget), (flag)); \
 	}G_STMT_END 
 
 MODULE = Gtk::Widget		PACKAGE = Gtk::Widget		PREFIX = gtk_widget_
@@ -600,7 +602,7 @@ gtk_widget_user_style(widget, newvalue=0)
 
 #endif
 
-Gtk::Widget_Up
+Gtk::Widget_OrNULL_Up
 parent(widget)
 	Gtk::Widget	widget
 	CODE:

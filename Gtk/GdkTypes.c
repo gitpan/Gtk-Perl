@@ -443,6 +443,7 @@ SV * newSVGdkEvent(GdkEvent * e)
 		break;
 	default:
 		/*g_message("event type %d not handled", e->type);*/
+		break;
 	}
 	
 	return r;

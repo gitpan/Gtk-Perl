@@ -7,7 +7,7 @@ require AutoLoader;
 
 use Carp;
 
-$VERSION = '0.7003';
+$VERSION = '0.7004';
 
 @ISA = (@ISA, qw(Exporter DynaLoader));
 # Items to export into callers namespace by default. Note: do not export

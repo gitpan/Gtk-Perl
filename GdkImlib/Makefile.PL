@@ -59,7 +59,7 @@ WriteMakefile(
 	'TYPEMAPS' => $typemaps,
 	'XS' => $xfiles,
 	'XSOPT' => '-noversioncheck',
-	'DEFINE'    => join(' ',@defines),
+	'DEFINE'    => join(' ',"-I.", @defines),
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
 	'INC' => $inc,
 	'LIBS' => [$libs],

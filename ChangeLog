@@ -1,3 +1,22 @@
+Fri Oct 20 18:32:19 CEST 2000 Paolo Molaro <lupus@debian.org>
+
+	* Released 0.7004.
+
+Thu Oct 19 16:24:31 CEST 2000 Paolo Molaro <lupus@debian.org>
+
+	* Gtk::Widget::parent may return undef.
+	* Gtk/Gtk.pm: allow -init in use Gtk -init;
+	* Gtk/xs/GtkList.xs GtkTree.xs: applied patch from 
+		Francois Pons <fpons@mandrakesoft.com> (fixes list
+		problems and provides speedup).
+	* GdkImlib/Makefile.PL, Gtk/xs/GtkWidget.xs: fixes for picky
+	compilers pointed out by Aron Griffis <agriffis@bigfoot.com>.
+	* Gtk/GdkTypes.c: added a statement to a default case for picky 
+	compilers (bug found by Nick Metrowsky <nmetro@colorado.edu>).
+	* Gtk/xs/Gtk.xs: applied patch by Maher Awamy <muhri@muhri.net>
+	to expose XDISPLAY, XVISUAL and XCOLORMAP (with 64bit fixes by me).
+	* Preparation for release: folks, please test this.
+
 Wed, 16 Aug 2000 19:40:14 +0200
 
 	* Last minute bug fixes.

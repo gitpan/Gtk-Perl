@@ -6,7 +6,7 @@ require AutoLoader;
 
 use Carp;
 
-$VERSION = '0.7003';
+$VERSION = '0.7004';
 
 @ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export
@@ -18,6 +18,13 @@ $VERSION = '0.7003';
 # Other items we are prepared to export if requested
 @EXPORT_OK = qw(
 );
+
+sub import {
+	my $self = shift;
+	foreach (@_) {
+		$self->init(),	next if /^-init$/;
+	}
+}
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

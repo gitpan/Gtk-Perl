@@ -10,7 +10,7 @@ require AutoLoader;
 use Carp;
 use strict;
 
-$Gtk::GladeXML::VERSION = '0.7003';
+$Gtk::GladeXML::VERSION = '0.7004';
 
 @Gtk::GladeXML::ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export

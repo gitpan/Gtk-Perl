@@ -26,14 +26,13 @@ insert_items(list, position, ...)
 	{
 		GList * tmp = 0;
 		int i;
-		for(i=2;i<items;i++) {
+		for(i=items-1;i>1;i--) {
 			GtkObject * o;
 			o = SvGtkObjectRef(ST(i), "Gtk::ListItem");
 			if (!o)
 				croak("item cannot be undef");
 			tmp = g_list_prepend(tmp, o);
 		}	
-		tmp = g_list_reverse(tmp);
 		gtk_list_insert_items(list, tmp, position);
 	}
 
@@ -47,16 +46,14 @@ append_items(list, ...)
 	{
 		GList * tmp = 0;
 		int i;
-		for(i=1;i<items;i++) {
+		for(i=items-1;i>0;i--) {
 			GtkObject * o;
 			o = SvGtkObjectRef(ST(i), "Gtk::ListItem");
 			if (!o)
 				croak("item cannot be undef");
 			tmp = g_list_prepend(tmp, GTK_LIST_ITEM(o));
 		}
-		tmp = g_list_reverse(tmp);
 		gtk_list_append_items(list, tmp);
-		g_list_free(tmp);
 	}
 
  #ARG: ... list (list of Gtk::ListItem widgets)
@@ -67,16 +64,14 @@ prepend_items(list, ...)
 	{
 		GList * tmp = 0;
 		int i;
-		for(i=1;i<items;i++) {
+		for(i=items-1;i>0;i--) {
 			GtkObject * o;
 			o = SvGtkObjectRef(ST(i), "Gtk::ListItem");
 			if (!o)
 				croak("item cannot be undef");
 			tmp = g_list_prepend(tmp, GTK_LIST_ITEM(o));
 		}
-		tmp = g_list_reverse(tmp);
 		gtk_list_prepend_items(list, tmp);
-		g_list_free(tmp);
 	}
 
  #ARG: ... list (list of Gtk::ListItem widgets)
@@ -87,7 +82,7 @@ remove_items(list, ...)
 	{
 		GList * tmp = 0;
 		int i;
-		for(i=1;i<items;i++) {
+		for(i=items-1;i>0;i--) {
 			GtkObject * o;
 			o = SvGtkObjectRef(ST(i), "Gtk::ListItem");
 			if (!o)
@@ -108,7 +103,7 @@ remove_items_no_unref(list, ...)
 	{
 		GList * tmp = 0;
 		int i;
-		for(i=1;i<items;i++) {
+		for(i=items-1;i>0;i--) {
 			GtkObject * o;
 			o = SvGtkObjectRef(ST(i), "Gtk::ListItem");
 			if (!o)

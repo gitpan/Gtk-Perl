@@ -371,7 +371,9 @@ void UnregisterGtkObject(SV * sv_object, GtkObject * gtk_object)
 	if (!ObjectCache)
 		ObjectCache = newHV();
 	
-	/*printf("Unregistering PO %x/%d from GO %x/%d\n", hv_object, SvREFCNT(hv_object), gtk_object, gtk_object->ref_count);*/
+#ifdef DEBUG_TYPES
+	printf("Unregistering PO %x/%d from GO %x/%d\n", sv_object, SvREFCNT(sv_object), gtk_object, gtk_object->ref_count);
+#endif
 	
 	hv_delete(ObjectCache, buffer, strlen(buffer), G_DISCARD);
 }
@@ -384,7 +386,9 @@ void RegisterGtkObject(SV * sv_object, GtkObject * gtk_object)
 	if (!ObjectCache)
 		ObjectCache = newHV();
 	
-	/*printf("Registering PO %x/%d for GO %x/%d\n", hv_object, SvREFCNT(hv_object), gtk_object, gtk_object->ref_count);*/
+#ifdef DEBUG_TYPES
+	printf("Registering PO %x/%d for GO %x/%d\n", sv_object, SvREFCNT(sv_object), gtk_object, gtk_object->ref_count);
+#endif
 
 	hv_store(ObjectCache, buffer, strlen(buffer), newRV((SV*)sv_object), 0);
 }
@@ -401,9 +405,15 @@ SV * RetrieveGtkObject(GtkObject * gtk_object)
 
 	s = hv_fetch(ObjectCache, buffer, strlen(buffer), 0);
 	
+#ifdef DEBUG_TYPES
+		printf("try to retreive %p\n", gtk_object);
+#endif
 	if (s) {
 		sv_object = (SV*)SvRV(*s);
 		/*printf("Retrieving PO %x/%d for GO %x/%d\n", hv_object, SvREFCNT(hv_object), gtk_object, gtk_object->ref_count);*/
+#ifdef DEBUG_TYPES
+		printf("retreive %p -> %p\n", sv_object, gtk_object);
+#endif
 		return sv_object;
 	} else
 		return 0;
@@ -419,7 +429,9 @@ int GCHVObject(HV * hv_object) {
 		return 0;
 	gtk_object = (GtkObject*)SvIV(*found);
 
-	/*printf("Checking PO %x/%d vs GO %x/%d\n", hv_object, SvREFCNT(hv_object), gtk_object, gtk_object->ref_count);*/
+#ifdef DEBUG_TYPES
+	printf("Checking PO %x/%d vs GO %x/%d\n", hv_object, SvREFCNT(hv_object), gtk_object, gtk_object->ref_count);
+#endif
 	if ((gtk_object->ref_count == 1) && (SvREFCNT(hv_object) == 1)) {
 		/*printf("Derefing PO in GC\n");*/
 		UnregisterGtkObject((SV*)hv_object, gtk_object);
@@ -647,15 +659,33 @@ SV * newSVGtkObjectRef(GtkObject * object, char * classname)
 		h = newHV();
 		s = newSViv((long)object);
 		hv_store(h, "_gtk", 4, s, 0);
+#ifdef DEBUG_TYPES
+		printf("1Creating new PO %p/%d referencing GO %p/%d\n", h, SvREFCNT(h), object, object->ref_count);
+#endif
 		result = newRV((SV*)h);
+#ifdef DEBUG_TYPES
+		printf("2Creating new PO %p/%d referencing GO %p/%d\n", h, SvREFCNT(h), object, object->ref_count);
+#endif
 		RegisterGtkObject((SV*)h, object);
+		/*SvREFCNT_dec(h);*/
+#ifdef DEBUG_TYPES
+		printf("3Creating new PO %p/%d referencing GO %p/%d\n", h, SvREFCNT(h), object, object->ref_count);
+#endif
 		gtk_object_ref(object);
+#ifdef DEBUG_TYPES
+		printf("4Creating new PO %p/%d referencing GO %p/%d\n", h, SvREFCNT(h), object, object->ref_count);
+#endif
 		gtk_signal_connect(object, "destroy", (GtkSignalFunc)DestroyGtkObject, (gpointer)h);
 		gtk_object_set_data_full(object, "_perl", h, FreeGtkObject);
 		sv_bless(result, gv_stashpv(classname, FALSE));
+#ifdef DEBUG_TYPES
+		printf("5Creating new PO %p/%d referencing GO %p/%d\n", h, SvREFCNT(h), object, object->ref_count);
+#endif
 		SvREFCNT_dec(h);
 		GCAfterTimeout();
-		/*printf("Creating new PO %p/%d referencing GO %p/%d\n", h, SvREFCNT(h), object, object->ref_count);*/
+#ifdef DEBUG_TYPES
+		printf("Creating new PO %p/%d referencing GO %p/%d\n", h, SvREFCNT(h), object, object->ref_count);
+#endif
 	}
 	return result;
 }

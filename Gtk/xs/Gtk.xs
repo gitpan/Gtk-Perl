@@ -3091,7 +3091,7 @@ gdk_selection_property_get (window)
 MODULE = Gtk        PACKAGE = Gtk::Gdk::Pixmap  PREFIX = gdk_window_
 
  #DESC: Get the low-level id of the drawable.
-unsigned int
+unsigned long
 XWINDOW(window)
 	Gtk::Gdk::Window	window
 	CODE:
@@ -3099,6 +3099,15 @@ XWINDOW(window)
 	OUTPUT:
 	RETVAL
 
+unsigned long
+XDISPLAY(window)
+	Gtk::Gdk::Window	window
+	CODE:
+	RETVAL = GDK_WINDOW_XDISPLAY(window);
+	OUTPUT:
+	RETVAL
+
+	
  #DESC: Get the type of the drawable.
 Gtk::Gdk::WindowType
 gdk_window_get_type(window)
@@ -3328,6 +3337,14 @@ new(Class, visual, allocate)
 	int	allocate
 	CODE:
 	RETVAL = gdk_colormap_new(visual, allocate);
+	OUTPUT:
+	RETVAL
+
+unsigned long
+XCOLORMAP(cmap)
+	Gtk::Gdk::Colormap	cmap
+	CODE:
+	RETVAL = GDK_COLORMAP_XCOLORMAP(cmap);
 	OUTPUT:
 	RETVAL
 
@@ -3950,6 +3967,15 @@ best_type(Class=0)
 	RETVAL = newSVGdkVisualType(gdk_visual_get_best_type());
 	OUTPUT:
 	RETVAL
+
+unsigned long
+XVISUAL(visual)
+	Gtk::Gdk::Visual	visual
+	CODE:
+	RETVAL = GDK_VISUAL_XVISUAL(visual);
+	OUTPUT:
+	RETVAL
+	
 
 Gtk::Gdk::Visual
 best(Class=0, depth=0, type=0)
