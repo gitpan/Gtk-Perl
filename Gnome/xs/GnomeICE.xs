@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::ICE		PACKAGE = Gnome::ICE	PREFIX = gnome_ice_
 

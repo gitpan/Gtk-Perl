@@ -1,7 +1,7 @@
 
 	The source files in this distribution are 
-	Copyright (C) 1997-1999, Kenneth Albanowski, and are licensed for
-	use under the same terms as Perl itself.
+	Copyright (C) 1997-1999, Kenneth Albanowski, Paolo Molaro and are 
+	licensed for use under the same terms as Perl itself.
 
 The graphics files, testgtkrc file, */*.defs (originally gtk.defs) file,
 and the origination for test.pl and simple.pl are from the gtk distribution,
@@ -28,6 +28,29 @@ and are under this copyright:
 The GNU public license is included with Perl, and with this distribution in
 the file "COPYING".
 
+Starting with version 0.7000 of this package, each submodule must be compiled
+separately: this allows for greater flexibility and lower memory usage.
+Gnome requires GdkImlib support build first.
+To compile each package, run "perl Makefile.PL; make; make install" in each subdir,
+starting from the base dir (the Gtk submodule, required by all the others).
+At the time of this writing the submodules supported are:
+./ (Gtk), GdkImlib, Gnome, GtkXmHTML, GtkGLArea, Glade.
+See the INSTALL file for more details on installing this package.
+
+This setup may require changes in the source code of existing programs, ie
+if you need gdk-imlib support, you need to "use Gtk::Gdk::ImlibImage".
+The same applies if you used gnome features without "use Gnome".
+
+Also, starting with version 0.7000, info about flags and enumeration values are
+retreived directly from gtk+ at runtime instead of relying on our .defs files.
+This makes for faster startup and lower memory usage, but may introduce
+some source incompatibilities: the only one I know of is the values of
+Gtk::PackerOptions (pack-expand becomes expand now).
+
+This module should compile with Gtk+ version 1.2.x, gnome version 1.0.x,
+libglade version 0.11, gdkimlib version 1.9.x, gtkglarea 1.2.x.
+
+Some of the information below may be out of date.
 
 Usage information: this package was designed to work Gtk+ versions 0.99.10
 through 1.2.3, though there is no guarantee it will work with any other

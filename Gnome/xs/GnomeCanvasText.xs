@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::CanvasText		PACKAGE = Gnome::CanvasText		PREFIX = gnome_canvas_text_
 

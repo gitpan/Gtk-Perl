@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::FileEntry		PACKAGE = Gnome::FileEntry		PREFIX = gnome_file_entry_
 

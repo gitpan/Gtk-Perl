@@ -2,7 +2,7 @@
 $Prefix = $ARGV[0];
 $PREFIX = uc $Prefix;
 
-@ARGV = <*/*.h>;
+@ARGV = (<$Prefix/*.h>, <*.h>);
 
 $div1 = "";
 $div2 = "";

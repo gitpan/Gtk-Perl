@@ -26,7 +26,7 @@ colorsel(csdialog)
 	OUTPUT:
 	RETVAL
 
-Gtk::Widget
+Gtk::Widget_Up
 ok_button(csdialog)
 	Gtk::ColorSelectionDialog	csdialog
 	CODE:
@@ -34,7 +34,7 @@ ok_button(csdialog)
 	OUTPUT:
 	RETVAL
 
-Gtk::Widget
+Gtk::Widget_Up
 cancel_button(csdialog)
 	Gtk::ColorSelectionDialog	csdialog
 	CODE:
@@ -42,7 +42,7 @@ cancel_button(csdialog)
 	OUTPUT:
 	RETVAL
 
-Gtk::Widget
+Gtk::Widget_Up
 help_button(csdialog)
 	Gtk::ColorSelectionDialog	csdialog
 	CODE:

@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::FontSelector		PACKAGE = Gnome::FontSelector		PREFIX = gnome_font_selector_
 

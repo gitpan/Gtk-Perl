@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::CanvasRE		PACKAGE = Gnome::CanvasRE		PREFIX = gnome_canvas_re_
 

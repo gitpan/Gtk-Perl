@@ -4,14 +4,81 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GtkXmHTMLDefs.h"
+
+static void 
+destroy_handler(gpointer data) {
+        SvREFCNT_dec((AV*)data);
+}
+
+static void     callXS (void (*subaddr)(CV* cv), CV *cv, SV **mark)
+{
+        int items;
+        dSP;
+        PUSHMARK (mark);
+        (*subaddr)(cv);
+
+        PUTBACK;  /* Forget the return values */
+}
 
 #define sp (*_sp)
 static int fixup_xmhtml(SV ** * _sp, int match, GtkObject * object, char * signame, int nparams, GtkArg * args, GtkType return_type)
 {
-	XPUSHs(sv_2mortal(newSVXmAnyCallbackStruct((XmAnyCallbackStruct*)GTK_VALUE_POINTER(args[0]))));
+	dTHR;
+	if (match == 0 ) {
+		XPUSHs(sv_2mortal(newSVpv(GTK_VALUE_POINTER(args[0]), 0)));
+		XPUSHs(sv_2mortal(newSVXmAnyCallbackStruct((XmAnyCallbackStruct*)GTK_VALUE_POINTER(args[1]))));
+	} else
+		XPUSHs(sv_2mortal(newSVXmAnyCallbackStruct((XmAnyCallbackStruct*)GTK_VALUE_POINTER(args[0]))));
 	return 1;
 }
 #undef sp
+
+static XmImageInfo *
+my_load_image(GtkWidget *self, gchar *ref) {
+	AV * args;
+	SV * handler, *result, *name;
+	int i;
+	XmImageInfo *info = NULL;
+	STRLEN len;
+	dSP;
+	
+	/* FIXME: add a destroy handler for args */
+	args = gtk_object_get_data(GTK_OBJECT(self), "_perl_im_cb");
+	handler = * av_fetch(args, 0, 0);
+	
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(sp);
+	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(self), 0)));
+	XPUSHs(sv_2mortal(newSVpv(ref, 0)));
+	for (i=1;i<=av_len(args);i++)
+		XPUSHs(sv_2mortal(newSVsv(*av_fetch(args, i, 0))));
+
+	PUTBACK;
+	i = perl_call_sv(handler, G_ARRAY);
+	if (i!=2)
+		croak("handler failed");
+
+	SPAGAIN;
+	result = POPs;
+	name = POPs;
+
+	if (SvOK(result) && SvPV(result, len) != NULL) {
+		/*printf("Got data: len = %d\n", len);*/
+		info = XmHTMLImageDefaultProc(self, SvPV(name, len), SvPV(result, len), len);
+	} else {
+		/*printf("Got file: %s\n", SvPV(result, len));*/
+		info = XmHTMLImageDefaultProc(self, SvPV(name, len), NULL, 0);
+	}
+
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+	
+	return info;
+}
+
 
 MODULE = Gtk::XmHTML	PACKAGE = Gtk::XmHTML	PREFIX = gtk_xmhtml_
 
@@ -21,10 +88,12 @@ void
 init(Class)
 	CODE:
 	{
+		static int did_it = 0;
 		static char * names[] = {
+				"anchor-visited",
 				"activate",
 				"arm",
-				"anchor_track",
+				"anchor-track",
 				"frame",
 				"form",
 				"input",
@@ -33,10 +102,15 @@ init(Class)
 				"imagemap",
 				"document",
 				"_focus",
-				"losing_focus",
-				"motion_track",
-				"html_event",
-				"anchor_visited" };
+				"losing-focus",
+				"motion-track",
+				"html-event",
+				0};
+		if (did_it)
+			return;
+		did_it = 1;
+		GtkXmHTML_InstallTypedefs();
+		GtkXmHTML_InstallObjects();
 		AddSignalHelperParts(gtk_xmhtml_get_type(), names, fixup_xmhtml, 0);
 	}
 
@@ -178,7 +252,7 @@ gtk_xmhtml_set_freeze_animations(self, flag)
 
 #if 0
 
-char*
+gstring
 gtk_xmhtml_get_source(self)
 	Gtk::XmHTML self
 
@@ -234,5 +308,25 @@ gtk_xmhtml_set_rgb_conv_mode(self, val)
 	Gtk::XmHTML self
 	int val
 
+void
+gtk_xmhtml_set_image_procs (self, handler, ...)
+	Gtk::XmHTML self
+	SV *	handler
+	CODE:
+	{
+		AV * args = newAV();
+		PackCallbackST(args, 1);
+
+		gtk_xmhtml_set_image_procs(self, my_load_image, NULL, NULL, NULL);
+		gtk_object_set_data_full(GTK_OBJECT(self), "_perl_im_cb", args, destroy_handler);
+	}
+
+
 #endif
+
+INCLUDE: ../build/boxed.xsh
+
+INCLUDE: ../build/objects.xsh
+
+INCLUDE: ../build/extension.xsh
 

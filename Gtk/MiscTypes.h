@@ -9,6 +9,8 @@
 #include "PerlGtkInt.h"
 #endif
 
+#include <gtk/gtktypeutils.h>
+
 struct opts { int value; char * name; };
    
 PerlGtkDeclareFunc(void, UnregisterMisc)(HV * hv_object, void * misc_object);
@@ -23,12 +25,20 @@ PerlGtkDeclareFunc(long, SvOpt)(SV * name, char * optname, struct opts * o);
 PerlGtkDeclareFunc(SV *, newSVOpt)(long value, char * optname, struct opts * o);
 
 PerlGtkDeclareFunc(long, SvOptFlags)(SV * name, char * optname, struct opts * o);
-PerlGtkDeclareFunc(SV *, newSVOptFlags)(long value, char * optname, struct opts * o, int hash);
+PerlGtkDeclareFunc(SV *, newSVOptFlags)(long value, char * optname, struct opts * o);
 
 PerlGtkDeclareFunc(long, SvOptsHash)(SV * name, char * optname, HV * o);
 PerlGtkDeclareFunc(SV *, newSVOptsHash)(long value, char * optname, HV * o);
 PerlGtkDeclareFunc(long, SvFlagsHash)(SV * name, char * optname, HV * o);
-PerlGtkDeclareFunc(SV *, newSVFlagsHash)(long value, char * optname, HV * o, int hash);
+PerlGtkDeclareFunc(SV *, newSVFlagsHash)(long value, char * optname, HV * o);
+
+PerlGtkDeclareFunc (SV *, newSVDefEnumHash)(GtkType type, long value);
+PerlGtkDeclareFunc (SV *, newSVDefFlagsHash)(GtkType type, long value);
+PerlGtkDeclareFunc (long, SvEFValueLookup)(GtkEnumValue * vals, char* name, GtkType type);
+PerlGtkDeclareFunc (long, SvDefEnumHash)(GtkType type, SV *name);
+PerlGtkDeclareFunc (long, SvDefFlagsHash)(GtkType type, SV *name);
+PerlGtkDeclareVar(int, pgtk_use_minus);
+PerlGtkDeclareVar(int, pgtk_use_array);
 
 PerlGtkDeclareFunc(void *, alloc_temp)(int length);
 

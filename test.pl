@@ -55,12 +55,19 @@ foreach (@INC) {
 
 sub run {
 	my($script) = @_;
+	my(@blib) = ();
 	
-	print "\nExecuting (in $script->{directory}: ", join(' ', @exec, $script->{file}), "\n";
+	foreach (split(/\s+/, $script->{requires})) {
+		next if /^Gtk$/;
+		push(@blib, "-Mblib=../../$_") if -d "$_/blib";
+		push(@blib, "-Mblib=../../GdkImlib") 
+			if (/^Gnome$/ && -d "GdkImlib/blib");
+	}
+	print "\nExecuting (in $script->{directory}: ", join(' ', @exec, @blib, $script->{file}), "\n";
 	
 	if (!fork) {
 		chdir($script->{directory});
-		exec @exec, $script->{file};
+		exec @exec, @blib, $script->{file};
 	}
 }
 
@@ -69,6 +76,7 @@ sub run {
 $main_window = new Gtk::Window -toplevel;
 $main_window->set_title("Samples for Perl/Gtk+");
 $main_window->set_border_width(5);
+$main_window->set_usize(600, 500);
 
 $hbox = new Gtk::HBox 0, 0;
 show $hbox;
@@ -149,6 +157,11 @@ $source_hbox->pack_end($source_vscroll, 0, 0, 0);
 $vbox->pack_start($source_hbox, 1, 1, 0);
 
 $hbbox = new Gtk::HButtonBox;
+
+$run = new Gtk::Button "Quit";
+$run->signal_connect("clicked" => sub { Gtk->exit(0);} );
+show $run;
+$hbbox->add($run);
 
 $run = new Gtk::Button "Run";
 $run->signal_connect("clicked" => sub { run $current_sample if defined $current_sample;} );

@@ -101,4 +101,22 @@ gtk_adjustment_page_size (self, change=0)
 	OUTPUT:
 	RETVAL
 
+#if GTK_HVER >= 0x010200
+
+void
+gtk_adjustment_changed (adj)
+	Gtk::Adjustment	adj
+
+void
+gtk_adjustment_value_changed (adj)
+	Gtk::Adjustment	adj
+
+void
+gtk_adjustment_clamp_page (adj, lower, upper)
+	Gtk::Adjustment adj
+	double	lower
+	double	upper
+
+#endif
+
 #endif

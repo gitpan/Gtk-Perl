@@ -6,8 +6,10 @@
 
 use Gtk;
 use OpenGL qw(:all !:glutconstants !:glutfunctions);
+use Gtk::GLArea;
 use Gtk::GLArea::Glut qw(:all);
 init Gtk;
+init Gtk::GLArea;
 
 use Data::Dumper;
 
@@ -71,7 +73,7 @@ sub gear
 	
 	glShadeModel(GL_FLAT);
 	
-	glNormal3d(0.0, 0.0, 1.0);
+	glNormal3f(0.0, 0.0, 1.0);
 	
 	glBegin(GL_QUAD_STRIP);
 	for ($i = 0; $i <= $teeth; $i++) {

@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::Dialog		PACKAGE = Gnome::Dialog		PREFIX = gnome_dialog_
 
@@ -103,6 +105,14 @@ vbox(dialog)
 CODE:
 	RETVAL = GTK_WIDGET(dialog->vbox);
 OUTPUT:
+	RETVAL
+
+Gtk::Widget_OrNULL_Up
+action_area(dialog)
+	Gnome::Dialog dialog
+	CODE:
+	RETVAL = GTK_WIDGET(dialog->action_area);
+	OUTPUT:
 	RETVAL
 
 

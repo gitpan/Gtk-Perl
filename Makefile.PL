@@ -3,9 +3,11 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 
 use Cwd;
+require 'Depends.pm';
+#import ExtUtils::Depends;
 
-print "Configuring Perl/Gtk+... Note that additional packages can be added\n";
-print "by giving switches to Makefile.PL, including:\n\n";
+#print "Configuring Perl/Gtk+... Note that additional packages can be added\n";
+#print "by giving switches to Makefile.PL, including:\n\n";
 
 foreach (<*/pkg*.pl>) {
 	next unless m!(.*)/pkg(.*)\.pl!;
@@ -15,15 +17,15 @@ foreach (<*/pkg*.pl>) {
 }
 
 foreach (sort keys %package) {
-	print "\t--with-$_\n";
+#	print "\t--with-$_\n";
 }
 
-print "\nWe are going to guess some packages, if we guess wrong just use\n";
-print qq{the flags above but change "with" to "without".\n\n};
+#print "\nWe are going to guess some packages, if we guess wrong just use\n";
+#print qq{the flags above but change "with" to "without".\n\n};
 
-print "Unfortunately, these packages aren't terribly smart, and you may need\n";
-print "to tweak the resultant Makefile or the */pkg*.pl files to properly\n";
-print "locate the files needed for a package.\n\n";
+#print "Unfortunately, these packages aren't terribly smart, and you may need\n";
+#print "to tweak the resultant Makefile or the */pkg*.pl files to properly\n";
+#print "locate the files needed for a package.\n\n";
 
 # Guess packages
 print "You may also use '--lazy-load', which will reduce initial memory usage\n";
@@ -37,12 +39,19 @@ print "and loading time, at the cost of some internal glitches.\n\n";
 for(keys %conf) {
 	my $v;
 	if( ($v = qx($conf{$_} --version)) =~ /[0-9]/ ) {
-		print "Guessing $_ - got version $v from $conf{$_}\n";
-		$defaultpack{$_} = 1;
+		# no default submodule compilation
+		#print "Guessing $_ - got version $v from $conf{$_}\n";
+		#$defaultpack{$_} = 1;
 	}
 }
 
 @defines = ();
+
+# Starting with Perl 5.005 all embed variables got PL_ prefix
+# so, to avoid errorswith sv_undef, we enable polluting name space..
+if ($] > 5.004) {
+	push @defines, "-DPERL_POLLUTE";
+}
 
 sub estr { # Take out blanks
 	local $_ = $_[0];
@@ -59,10 +68,6 @@ if(qx{gnome-config}) {
 	$gnome_version =~ s/\S+\s//;
 	print "gnome version = $gnome_version\n";
 	if($gnome_version =~ /0\.99/ || $gnome_version =~ /^1\./) {
-		push @defines, "-DNEW_GNOME";
-		print "new gnome found\n";
-	}
-	if($gnome_version =~ /1\./) {
 		push @defines, "-DNEW_GNOME";
 		print "new gnome found\n";
 	}
@@ -116,7 +121,7 @@ if ($gtk_version =~ /^(\d+)\.(\d+)\.(\d+)/) {
 	$gtk_micro = 0;
 }
 
-$gtk_hverstr = sprintf("0x%02d%02d%02d", $gtk_major, $gtk_minor, $gtk_micro);
+$gtk_hverstr = sprintf("0x%02x%02x%02x", $gtk_major, $gtk_minor, $gtk_micro);
 $gtk_hver = hex($gtk_hverstr);
 
 push @defines, "-DGTK_HVER=$gtk_hverstr";
@@ -138,7 +143,7 @@ $pm = {
 
 @clean = qw( build/perl-gtk-ref.pod build/perl-gtk-ds.pod
 	build/GtkTypes.pm build/GtkKeysyms.pm build/GtkTypemap build/GtkDefs.c build/GtkDefs.h build/Objects.xpl build/boxed.xsh build/extension.xsh build/objects.xsh 
-			build/PerlGtkExt.c build/PerlGtkExt.h build/PerlGtkInt.h Gtk/IFiles.pm */*.o */*/*.o);
+			build/PerlGtkExt.c build/PerlGtkExt.h build/PerlGtkInt.h build/IFiles.pm */*.o */*/*.o);
 
 %xs = ();
 %typemaps = ();
@@ -191,7 +196,8 @@ sub include_package {
 
 foreach (@ARGV) {
 	if (/^--with-/) {
-		include_package($');
+		#include_package($');
+		$defaultpack{$'} = 1;
 	} elsif(/^--without-/) {
 		print "Not including package $'\n";
 		delete $defaultpack{$'};
@@ -291,9 +297,9 @@ foreach (sort {$typemap{$a} <=> $typemap{$b}} keys %typemap) {
 
 use File::Basename;
 
-#foreach ( 'GtkDefs.h', 'PerlGtkExt.h', 'GtkTypes.h', 'GdkTypes.h', 'MiscTypes.h', 'gendefs.pl', 'genext.pl') {
-#	$pm->{$_} = '$(INST_ARCHLIBDIR)/Gtk/Install/' . basename($_);
-#}
+foreach ( 'build/GtkDefs.h', 'build/PerlGtkExt.h', 'build/PerlGtkInt.h', 'Gtk/ppport.h', 'Gtk/GtkTypes.h', 'Gtk/GdkTypes.h', 'Gtk/MiscTypes.h', 'tools/gendefs.pl', 'tools/genext.pl', 'tools/gendoc.pl') {
+	$pm->{$_} = '$(INST_ARCHLIBDIR)/Gtk/Install/' . basename($_);
+}
 
 #$archinstall = join(' ', map( "Gtk/Install/$_", @archinstall));
 
@@ -394,6 +400,7 @@ if (defined $inc and $inc !~ /^\s*$/) {
 
 $depend = {'build/GtkDefs.c' => 'build/PerlGtkExt.h build/PerlGtkInt.h'};
 
+ExtUtils::Depends::save_config('Gtk', 'build/IFiles.pm', $inc, $libs, $typemap, [keys %defs], [@defines], [keys %headers], $pm);
 
 WriteMakefile(
 	'DISTNAME' => 'Gtk-Perl',
@@ -404,6 +411,7 @@ WriteMakefile(
     'XS' => $xfiles,
     'XSOPT' => '-noversioncheck',
     'DEFINE'	=> join(' ',@defines),
+    'DIR'	=> '',
     'OBJECT' => $object,
 	'XSPROTOARG' => '-noprototypes',
 	'clean' => {FILES => join(' ', @clean) },

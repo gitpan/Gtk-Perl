@@ -1,0 +1,6 @@
+(define-object GtkHTML (GtkLayout))
+
+(define-enum GtkHTMLStreamStatus
+  (ok GTK_HTML_STREAM_OK)
+  (error GTK_HTML_STREAM_ERROR))
+

@@ -77,7 +77,7 @@ gtk_button_box_set_child_ipadding_default(Class, ipad_x, ipad_y)
 	int	ipad_x
 	int	ipad_y
 	CODE:
-	gtk_button_box_set_child_size_default(ipad_x, ipad_y);
+	gtk_button_box_set_child_ipadding_default(ipad_x, ipad_y);
 
 void
 gtk_button_box_get_child_ipadding_default (Class)
@@ -102,5 +102,6 @@ gtk_button_box_get_child_ipadding(self)
 		PUSHs(sv_2mortal(newSViv(ipad_x)));
 		PUSHs(sv_2mortal(newSViv(ipad_y)));
 	}
+
 
 #endif

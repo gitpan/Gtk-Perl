@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gtk::Image		PACKAGE = Gtk::Image		PREFIX = gtk_image_
 

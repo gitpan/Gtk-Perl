@@ -6,6 +6,8 @@
 #include "PerlGtkInt.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::PaperSelector		PACKAGE = Gnome::PaperSelector		PREFIX = gnome_paper_selector_
 

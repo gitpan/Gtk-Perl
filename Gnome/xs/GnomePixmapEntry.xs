@@ -6,6 +6,8 @@
 #include "PerlGtkInt.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::PixmapEntry		PACKAGE = Gnome::PixmapEntry		PREFIX = gnome_pixmap_entry_
 

@@ -55,6 +55,7 @@ sub typeize {
 	s/([a-z])([A-Z])/${1}_$2/g;
 	$_ = uc $_;
 	s/^GTK_/GTK_TYPE_/;
+	s/^GNOME_/GTK_TYPE_GNOME_/;
 	s/^GDK_/GTK_TYPE_GDK_/;
 	$_;
 }
@@ -174,7 +175,9 @@ sub process_node {
 				$perl = $_;
 				next;
 			}
-			$_->[0] =~ tr/-/_/;
+			# new convention is to use '-'
+			#$_->[0] =~ tr/-/_/;
+			$_->[0] =~ tr/_/-/;
 			push @enum, {simple => $_->[0], constant => $_->[1]};
 		}
 		if ( exists $enum{$node[1]} ) {
@@ -210,7 +213,9 @@ sub process_node {
 				$perl = $_;
 				next;
 			}
-			$_->[0] =~ tr/-/_/;
+			# new convention is to use '-'
+			#$_->[0] =~ tr/-/_/;
+			$_->[0] =~ tr/_/-/;
 			push @flag, {simple => $_->[0], constant => $_->[1]};
 		}
 		if ( exists $flags{$node[1]} ) {
@@ -343,6 +348,104 @@ foreach $node (parse_lisp($_)) {
 	process_node($node);
 
 }
+
+# Better way to get export stuff right with gtk+ 1.2.x:
+# We query gtk directly about the types it knows about...
+open(T, ">gtktypexp.c");
+print T <<'EOT';
+#include <gtk/gtktypeutils.h>
+#include <stdio.h>
+#include <string.h>
+
+int 
+main() {
+	char buf[256];
+	char *p;
+	GSList *names=NULL;
+
+	gtk_type_init();
+	while(fgets(buf, 256, stdin)) {
+		p = strchr(buf, '\n');
+		if (p)
+			*p = 0;
+		names = g_slist_prepend(names, g_strdup(buf));
+	}
+	for (; names; names = names->next) {
+		if (gtk_type_from_name((char*)names->data))
+			fprintf(stdout, "%s\n", names->data);
+	}
+	return 0;
+}
+EOT
+close(T);
+
+use Config;
+
+$c = "$Config{cc} $::inc gtktypexp.c $::libs -o gtktypexp";
+open(T, "|$c && ./gtktypexp > gtktypexp.out ");
+foreach my $hasht ((\%enum, \%flags, \%struct, \%boxed)) {
+	foreach (keys %{$hasht}) {
+		print T "$_\n";
+	}
+}
+close(T);
+open(T, "gtktypexp.out");
+@e = <T>;
+chomp(@e);
+@texported{@e} = ();
+close(T);
+unlink("gtktypexp.out", "gtktypexp", "gtktypexp.o", "gtktypexp.c");
+foreach my $hasht ((\%enum, \%flags, \%struct, \%boxed)) {
+	# does not work because gtk is broken: GTK_TYPE_GDK_WMFUNCTION
+	last;
+	# disabled for sub-modules...
+	last if $Module ne "Gtk";
+	foreach (keys %{$hasht}) {
+		#print "Checking $_: ", exists $texported{$_}, "\n";
+		$hasht->{$_}->{export} = exists $texported{$_};
+	}
+}
+
+# handle non-exported enums and flags...
+$enum_flags_code_decl = "";
+$enum_flags_code_init = "";
+$enum_flags_code_incl = "";
+
+foreach (sort keys %enum) {
+	next if $enum{$_}->{export};
+	print "Exporting enum: $_\n";
+	$v = $enum{$_};
+	$enum_flags_code_init .= "if (!($v->{typename}=gtk_type_from_name(\"$_\")))\n";
+	$enum_flags_code_init .= "\t\t$v->{typename} = gtk_type_register_enum(\"$_\", names_$_);\n";
+	$enum_flags_code_incl .= "extern GtkType $v->{typename};\n";
+	$enum_flags_code_decl .= "GtkType $v->{typename};\n";
+	$enum_flags_code_decl .= "static GtkEnumValue names_${_}[] = {\n";
+	foreach $v (@{$enum{$_}->{'values'}}) {
+		 $enum_flags_code_decl .= "\t{$v->{constant}, \"$v->{constant}\", \"$v->{simple}\"},\n";
+	}
+	$enum_flags_code_decl .= "\t{0, 0, 0}\n";
+	$enum_flags_code_decl .= "};\n";
+	$enum{$_}->{export} = 1;
+}
+
+foreach (sort keys %flags) {
+	next if $flags{$_}->{export};
+	print "Exporting flags: $_\n";
+	$v = $flags{$_};
+	$enum_flags_code_init .= "if (!gtk_type_from_name(\"$_\"))\n";
+	$enum_flags_code_init .= "\t\t$v->{typename} = gtk_type_register_flags(\"$_\", names_$_);\n";
+	$enum_flags_code_incl .= "extern GtkType $v->{typename};\n";
+	$enum_flags_code_decl .= "GtkType $v->{typename};\n";
+	$enum_flags_code_decl .= "static GtkEnumValue names_${_}[] = {\n";
+	foreach $v (@{$flags{$_}->{'values'}}) {
+		$enum_flags_code_decl .= "\t{$v->{constant}, \"$v->{constant}\", \"$v->{simple}\"},\n";
+	}
+	$enum_flags_code_decl .= "\t{0, 0, 0}\n";
+	$enum_flags_code_decl .= "};\n";
+	$flags{$_}->{export} = 1;
+}
+
+
 
 delete $pointer{""};
 #foreach (qw(CHAR BOOL INT UINT LONG ULONG FLOAT DOUBLE STRING ENUM FLAGS BOXED OBJECT POINTER)) {
@@ -542,12 +645,18 @@ Perl${FilePrefix}DeclareFunc(void, $opt{FilePrefix}_InstallTypedefs)(void);
 
 EOT
 
+print $enum_flags_code_incl;
 
 $i = 0;
 foreach (sort keys %enum) {
 	print "#define TYPE_$_\n";
-	print "Perl${FilePrefix}DeclareFunc(SV *, newSV$_)($_ value);\n";
-	print "Perl${FilePrefix}DeclareFunc($_, Sv$_)(SV * value);\n";
+	if ($enum{$_}->{export}) {
+		print "#define newSV$_(value) newSVDefEnumHash($enum{$_}->{typename}, (value))\n";
+		print "#define Sv$_(value) SvDefEnumHash($enum{$_}->{typename}, (value))\n";
+	} else {
+		print "Perl${FilePrefix}DeclareFunc(SV *, newSV$_)($_ value);\n";
+		print "Perl${FilePrefix}DeclareFunc($_, Sv$_)(SV * value);\n";
+	}
 #	print "#define pGE_$_ pGtkType[$i]\n";
 #	print "#define pGEName_$_ pGtkTypeName[$i]\n";
 #	print "#define newSV$_(v) newSVOptsHash(v, pGEName_$_, pGE_$_)\n";
@@ -561,8 +670,13 @@ foreach (sort keys %enum) {
 }
 foreach (sort keys %flags) {
 	print "#define TYPE_$_\n";
-	print "Perl${FilePrefix}DeclareFunc(SV *, newSV$_)($_ value);\n";
-	print "Perl${FilePrefix}DeclareFunc($_, Sv$_)(SV * value);\n";
+	if ($flags{$_}->{export}) {
+		print "#define newSV$_(value) newSVDefFlagsHash($flags{$_}->{typename}, (value))\n";
+		print "#define Sv$_(value) SvDefFlagsHash($flags{$_}->{typename}, (value))\n";
+	} else {
+		print "Perl${FilePrefix}DeclareFunc(SV *, newSV$_)($_ value);\n";
+		print "Perl${FilePrefix}DeclareFunc($_, Sv$_)(SV * value);\n";
+	}
 #	print "#define pGF_$_ pGtkType[$i]\n";
 #	print "#define pGFName_$_ pGtkTypeName[$i]\n";
 #	# Generate arrays
@@ -681,6 +795,8 @@ print <<"EOT";
 
 EOT
 
+print "#include \"GtkDefs.h\"\n\n" if ($opt{FilePrefix} ne 'Gtk');
+
 foreach (sort keys %boxed) {
 	next if $overrideboxed{$_};
 	print <<"EOT";
@@ -775,6 +891,7 @@ static SV * $opt{FilePrefix}_GetArg(GtkArg * a)
 EOT
 
 foreach (sort keys %enum) {
+	next if $enum{$_}->{export};
 	print "#ifdef $enum{$_}->{typename}\n" unless $enum{$_}->{export};
 	print "			if (a->type == $enum{$_}->{typename})\n";
 	print "				result = newSV$_(GTK_VALUE_ENUM(*a));\n";
@@ -789,6 +906,7 @@ print <<"EOT";
 EOT
 
 foreach (sort keys %flags) {
+	next if $flags{$_}->{export};
 	print "#ifdef $flags{$_}->{typename}\n" unless $flags{$_}->{export};
 	print "			if (a->type == $flags{$_}->{typename})\n";
 	print "				result = newSV$_(GTK_VALUE_FLAGS(*a));\n";
@@ -852,6 +970,7 @@ print <<"EOT";
 EOT
 
 foreach (sort keys %enum) {
+	next if $enum{$_}->{export};
 	print "#ifdef $enum{$_}->{typename}\n" unless $enum{$_}->{export};
 	print "			if (a->type == $enum{$_}->{typename})\n";
 	print "				GTK_VALUE_ENUM(*a) = Sv$_(v);\n";
@@ -864,6 +983,7 @@ print <<"EOT";
 		case GTK_TYPE_FLAGS:
 EOT
 foreach (sort keys %flags) {
+	next if $flags{$_}->{export};
 	print "#ifdef $flags{$_}->{typename}\n" unless $flags{$_}->{export};
 	print "			if (a->type == $flags{$_}->{typename})\n";
 	print "				GTK_VALUE_FLAGS(*a) = Sv$_(v);\n";
@@ -901,6 +1021,7 @@ static int $opt{FilePrefix}_SetRetArg(GtkArg * a, SV * v, SV * Class, GtkObject 
 EOT
 
 foreach (sort keys %enum) {
+	next if $enum{$_}->{export};
 	print "#ifdef $enum{$_}->{typename}\n" unless $enum{$_}->{export};
 	print "			if (a->type == $enum{$_}->{typename})\n";
 	print "				*GTK_RETLOC_ENUM(*a) = Sv$_(v);\n";
@@ -913,6 +1034,7 @@ print <<"EOT";
 		case GTK_TYPE_FLAGS:
 EOT
 foreach (sort keys %flags) {
+	next if $flags{$_}->{export};
 	print "#ifdef $flags{$_}->{typename}\n" unless $flags{$_}->{export};
 	print "			if (a->type == $flags{$_}->{typename})\n";
 	print "				*GTK_RETLOC_FLAGS(*a) = Sv$_(v);\n";
@@ -964,6 +1086,7 @@ static SV * $opt{FilePrefix}_GetRetArg(GtkArg * a)
 EOT
 
 foreach (sort keys %enum) {
+	next if $enum{$_}->{export};
 	print "#ifdef $enum{$_}->{typename}\n" unless $enum{$_}->{export};
 	print "			if (a->type == $enum{$_}->{typename})\n";
 	print "				result = newSV$_(*GTK_RETLOC_ENUM(*a));\n";
@@ -976,6 +1099,7 @@ print <<"EOT";
 		case GTK_TYPE_FLAGS:
 EOT
 foreach (sort keys %flags) {
+	next if $flags{$_}->{export};
 	print "#ifdef $flags{$_}->{typename}\n" unless $flags{$_}->{export};
 	print "			if (a->type == $flags{$_}->{typename})\n";
 	print "				result = newSV$_(*GTK_RETLOC_FLAGS(*a));\n";
@@ -1034,16 +1158,29 @@ static struct PerlGtkTypeHelper help =
 
 EOT
 
+print $enum_flags_code_decl;
+
 foreach (sort keys %enum) {
-	print "\nstatic HV * enum_$_;\n";
-	print "SV * newSV$_($_ v) { return newSVOptsHash(v, \"$enum{$_}->{perlname}\", enum_$_); }\n";
-	print "$_ Sv$_(SV * s) { return SvOptsHash(s, \"$enum{$_}->{perlname}\", enum_$_); }\n\n";
+	if ($enum{$_}->{export}) {
+		#print "SV * newSV$_($_ v) { return newSVDefEnumHash($enum{$_}->{typename}, v);}\n";
+		#print "$_ Sv$_(SV * s) { return SvDefEnumHash($enum{$_}->{typename}, s); }\n\n";
+	} else {
+		print "\nstatic HV * enum_$_;\n";
+		print "SV * newSV$_($_ v) { return newSVOptsHash(v, \"$enum{$_}->{perlname}\", enum_$_); }\n";
+		print "$_ Sv$_(SV * s) { return SvOptsHash(s, \"$enum{$_}->{perlname}\", enum_$_); }\n\n";
+	}
 }
 
 foreach (sort keys %flags) {
-	print "\nstatic HV * flags_$_;\n";
-	print "SV * newSV$_($_ v) { return newSVFlagsHash(v, \"$flags{$_}->{perlname}\", flags_$_, 1); }\n";
-	print "$_ Sv$_(SV * s) { return SvFlagsHash(s, \"$flags{$_}->{perlname}\", flags_$_); }\n\n";
+	if ($flags{$_}->{export}) {
+		# MAYBE its better to return an array ref instead of an hash
+		#print "SV * newSV$_($_ v) { return newSVDefFlagsHash($flags{$_}->{typename}, v, 1);}\n";
+		#print "$_ Sv$_(SV * s) { return SvDefFlagsHash($flags{$_}->{typename}, s); }\n\n";
+	} else {
+		print "\nstatic HV * flags_$_;\n";
+		print "SV * newSV$_($_ v) { return newSVFlagsHash(v, \"$flags{$_}->{perlname}\", flags_$_); }\n";
+		print "$_ Sv$_(SV * s) { return SvFlagsHash(s, \"$flags{$_}->{perlname}\", flags_$_); }\n\n";
+	}
 }
 
 
@@ -1057,8 +1194,13 @@ void $opt{FilePrefix}_InstallTypedefs(void) {
 	did_it = 1;
 	
 EOT
+
+print $enum_flags_code_init;
+
 $i = 0;
 foreach (sort keys %enum) {
+	next if $enum{$_}->{export};
+	next; # disable
 	print "\n	enum_$_ = newHV();\n";
 	foreach $v (@{$enum{$_}->{'values'}}) {
 		print "	hv_store(enum_$_, \"$v->{simple}\", ", length($v->{simple}), ", newSViv(", $v->{constant},"), 0);\n";
@@ -1069,6 +1211,8 @@ foreach (sort keys %enum) {
 }
 
 foreach (sort keys %flags) {
+	next if $flags{$_}->{export};
+	next; # disable
 	print "\n	flags_$_ = newHV();\n";
 	foreach $v (@{$flags{$_}->{'values'}}) {
 		print "	hv_store(flags_$_, \"$v->{simple}\", ", length($v->{simple}), ", newSViv(", $v->{constant},"), 0);\n";
@@ -1191,6 +1335,7 @@ print "MODULE = $Module	PACKAGE = $Module\n\n";
 
 foreach (sort keys %object) {
 	next if not length $object{$_}->{xsname};
+	next if $object{$_}->{perlname} eq $Module;
 	print <<"EOT";
 BOOT:
 {
@@ -1225,8 +1370,9 @@ select(STDOUT);
 # Write out the data structures documentation
 
 sub gen_doc {
+	my ($tag) = shift || 'gtk';
 	print STDERR "Creating reference documentation\n";
-	open (DOC, ">build/perl-gtk-ds.pod") || die "Cannot open doc file: $!";
+	open (DOC, ">build/perl-$tag-ds.pod") || die "Cannot open doc file: $!";
 	#print DOC "\n=head1 NAME\n\nPerl/Gtk data structures reference\n\n";
 
 	print DOC "=head1 Enumerations\n\n";

@@ -1,12 +1,16 @@
 #!/usr/bin/perl
 
 #TITLE: Gnome Canvas
-#REQUIRES: Gtk Gnome
+#REQUIRES: Gtk Gnome GdkImlib
 
-$NAME = 'Calculator';
+$NAME = 'Canvas';
 
+use Gtk;
+use Gtk::Gdk::ImlibImage;
 use Gnome;
-init Gnome "calculator.pl";
+#init Gtk;
+init Gnome "canvas.pl";
+init Gtk::Gdk::ImlibImage;
 
 my($window) = new Gtk::Widget "Gtk::Window",
 	-type => -toplevel,
@@ -87,15 +91,40 @@ my $txt = $cgroup2->new($cgroup2, "Gnome::CanvasText",
 	x => 50,
 	y => 50,
 	text => "A string\nToinen rivi",
+	fill_color => 'red',
+	font => 'fixed',
+	anchor => 'sw',
+);
+
+my $txt2 = $cgroup2->new($cgroup2, "Gnome::CanvasText",
+	x => 80,
+	y => 80,
+	text => "A string\nToinen rivi",
+	fill_color => 'steelblue',
+	font_gdk => load Gtk::Gdk::Font('-*-helvetica-*'),
+	anchor => 'center',
 );
 
 my $line = $cgroup2->new($cgroup2,"Gnome::CanvasLine",
  	points => [10,10, 40,30, 50,40, 30,80, 80, 80],
-	fill_color => green,
+	fill_color => "green",
 	width_pixels => 8,
 	smooth => 1,
 	spline_steps => 50
 );
 
+my $img = Gtk::Gdk::ImlibImage->load_image("save.xpm") || die;
+my $imgitem = $cgroup2->new($cgroup2, "Gnome::CanvasImage",
+	'image' => $img,
+	'x' => 50,
+	'y' => 50,
+	width => $img->rgb_width,
+	height => $img->rgb_height,
+	);
+my ($points) = $line->get('points');
+print "POINTS: ", join(' ', @$points), "\n";
+
+$img = $imgitem->get('image');
+print "IMAGE: ", ref($img), "\n";
 
 main Gtk;

@@ -4,6 +4,7 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
 
 #include <zvt/zvtterm.h>
 
@@ -18,6 +19,22 @@ new(Class)
 	RETVAL = ZVT_TERM(zvt_term_new());
 	OUTPUT:
 	RETVAL
+
+Gnome::ZvtTerm_Sink
+new_with_size(Class, cols, rows)
+	SV *	Class
+	int	cols
+	int	rows
+	CODE:
+	RETVAL = ZVT_TERM(zvt_term_new_with_size(cols, rows));
+	OUTPUT:
+	RETVAL
+
+void
+zvt_term_reset (term, hard)
+	Gnome::ZvtTerm	term
+	int	hard
+
 
 #ifdef NEW_GNOME
 
@@ -44,9 +61,33 @@ zvt_term_killchild(term, signal)
 	int	signal
 
 void
+zvt_term_bell(term)
+	Gnome::ZvtTerm	term
+
+void
 zvt_term_set_scrollback(term, scrollback)
 	Gnome::ZvtTerm	term
 	int	scrollback
+
+void
+zvt_term_get_buffer (term, type, sx, sy, ex, ey)
+	Gnome::ZvtTerm	term
+	int	type
+	int	sx
+	int	sy
+	int	ex
+	int	ey
+	PPCODE:
+	{
+		char* res;
+		int len=0;
+
+		res = zvt_term_get_buffer (term, &len, type, sx, sy, ex, ey);
+		EXTEND(sp, 2);
+		PUSHs(sv_2mortal(newSVpv(res, 0)));
+		PUSHs(sv_2mortal(newSViv(len)));
+		g_free(res);
+	}
 
 void
 zvt_term_set_font_name(term, name)
@@ -68,6 +109,15 @@ zvt_term_show_pointer(term)
 	Gnome::ZvtTerm	term
 
 void
+zvt_term_set_bell (term, state)
+	Gnome::ZvtTerm	term
+	int	state
+
+gboolean
+zvt_term_get_bell (term)
+	Gnome::ZvtTerm	term
+
+void
 zvt_term_set_blink(term, state)
 	Gnome::ZvtTerm	term
 	int	state
@@ -82,9 +132,40 @@ zvt_term_set_scroll_on_output(term, state)
 	Gnome::ZvtTerm	term
 	int	state
 
+# FIXME: zvt_term_set_color_scheme
+
 void
 zvt_term_set_default_color_scheme(term)
 	Gnome::ZvtTerm	term
+
+void
+zvt_term_set_del_key_swap (term, state)
+	Gnome::ZvtTerm	term
+	int	state
+
+void
+zvt_term_set_wordclass (term ,klass)
+	Gnome::ZvtTerm	term
+	char*	klass
+
+void
+zvt_term_set_background (term, pixmap_file, transparent, shaded)
+	Gnome::ZvtTerm	term
+	char*	pixmap_file
+	int	transparent
+	int	shaded
+
+void
+zvt_term_set_shadow_type (term, type)
+	Gnome::ZvtTerm	term
+	Gtk::ShadowType	type
+
+void
+zvt_term_set_size (term, width, height)
+	Gnome::ZvtTerm	term
+	int	width
+	int	height
+
 
 Gtk::Adjustment
 adjustment(term)

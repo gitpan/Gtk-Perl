@@ -42,5 +42,15 @@ PerlGtkDeclareFunc(GdkWindowAttr *, SvGdkWindowAttr)(SV * data, GdkWindowAttr * 
 PerlGtkDeclareFunc(SV *, newSVGdkWindow)(GdkWindow * value);
 PerlGtkDeclareFunc(GdkWindow *, SvGdkWindow)(SV * value);
 
+#if GTK_HVER > 0x010200
+
+typedef GdkGeometry* Gtk__Gdk__Geometry;
+PerlGtkDeclareFunc(GdkGeometry *, SvGdkGeometry)(SV * value);
+
+PerlGtkDeclareFunc(GdkDragContext *, SvGdkDragContextRef)(SV * value);
+PerlGtkDeclareFunc(SV *, newSVGdkDragContextRef)(GdkDragContext * e);
+
+#endif
+
 #endif /*_Gdk_Types_h_*/
 

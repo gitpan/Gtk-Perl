@@ -7,6 +7,8 @@ require AutoLoader;
 
 use Carp;
 
+$VERSION = '0.7000';
+
 @ISA = (@ISA, qw(Exporter DynaLoader));
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
@@ -48,6 +50,12 @@ sub AUTOLOAD {
 }
 
 package Gtk::XmHTML;
+
+sub dl_load_flags {0x01}
+
+bootstrap Gtk::XmHTML;
+
+require Gtk::XmHTML::Types;
 
 # Autoload methods go after __END__, and are processed by the autosplit program.
 

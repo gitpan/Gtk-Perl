@@ -6,6 +6,8 @@
 #include "PerlGtkInt.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::IconEntry		PACKAGE = Gnome::IconEntry		PREFIX = gnome_icon_entry_
 

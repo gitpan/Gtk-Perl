@@ -4,6 +4,7 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GtkGLAreaDefs.h"
 
 static int
 not_here(s)

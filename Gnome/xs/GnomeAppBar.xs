@@ -4,10 +4,11 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
 
 MODULE = Gnome::AppBar		PACKAGE = Gnome::AppBar		PREFIX = gnome_appbar_
 
-#ifdef GNOME_APP_BAR
+#ifdef GNOME_APPBAR
 
 Gnome::AppBar_Sink
 new(Class, has_progress, has_status, interactivity)

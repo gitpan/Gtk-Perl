@@ -1,11 +1,12 @@
 
 use Gtk;
 
+use Gtk::GLArea;
 use Gtk::GLArea::Constants;
 use OpenGL qw(:all);
 
 #TITLE: Open GL Test
-#REQUIRES: Gtk GtkGLArea OpenGL libGL libGLUT
+#REQUIRES: Gtk GtkGLArea
 
 sub init {
 	my($widget) = @_;
@@ -63,6 +64,7 @@ sub reshape {
 
 
 init Gtk;
+init Gtk::GLArea;
 
 if (!Gtk::Gdk::GL->query) {
 	die "OpenGL not supported";

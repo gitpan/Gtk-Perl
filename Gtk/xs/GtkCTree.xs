@@ -122,6 +122,248 @@ line_style(self)
 	OUTPUT:
 	RETVAL
 
+Gtk::CellType
+gtk_ctree_node_get_cell_type (self, node, column)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	int column
+
+
+char*
+gtk_ctree_node_get_text(self, node, column)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	int column
+	ALIAS:
+		Gtk::CTree::node_get_text = 0
+		Gtk::CTree::get_text = 1
+	CODE:
+	{
+		gchar* text=NULL;
+#if GTK_HVER <= 0x010101
+		/* FIXME: DEPRECATED? */
+		gtk_ctree_get_text(self, node, column, &text);
+#else
+		gtk_ctree_node_get_text(self, node, column, &text);
+#endif
+		RETVAL = text;
+	}
+	OUTPUT:
+	RETVAL
+
+
+void
+gtk_ctree_node_get_pixmap (self, node, column)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	int column
+	ALIAS:
+		Gtk::CTree::node_get_pixmap = 0
+		Gtk::CTree::get_pixmap = 1
+	PPCODE:
+	{
+		GdkPixmap * pixmap = NULL;
+		GdkBitmap * bitmap = NULL;
+		int result;
+		result = gtk_ctree_node_get_pixmap(self, node, column, &pixmap, (GIMME == G_ARRAY) ?&bitmap: NULL);
+		if ( result ) {
+			if ( pixmap ) {
+				EXTEND(sp, 1);
+				PUSHs(sv_2mortal(newSVGdkPixmap(pixmap)));
+			}
+			if (bitmap ) {
+				EXTEND(sp, 1);
+				PUSHs(sv_2mortal(newSVGdkBitmap(bitmap)));
+			}
+		}
+	}
+
+
+void
+gtk_ctree_node_get_pixtext (self, node, column)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	int column
+	ALIAS:
+		Gtk::CTree::node_get_pixtext = 0
+		Gtk::CTree::get_pixtext = 1
+	PPCODE:
+	{
+		gchar* text = NULL;
+		guint8 spacing;
+		GdkPixmap * pixmap = NULL;
+		GdkBitmap * bitmap = NULL;
+		int result;
+		/* FIXME: require GIMME == G_ARRAY? */
+		result = gtk_ctree_node_get_pixtext(self, node, column, &text, &spacing, &pixmap, &bitmap);
+		if ( result ) {
+			EXTEND(sp, 4);
+			if ( text )
+				PUSHs(sv_2mortal(newSVpv(text, 0)));
+			else
+				PUSHs(sv_2mortal(newSVsv(&PL_sv_undef)));
+			PUSHs(sv_2mortal(newSViv(spacing)));
+			if ( pixmap )
+				PUSHs(sv_2mortal(newSVGdkPixmap(pixmap)));
+			else
+				PUSHs(sv_2mortal(newSVsv(&PL_sv_undef)));
+			if (bitmap )
+				PUSHs(sv_2mortal(newSVGdkBitmap(bitmap)));
+			else
+				PUSHs(sv_2mortal(newSVsv(&PL_sv_undef)));
+		}
+	}
+
+
+#if GTK_HVER >= 0x010200
+
+Gtk::Style
+gtk_ctree_node_get_cell_style (self, node, column)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	int	column
+
+Gtk::Style
+gtk_ctree_node_get_row_style (self, node)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+
+void
+gtk_ctree_node_set_row_style (self, node, style)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	Gtk::Style	style
+
+void
+gtk_ctree_node_set_cell_style (self, node, column, style)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	gint	column
+	Gtk::Style	style
+
+gboolean
+gtk_ctree_node_get_selectable (self, node)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+
+void
+gtk_ctree_node_set_selectable (self, node, selectable)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	gboolean	selectable
+
+void
+gtk_ctree_node_set_shift (self, node, column, vertical, horizontal)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	int	column
+	int	vertical
+	int	horizontal
+
+Gtk::Visibility
+gtk_ctree_node_is_visible (self, node)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+
+void
+gtk_ctree_node_moveto (self, node, column, row_align, col_align)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	int	column
+	double	row_align
+	double	col_align
+
+Gtk::CTreeNode
+gtk_ctree_node_nth (self, row)
+	Gtk::CTree	self
+	int	row
+
+void
+gtk_ctree_node_set_foreground (self, node, color)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	Gtk::Gdk::Color	color
+
+void
+gtk_ctree_node_set_background (self, node, color)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	Gtk::Gdk::Color	color
+
+void
+gtk_ctree_node_set_pixmap (self, node, column, pixmap, mask)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	int	column
+	Gtk::Gdk::Pixmap	pixmap
+	Gtk::Gdk::Bitmap	mask
+
+void
+gtk_ctree_node_set_pixtext (self, node, column, text, spacing, pixmap, mask)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	int	column
+	char *	text
+	gint	spacing
+	Gtk::Gdk::Pixmap	pixmap
+	Gtk::Gdk::Bitmap	mask
+
+void
+gtk_ctree_set_node_info (self, node, text, spacing, pixmap_closed, mask_closed, pixmap_opened, mask_opened, is_leaf, expanded)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	char *	text
+	gint	spacing
+	Gtk::Gdk::Pixmap	pixmap_closed
+	Gtk::Gdk::Bitmap	mask_closed
+	Gtk::Gdk::Pixmap	pixmap_opened
+	Gtk::Gdk::Bitmap	mask_opened
+	gboolean	is_leaf
+	gboolean	expanded
+
+void
+gtk_ctree_get_node_info (self, node)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	PPCODE:
+	{
+		char * text;
+		guint8 spacing;
+		GdkPixmap *pc = NULL, * po=NULL;
+		GdkBitmap *bc=NULL, *bo=NULL;
+		gboolean is_leaf, expanded;
+
+		if (gtk_ctree_get_node_info(self, node, &text, &spacing, &pc, &bc, &po, &bo, &is_leaf, &expanded)) {
+			EXTEND(sp, 8);
+			PUSHs(sv_2mortal(newSVpv(text, 0)));
+			PUSHs(sv_2mortal(newSViv(spacing)));
+			PUSHs(sv_2mortal(newSVGdkPixmap(pc)));
+			PUSHs(sv_2mortal(newSVGdkBitmap(bc)));
+			PUSHs(sv_2mortal(newSVGdkPixmap(po)));
+			PUSHs(sv_2mortal(newSVGdkBitmap(bo)));
+			PUSHs(sv_2mortal(newSViv(is_leaf)));
+			PUSHs(sv_2mortal(newSViv(expanded)));
+		}
+	}
+
+void
+gtk_ctree_set_expander_style (self, expander_style)
+	Gtk::CTree	self
+	Gtk::CTreeExpanderStyle	expander_style
+
+void
+gtk_ctree_set_show_stub (self, show_stub)
+	Gtk::CTree	self
+	gboolean	show_stub
+
+void
+gtk_ctree_set_spacing (self, spacing)
+	Gtk::CTree	self
+	gint	spacing
+
+
+#endif
+
 #endif
 
 
@@ -145,6 +387,29 @@ expanded(self)
 	OUTPUT:
 	RETVAL
 
+Gtk::CTreeNode
+children (self)
+	Gtk::CTreeRow	self
+	CODE:
+	RETVAL = self->children;
+	OUTPUT:
+	RETVAL
+
+Gtk::CTreeNode
+sibling (self)
+	Gtk::CTreeRow	self
+	CODE:
+	RETVAL = self->sibling;
+	OUTPUT:
+	RETVAL
+
+Gtk::CTreeNode
+parent (self)
+	Gtk::CTreeRow	self
+	CODE:
+	RETVAL = self->parent;
+	OUTPUT:
+	RETVAL
 
 #endif
 
@@ -346,7 +611,7 @@ gtk_ctree_node_set_text(self, node, column, text)
 #else
 	gtk_ctree_node_set_text(self, node, column, text);
 #endif
-	
+
 
 void
 gtk_ctree_sort_node(self, node)
@@ -368,6 +633,12 @@ gtk_ctree_sort_recursive(self, node)
 	Gtk::CTree	self
 	Gtk::CTreeNode_OrNULL	node
 
+gboolean
+gtk_ctree_is_hot_spot (ctree, x, y)
+	Gtk::CTree	ctree
+	int	x
+	int	y
+
 void
 selection (self)
 	Gtk::CList	self
@@ -377,7 +648,7 @@ selection (self)
 		while(selection) {
 			EXTEND(sp, 1);
 			PUSHs(sv_2mortal(newSVGtkCTreeNode(GTK_CTREE_NODE(selection->data))));
-			selection=g_list_next(selection);
+			selection=selection->next;
 		}
 	}
 
@@ -389,8 +660,8 @@ row_list (self)
 		GList * row_list = self->row_list;
 		while(row_list) {
 			EXTEND(sp, 1);
-			PUSHs(sv_2mortal(newSVGtkCTreeNode(row_list->data)));
-			row_list=g_list_next(row_list);
+			PUSHs(sv_2mortal(newSVGtkCTreeRow(row_list->data)));
+			row_list=row_list->next;
 		}
 
 	}

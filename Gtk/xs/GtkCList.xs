@@ -374,6 +374,8 @@ gtk_clist_find_row_from_data (self, data)
 		
 		RETVAL = gtk_clist_find_row_from_data(self, sv);
 	}
+	OUTPUT:
+	RETVAL
 	
 void
 gtk_clist_select_row(self, row, column)
@@ -486,5 +488,35 @@ gtk_clist_set_column_auto_resize(self, column, resize)
 	bool		resize
 
 #endif	
+
+#if GTK_HVER >= 0x010200
+
+void
+gtk_clist_set_cell_style(self, row, column, style)
+	Gtk::CList	self
+	int	row
+	int	column
+	Gtk::Style	style
+
+Gtk::Style
+gtk_clist_get_cell_style(self, row, column)
+	Gtk::CList	self
+	int	row
+	int	column
+
+void
+gtk_clist_set_row_style(self, row, style)
+	Gtk::CList	self
+	int	row
+	Gtk::Style	style
+
+Gtk::Style
+gtk_clist_get_row_style(self, row)
+	Gtk::CList	self
+	int	row
+
+
+
+#endif
 
 #endif

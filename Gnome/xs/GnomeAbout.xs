@@ -4,6 +4,7 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
 
 MODULE = Gnome::About		PACKAGE = Gnome::About		PREFIX = gnome_about_
 

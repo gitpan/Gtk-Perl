@@ -105,7 +105,7 @@ SV * newSVMiscRef(void * object, char * classname, int * newref)
 			*newref = 0;
 	} else {
 		HV * h = newHV();
-		hv_store(h, "_gtk", 4, newSViv((int)object), 0);
+		hv_store(h, "_gtk", 4, newSViv((long)object), 0);
 		result = newRV((SV*)h);
 		RegisterMisc(h, object);
 		/*printf("Storing object %d as HV %d\n", object, h);*/
@@ -185,7 +185,7 @@ long SvFlagsHash(SV * name, char * optname, HV * o)
 	return val;
 }
 
-SV * newSVFlagsHash(long value, char * optname, HV * o, int hash) 
+SV * newSVFlagsHash(long value, char * optname, HV * o) 
 {
 	SV * target, *result;
 	int i;
@@ -194,7 +194,7 @@ SV * newSVFlagsHash(long value, char * optname, HV * o, int hash)
 	I32 len;
 	char * key;
 	
-	if (hash) 
+	if (!pgtk_use_array) 
 		target = (SV*)newHV();
 	else
 		target = (SV*)newAV();
@@ -204,7 +204,7 @@ SV * newSVFlagsHash(long value, char * optname, HV * o, int hash)
 		int val = SvIV(s);
 			
 		if ((value & val) == val) {
-			if (hash)
+			if (!pgtk_use_array)
 				hv_store((HV*)target, key, len, newSViv(1), 0);
 			else
 				av_push((AV*)target, newSVpv(key, len));
@@ -241,10 +241,10 @@ long SvOptFlags(SV * name, char * optname, struct opts * o)
 	return val;
 }
 
-SV * newSVOptFlags(long value, char * optname, struct opts * o, int hash) 
+SV * newSVOptFlags(long value, char * optname, struct opts * o) 
 {
 	SV * result;
-	if (hash) {
+	if (!pgtk_use_array) {
 		HV * h = newHV();
 		int i;
 		result = newRV((SV*)h);
@@ -268,6 +268,169 @@ SV * newSVOptFlags(long value, char * optname, struct opts * o, int hash)
 	return result;
 }
 
+SV * newSVDefEnumHash (GtkType type, long value) {
+	GtkEnumValue * vals;
+	SV * result;
+
+	vals = gtk_type_enum_get_values(type);
+	if (!vals)
+		croak("Invalid type for enum: %s", gtk_type_name(type));
+	while (vals && vals->value_nick) {
+		if (vals->value == value) {
+			result = newSVpv(vals->value_nick, 0);
+			if (!pgtk_use_minus) {
+				char *s = SvPV(result, PL_na);
+				while (*s) {
+					if (*s == '-') *s = '_';
+					*s++;
+				}
+			}
+			return result;
+		}
+		vals++;
+	}
+	croak("Invalid value %d for %s", value, gtk_type_name(type));
+}
+
+SV * newSVDefFlagsHash (GtkType type, long value) {
+	GtkFlagValue * vals;
+	SV * result;
+	char *s, *p;
+	
+	vals = gtk_type_flags_get_values(type);
+	if (!vals)
+		croak("Invalid type for flags: %s", gtk_type_name(type));
+	if (!pgtk_use_array) {
+		HV * h = newHV();
+		result = newRV((SV*)h);
+		SvREFCNT_dec(h);
+		while(vals && vals->value_nick) {
+			if ((vals->value & value) == value) {
+				if (pgtk_use_minus)
+					hv_store(h, vals->value_nick, strlen(vals->value_nick), newSViv(1), 0);
+				else {
+					p = s = g_strdup(vals->value_nick);
+					while (*s) {
+						if (*s == '-') *s = '_';
+						*s++;
+					}
+					hv_store(h, p, strlen(p), newSViv(1), 0);
+					g_free(p);
+				}
+				value &= ~vals->value;
+			}
+			vals++;
+		}
+	} else {
+		AV * a = newAV();
+		result = newRV((SV*)a);
+		SvREFCNT_dec(a);
+		while(vals && vals->value_nick) {
+			if ((vals->value & value) == value) {
+				if (pgtk_use_minus)
+					av_push(a, newSVpv(vals->value_nick, 0));
+				else {
+					p = s = g_strdup(vals->value_nick);
+					while (*s) {
+						if (*s == '-') *s = '_';
+						*s++;
+					}
+					av_push(a, newSVpv(p, 0));
+					g_free(p);
+				}
+				value &= ~vals->value;
+			}
+			vals++;
+		}
+	}
+	/* check for unhandled bits in value ... */
+	return result;
+}
+
+static int hystrEQ(register char* a, register char *b) {
+	while (*a && *b) {
+		if (*a == *b || ((*a == '-' || *a == '_') && (*b == '-' || *b == '_'))) {
+			a++;
+			b++;
+		} else
+			return 0;
+	}
+	return *a == *b;
+}
+
+long SvEFValueLookup (GtkEnumValue * vals, char* name, GtkType type) {
+	GtkEnumValue *v;
+	dTHR;
+
+	if (!name)
+		croak("Need a value in lookup");
+	if (*name == '-')
+		name++;
+	v = vals;
+	while (v && v->value_nick) {
+		if (hystrEQ(name, v->value_nick))
+			return v->value;
+		v++;
+	}
+	{
+		SV * r;
+		char * endc;
+		long val;
+		
+		/* last chanche: integer value... */
+		val = strtol(name, &endc, 0);
+		if (*name && *endc == '\0')
+			return val;
+		v = vals;
+		r = sv_newmortal();
+		sv_catpv(r, "invalid ");
+		sv_catpv(r, gtk_type_name(type));
+		sv_catpv(r, " value ");
+		sv_catpv(r, name);
+		sv_catpv(r, ", expecting: ");
+		while (v && v->value_nick) {
+			sv_catpv(r, v->value_nick);
+			if (++v)
+				sv_catpv(r, ", ");
+		}
+		croak(SvPV(r, PL_na));
+		return 0;
+	}
+}
+
+long SvDefEnumHash (GtkType type, SV *name) {
+	long val = 0;
+	GtkEnumValue * vals;
+	vals = gtk_type_enum_get_values(type);
+	if (!vals)
+		croak("Invalid type for enum: %s", gtk_type_name(type));
+	return SvEFValueLookup(vals, SvPV(name, PL_na), type);
+}
+
+long SvDefFlagsHash (GtkType type, SV *name) {
+	long val = 0;
+	GtkFlagValue * vals;
+	int i;
+	vals = gtk_type_flags_get_values(type);
+	if (!vals)
+		croak("Invalid type for flags: %s", gtk_type_name(type));
+	if (SvRV(name) && (SvTYPE(SvRV(name)) == SVt_PVAV)) {
+		AV * r = (AV*)SvRV(name);
+		for(i=0;i<=av_len(r);i++)
+			val |= SvEFValueLookup(vals, SvPV(*av_fetch(r, i, 0), PL_na), type);
+	} else if (SvRV(name) && (SvTYPE(SvRV(name)) == SVt_PVHV)) {
+		HV * r = (HV*)SvRV(name);
+		HE * he;
+		I32 len;
+
+		hv_iterinit(r);
+		while ((he=hv_iternext(r))) {
+			val |= SvEFValueLookup(vals, hv_iterkey(he, &len), type);
+		}
+	} else
+		val |= SvEFValueLookup(vals, SvPV(name, PL_na), type);
+	return val;
+}
 
 void * SvMiscRef(SV * o, char * classname)
 {
@@ -305,7 +468,7 @@ void RegisterMisc(HV * hv_object, void * gtk_object)
 	sprintf(buffer, "%lu", (unsigned long)gtk_object);
 	if (!MiscCache)
 		MiscCache = newHV();
-	hv_store(MiscCache, buffer, strlen(buffer), newSViv((int)hv_object), 0);
+	hv_store(MiscCache, buffer, strlen(buffer), newSViv((long)hv_object), 0);
 }
 
 HV * RetrieveMisc(void * gtk_object)

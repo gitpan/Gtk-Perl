@@ -6,6 +6,8 @@
 #include "PerlGtkInt.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::FontPicker		PACKAGE = Gnome::FontPicker		PREFIX = gnome_font_picker_
 

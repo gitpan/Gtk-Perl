@@ -7,10 +7,12 @@
 #include <gdk_imlib.h>
 
 #include "GtkDefs.h"
+#include "GdkImlibTypes.h"
 
-typedef GdkImlibImage * Gtk__Gdk__ImlibImage;
+/*typedef GdkImlibImage * Gtk__Gdk__ImlibImage;
 typedef GdkImlibSaveInfo * Gtk__Gdk__Imlib__SaveInfo;
 typedef GdkImlibColorModifier * Gtk__Gdk__Imlib__ColorModifier;
+*/
 
 SV * newSVGdkImlibImage(GdkImlibImage * value) {
 	int n = 0;
@@ -124,6 +126,7 @@ imlib_free(pixmap)
 	Gtk::Gdk::Pixmap pixmap
 	CODE:
 	gdk_imlib_free_pixmap(pixmap);
+	UnregisterMisc((HV*)SvRV(ST(0)), pixmap);
 
 MODULE = Gtk::Gdk::ImlibImage	PACKAGE = Gtk::Gdk::Bitmap
 
@@ -132,6 +135,7 @@ imlib_free( bitmap)
 	Gtk::Gdk::Bitmap bitmap
 	CODE:
 	gdk_imlib_free_bitmap(bitmap);
+	UnregisterMisc((HV*)SvRV(ST(0)), bitmap);
 
 MODULE = Gtk::Gdk::ImlibImage	PACKAGE = Gtk::Gdk::ImlibImage	PREFIX = gdk_imlib_
 
@@ -182,7 +186,21 @@ gdk_imlib_load_alpha(Class, file)
 	OUTPUT:
 	RETVAL
 
-# comment gdk_imlib_best_color_match()
+void
+gdk_imlib_best_color_match (Class, r, g, b)
+	SV *	Class
+	int	r
+	int	g
+	int	b
+	PPCODE:
+	{
+		int res = gdk_imlib_best_color_match(&r, &g, &b);
+		EXTEND(sp, 4);
+		XPUSHs(sv_2mortal(newSViv(res)));
+		XPUSHs(sv_2mortal(newSViv(r)));
+		XPUSHs(sv_2mortal(newSViv(g)));
+		XPUSHs(sv_2mortal(newSViv(b)));
+	}
 
 int
 gdk_imlib_render( self, width, height)
@@ -209,10 +227,22 @@ gdk_imlib_move_mask(self)
 void
 gdk_imlib_destroy_image(self)
 	Gtk::Gdk::ImlibImage self
+	CODE:
+	gdk_imlib_destroy_image(self);
+	UnregisterMisc((HV*)SvRV(ST(0)), self);
 
 void
 gdk_imlib_kill_image(self)
 	Gtk::Gdk::ImlibImage self
+	CODE:
+	gdk_imlib_kill_image(self);
+	UnregisterMisc((HV*)SvRV(ST(0)), self);
+
+void
+DESTROY(self)
+	Gtk::Gdk::ImlibImage self
+	CODE:
+	UnregisterMisc((HV*)SvRV(ST(0)), self);
 
 void
 gdk_imlib_free_colors(Class)
@@ -220,8 +250,49 @@ gdk_imlib_free_colors(Class)
 	CODE:
 	gdk_imlib_free_colors();
 
+void
+gdk_imlib_set_image_border (self, left, right, top, bottom)
+	Gtk::Gdk::ImlibImage self
+	int	left
+	int	right
+	int	top
+	int	bottom
+	CODE:
+	{
+		GdkImlibBorder border;
+		border.left = left;
+		border.right = right;
+		border.top = top;
+		border.bottom = bottom;
+		gdk_imlib_set_image_border(self, &border);
+	}
 
-# comment missing get/set border/shape
+void
+gdk_imlib_get_image_border (self)
+	Gtk::Gdk::ImlibImage self
+	PPCODE:
+	{
+		GdkImlibBorder border;
+		gdk_imlib_get_image_border (self, &border);
+		EXTEND(sp, 4);
+		XPUSHs(sv_2mortal(newSViv(border.left)));
+		XPUSHs(sv_2mortal(newSViv(border.right)));
+		XPUSHs(sv_2mortal(newSViv(border.top)));
+		XPUSHs(sv_2mortal(newSViv(border.bottom)));
+	}
+
+void
+gdk_imlib_set_image_shape(self, r, g, b)
+	Gtk::Gdk::ImlibImage self
+	int	r
+	int	g
+	int	b
+	CODE:
+	{
+		GdkImlibColor color;
+		color.r = r; color.g = g; color.b = b;
+		gdk_imlib_set_image_shape(self, &color);
+	}
 
 int
 gdk_imlib_save_image_to_eim(self, file)
@@ -461,7 +532,7 @@ Gtk::Gdk::ImlibImage
 gdk_imlib_create_image_from_drawable(Class, gwin, gmask, x, y, width, height)
 	SV *	Class
 	Gtk::Gdk::Window	gwin
-	Gtk::Gdk::Bitmap	gmask
+	Gtk::Gdk::Bitmap_OrNULL	gmask
 	int	x
 	int	y
 	int	width
@@ -596,10 +667,9 @@ gdk_imlib_get_cache_info(Class)
 	{
 		int cache_p, cache_i;
 		gdk_imlib_get_cache_info(&cache_p, &cache_i);
-		/*EXTEND(sp,2);
-		PUSHi(cache_p);
-		PUSHi(cache_i);
-		*/
+		EXTEND(sp,2);
+		PUSHs(sv_2mortal(newSViv(cache_p)));
+		PUSHs(sv_2mortal(newSViv(cache_i)));
 	}
 
 void

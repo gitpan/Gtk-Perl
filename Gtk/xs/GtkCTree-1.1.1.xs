@@ -5,7 +5,7 @@
 
 #include "GtkDefs.h"
 
-void ctree_func_handler (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
+static void ctree_func_handler (GtkCTree *ctree, GtkCTreeNode *node, gpointer data)
 {
 	AV * perlargs = (AV*)data;
 	SV * perlhandler = *av_fetch(perlargs, 1, 0);
@@ -198,6 +198,149 @@ void
 gtk_ctree_sort_recursive(self, node)
 	Gtk::CTree	self
 	Gtk::CTreeNode	node
+
+Gtk::Style
+gtk_ctree_node_get_cell_style (self, node, column)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	int	column
+
+Gtk::Style
+gtk_ctree_node_get_row_style (self, node)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+
+void
+gtk_ctree_node_set_row_style (self, node, style)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	Gtk::Style	style
+
+void
+gtk_ctree_node_set_cell_style (self, node, column, style)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	gint	column
+	Gtk::Style	style
+
+gboolean
+gtk_ctree_node_get_selectable (self, node)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+
+void
+gtk_ctree_node_set_selectable (self, node, selectable)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	gboolean	selectable
+
+void
+gtk_ctree_node_set_shift (self, node, column, vertical, horizontal)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	int	column
+	int	vertical
+	int	horizontal
+
+Gtk::Visibility
+gtk_ctree_node_is_visible (self, node)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+
+void
+gtk_ctree_node_moveto (self, node, column, row_align, col_align)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	int	column
+	double	row_align
+	double	col_align
+
+Gtk::CTreeNode
+gtk_ctree_node_nth (self, row)
+	Gtk::CTree	self
+	int	row
+
+void
+gtk_ctree_node_set_foreground (self, node, color)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	Gtk::Gdk::Color	color
+
+void
+gtk_ctree_node_set_background (self, node, color)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	Gtk::Gdk::Color	color
+
+void
+gtk_ctree_node_set_pixmap (self, node, column, pixmap, mask)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	int	column
+	Gtk::Gdk::Pixmap	pixmap
+	Gtk::Gdk::Bitmap	mask
+
+void
+gtk_ctree_node_set_pixtext (self, node, column, text, spacing, pixmap, mask)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	int	column
+	char *	text
+	gint	spacing
+	Gtk::Gdk::Pixmap	pixmap
+	Gtk::Gdk::Bitmap	mask
+
+void
+gtk_ctree_set_node_info (self, node, text, spacing, pixmap_closed, mask_closed, pixmap_opened, mask_opened, is_leaf, expanded)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	char *	text
+	gint	spacing
+	Gtk::Gdk::Pixmap	pixmap_closed
+	Gtk::Gdk::Bitmap	mask_closed
+	Gtk::Gdk::Pixmap	pixmap_opened
+	Gtk::Gdk::Bitmap	mask_opened
+	gboolean	is_leaf
+	gboolean	expanded
+
+void
+gtk_ctree_get_node_info (self, node)
+	Gtk::CTree	self
+	Gtk::CTreeNode	node
+	PPCODE:
+	{
+		char * text;
+		guint8 spacing;
+		GdkPixmap *pc = NULL, * po=NULL;
+		GdkBitmap *bc=NULL, *bo=NULL;
+		gboolean is_leaf, expanded;
+		if (gtk_ctree_get_node_info(self, node, &text, &spacing, &pc, &bc, &po, &bo, &is_leaf, &expanded)) {
+			EXPAND(sp, 8);
+			PUSHp(text, 0);
+			PUSHi(spacing);
+			PUSHs(sv_2mortal(newSVGdkPixmap(pc)));
+			PUSHs(sv_2mortal(newSVGdkBitmap(bc)));
+			PUSHs(sv_2mortal(newSVGdkPixmap(po)));
+			PUSHs(sv_2mortal(newSVGdkBitmap(bo)));
+			PUSHi(is_leaf);
+			PUSHi(expanded);
+		}
+	}
+
+void
+gtk_ctree_set_expander_style (self, expander_style)
+	Gtk::CTree	self
+	Gtk::CTreeExpanderStyle	expander_style
+
+void
+gtk_ctree_set_show_stub (self, show_stub)
+	Gtk::CTree	self
+	gboolean	show_stub
+
+void
+gtk_ctree_set_spacing (self, spacing)
+	Gtk::CTree	self
+	gint	spacing
 
 void
 selection (self)

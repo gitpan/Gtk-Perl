@@ -166,4 +166,20 @@ gtk_container_set_focus_child(self, child)
 
 #endif
 
+#if GTK_HVER >= 0x010200
+
+char*
+gtk_container_child_type (self)
+	Gtk::Container	self
+	CODE:
+	RETVAL = ptname_for_gtnumber(gtk_container_child_type(self));
+
+char *
+gtk_container_child_composite_name (self, child)
+	Gtk::Container	self
+	Gtk::Widget	child
+
+
+#endif
+
 #endif

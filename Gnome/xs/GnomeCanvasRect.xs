@@ -4,6 +4,7 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
 
 
 MODULE = Gnome::CanvasRect		PACKAGE = Gnome::CanvasRect		PREFIX = gnome_canvas_rect_

@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::Calculator		PACKAGE = Gnome::Calculator		PREFIX = gnome_calculator_
 

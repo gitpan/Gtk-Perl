@@ -1,17 +1,40 @@
 <?xml version="1.0"?>
 <GTK-Interface>
 
+<project>
+  <name>Project1</name>
+  <program_name>project1</program_name>
+  <directory>../../../../../../home/lupus/Projects/project1</directory>
+  <source_directory>../../../../../../home/lupus/Projects/project1/src</source_directory>
+  <pixmaps_directory>../../../../../../home/lupus/Projects/project1/pixmaps</pixmaps_directory>
+  <language>C</language>
+  <gnome_support>True</gnome_support>
+  <gettext_support>True</gettext_support>
+  <use_widget_names>False</use_widget_names>
+  <output_main_file>True</output_main_file>
+  <output_support_files>True</output_support_files>
+  <output_build_files>True</output_build_files>
+  <backup_source_files>True</backup_source_files>
+  <main_source_file>interface.c</main_source_file>
+  <main_header_file>interface.h</main_header_file>
+  <handler_source_file>callbacks.c</handler_source_file>
+  <handler_header_file>callbacks.h</handler_header_file>
+  <support_source_file>support.c</support_source_file>
+  <support_header_file>support.h</support_header_file>
+  <translatable_strings_file>../../../../../../home/lupus/Projects/project1</translatable_strings_file>
+</project>
 
 <widget>
   <class>GtkWindow</class>
   <name>MainWindow</name>
-  <Signal>
+  <signal>
     <name>destroy</name>
     <handler>gtk_main_quit</handler>
-  </Signal>
+  </signal>
   <title>LibGlade Test</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
   <allow_shrink>True</allow_shrink>
   <allow_grow>True</allow_grow>
   <auto_shrink>False</auto_shrink>
@@ -25,307 +48,358 @@
     <widget>
       <class>GtkHandleBox</class>
       <name>handlebox1</name>
+      <shadow_type>GTK_SHADOW_OUT</shadow_type>
+      <handle_position>GTK_POS_LEFT</handle_position>
+      <snap_edge>GTK_POS_TOP</snap_edge>
       <child>
-        <padding>0</padding>
-        <expand>False</expand>
-        <fill>True</fill>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>True</fill>
       </child>
 
       <widget>
-        <class>GtkMenuBar</class>
-        <name>MenuBar</name>
+	<class>GtkMenuBar</class>
+	<name>MenuBar</name>
+	<shadow_type>GTK_SHADOW_OUT</shadow_type>
 
-        <widget>
-          <class>GtkMenuItem</class>
-          <name>FileMenu</name>
-          <label>File</label>
-          <right_justify>False</right_justify>
+	<widget>
+	  <class>GtkMenuItem</class>
+	  <name>FileMenu</name>
+	  <label>File</label>
+	  <right_justify>False</right_justify>
 
-          <widget>
-            <class>GtkMenu</class>
-            <name>menu7</name>
+	  <widget>
+	    <class>GtkMenu</class>
+	    <name>menu7</name>
 
-            <widget>
-              <class>GtkMenuItem</class>
-              <name>Quit</name>
-              <Accelerator>
-                <modifiers>GDK_CONTROL_MASK</modifiers>
-                <key>GDK_Q</key>
-                <signal>activate</signal>
-              </Accelerator>
-              <Signal>
-                <name>activate</name>
-                <handler>gtk_main_quit</handler>
-              </Signal>
-              <label>Quit</label>
-              <right_justify>False</right_justify>
-            </widget>
-          </widget>
-        </widget>
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>Quit</name>
+	      <accelerator>
+		<modifiers>GDK_CONTROL_MASK</modifiers>
+		<key>GDK_Q</key>
+		<signal>activate</signal>
+	      </accelerator>
+	      <signal>
+		<name>activate</name>
+		<handler>gtk_main_quit</handler>
+	      </signal>
+	      <label>Quit</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+	  </widget>
+	</widget>
 
-        <widget>
-          <class>GtkMenuItem</class>
-          <name>HelpMenu</name>
-          <label>Help</label>
-          <right_justify>True</right_justify>
+	<widget>
+	  <class>GtkMenuItem</class>
+	  <name>HelpMenu</name>
+	  <label>Help</label>
+	  <right_justify>True</right_justify>
 
-          <widget>
-            <class>GtkMenu</class>
-            <name>menu8</name>
+	  <widget>
+	    <class>GtkMenu</class>
+	    <name>menu8</name>
 
-            <widget>
-              <class>GtkMenuItem</class>
-              <name>About</name>
-              <Accelerator>
-                <modifiers>GDK_CONTROL_MASK</modifiers>
-                <key>GDK_A</key>
-                <signal>activate</signal>
-              </Accelerator>
-              <Signal>
-                <name>activate</name>
-                <handler>gtk_widget_show</handler>
-                <object>AboutDialog</object>
-              </Signal>
-              <label>About...</label>
-              <right_justify>False</right_justify>
-            </widget>
-          </widget>
-        </widget>
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>About</name>
+	      <accelerator>
+		<modifiers>GDK_CONTROL_MASK</modifiers>
+		<key>GDK_A</key>
+		<signal>activate</signal>
+	      </accelerator>
+	      <signal>
+		<name>activate</name>
+		<handler>gtk_widget_show</handler>
+		<object>AboutDialog</object>
+	      </signal>
+	      <label>About...</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+	  </widget>
+	</widget>
       </widget>
     </widget>
 
     <widget>
       <class>GtkNotebook</class>
       <name>notebook1</name>
-      <child>
-        <padding>0</padding>
-        <expand>True</expand>
-        <fill>True</fill>
-      </child>
       <can_focus>True</can_focus>
       <show_tabs>True</show_tabs>
       <show_border>True</show_border>
       <tab_pos>GTK_POS_TOP</tab_pos>
       <scrollable>False</scrollable>
-      <tab_border>3</tab_border>
+      <tab_hborder>2</tab_hborder>
+      <tab_vborder>2</tab_vborder>
       <popup_enable>False</popup_enable>
+      <child>
+	<padding>0</padding>
+	<expand>True</expand>
+	<fill>True</fill>
+      </child>
 
       <widget>
-        <class>GtkGammaCurve</class>
-        <name>gammacurve1</name>
-        <curve_type>GTK_CURVE_TYPE_SPLINE</curve_type>
-        <min_x>0</min_x>
-        <max_x>1</max_x>
-        <min_y>0</min_y>
-        <max_y>1</max_y>
+	<class>GtkGammaCurve</class>
+	<name>gammacurve1</name>
+	<curve_type>GTK_CURVE_TYPE_SPLINE</curve_type>
+	<min_x>0</min_x>
+	<max_x>1</max_x>
+	<min_y>0</min_y>
+	<max_y>1</max_y>
       </widget>
 
       <widget>
-        <class>GtkTable</class>
-        <name>table1</name>
-        <rows>2</rows>
-        <columns>2</columns>
-        <homogeneous>False</homogeneous>
-        <row_spacing>0</row_spacing>
-        <column_spacing>0</column_spacing>
-
-        <widget>
-          <class>GtkArrow</class>
-          <name>arrow2</name>
-          <child>
-            <left_attach>1</left_attach>
-            <right_attach>2</right_attach>
-            <top_attach>1</top_attach>
-            <bottom_attach>2</bottom_attach>
-            <xpad>0</xpad>
-            <ypad>0</ypad>
-            <xexpand>True</xexpand>
-            <yexpand>True</yexpand>
-            <xshrink>False</xshrink>
-            <yshrink>False</yshrink>
-            <xfill>True</xfill>
-            <yfill>True</yfill>
-          </child>
-          <arrow_type>GTK_ARROW_UP</arrow_type>
-          <shadow_type>GTK_SHADOW_OUT</shadow_type>
-          <xalign>0.5</xalign>
-          <yalign>0.5</yalign>
-          <xpad>0</xpad>
-          <ypad>0</ypad>
-        </widget>
-
-        <widget>
-          <class>GtkLabel</class>
-          <name>label6</name>
-          <child>
-            <left_attach>0</left_attach>
-            <right_attach>1</right_attach>
-            <top_attach>0</top_attach>
-            <bottom_attach>1</bottom_attach>
-            <xpad>0</xpad>
-            <ypad>0</ypad>
-            <xexpand>False</xexpand>
-            <yexpand>False</yexpand>
-            <xshrink>False</xshrink>
-            <yshrink>False</yshrink>
-            <xfill>True</xfill>
-            <yfill>True</yfill>
-          </child>
-          <label>~</label>
-          <justify>GTK_JUSTIFY_CENTER</justify>
-          <xalign>0.5</xalign>
-          <yalign>0.5</yalign>
-          <xpad>0</xpad>
-          <ypad>0</ypad>
-        </widget>
-
-        <widget>
-          <class>GtkVRuler</class>
-          <name>vruler3</name>
-          <child>
-            <left_attach>0</left_attach>
-            <right_attach>1</right_attach>
-            <top_attach>1</top_attach>
-            <bottom_attach>2</bottom_attach>
-            <xpad>0</xpad>
-            <ypad>0</ypad>
-            <xexpand>False</xexpand>
-            <yexpand>True</yexpand>
-            <xshrink>False</xshrink>
-            <yshrink>False</yshrink>
-            <xfill>True</xfill>
-            <yfill>True</yfill>
-          </child>
-          <metric>GTK_PIXELS</metric>
-          <lower>0</lower>
-          <upper>10</upper>
-          <position>0</position>
-          <max_size>10</max_size>
-        </widget>
-
-        <widget>
-          <class>GtkHRuler</class>
-          <name>hruler3</name>
-          <child>
-            <left_attach>1</left_attach>
-            <right_attach>2</right_attach>
-            <top_attach>0</top_attach>
-            <bottom_attach>1</bottom_attach>
-            <xpad>0</xpad>
-            <ypad>0</ypad>
-            <xexpand>True</xexpand>
-            <yexpand>False</yexpand>
-            <xshrink>False</xshrink>
-            <yshrink>False</yshrink>
-            <xfill>True</xfill>
-            <yfill>True</yfill>
-          </child>
-          <metric>GTK_PIXELS</metric>
-          <lower>0</lower>
-          <upper>10</upper>
-          <position>0</position>
-          <max_size>10</max_size>
-        </widget>
+	<class>GtkLabel</class>
+	<child_name>Notebook:tab</child_name>
+	<name>label2</name>
+	<label>Gamma</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
       </widget>
 
       <widget>
-        <class>GtkFrame</class>
-        <name>frame2</name>
-        <label_xalign>0</label_xalign>
-        <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+	<class>GtkTable</class>
+	<name>table1</name>
+	<rows>2</rows>
+	<columns>2</columns>
+	<homogeneous>False</homogeneous>
+	<row_spacing>0</row_spacing>
+	<column_spacing>0</column_spacing>
 
-        <widget>
-          <class>GtkVPaned</class>
-          <name>vpaned1</name>
-          <handle_size>8</handle_size>
-          <gutter_size>10</gutter_size>
+	<widget>
+	  <class>GtkArrow</class>
+	  <name>arrow2</name>
+	  <arrow_type>GTK_ARROW_UP</arrow_type>
+	  <shadow_type>GTK_SHADOW_OUT</shadow_type>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	  <child>
+	    <left_attach>1</left_attach>
+	    <right_attach>2</right_attach>
+	    <top_attach>1</top_attach>
+	    <bottom_attach>2</bottom_attach>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	    <xexpand>True</xexpand>
+	    <yexpand>True</yexpand>
+	    <xshrink>False</xshrink>
+	    <yshrink>False</yshrink>
+	    <xfill>True</xfill>
+	    <yfill>True</yfill>
+	  </child>
+	</widget>
 
-          <widget>
-            <class>GtkHScale</class>
-            <name>hscale1</name>
-            <can_focus>True</can_focus>
-            <draw_value>True</draw_value>
-            <value_pos>GTK_POS_TOP</value_pos>
-            <digits>1</digits>
-            <policy>GTK_UPDATE_CONTINUOUS</policy>
-            <hvalue>0</hvalue>
-            <hlower>0</hlower>
-            <hupper>100</hupper>
-            <hstep>1</hstep>
-            <hpage>10</hpage>
-            <hpage_size>10</hpage_size>
-          </widget>
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label6</name>
+	  <label>~</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	  <child>
+	    <left_attach>0</left_attach>
+	    <right_attach>1</right_attach>
+	    <top_attach>0</top_attach>
+	    <bottom_attach>1</bottom_attach>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	    <xexpand>False</xexpand>
+	    <yexpand>False</yexpand>
+	    <xshrink>False</xshrink>
+	    <yshrink>False</yshrink>
+	    <xfill>True</xfill>
+	    <yfill>True</yfill>
+	  </child>
+	</widget>
 
-          <widget>
-            <class>GtkVBox</class>
-            <name>vbox2</name>
-            <homogeneous>False</homogeneous>
-            <spacing>0</spacing>
+	<widget>
+	  <class>GtkVRuler</class>
+	  <name>vruler3</name>
+	  <metric>GTK_PIXELS</metric>
+	  <lower>0</lower>
+	  <upper>10</upper>
+	  <position>0</position>
+	  <max_size>10</max_size>
+	  <child>
+	    <left_attach>0</left_attach>
+	    <right_attach>1</right_attach>
+	    <top_attach>1</top_attach>
+	    <bottom_attach>2</bottom_attach>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	    <xexpand>False</xexpand>
+	    <yexpand>True</yexpand>
+	    <xshrink>False</xshrink>
+	    <yshrink>False</yshrink>
+	    <xfill>True</xfill>
+	    <yfill>True</yfill>
+	  </child>
+	</widget>
 
-            <widget>
-              <class>GtkProgressBar</class>
-              <name>progressbar1</name>
-              <child>
-                <padding>0</padding>
-                <expand>True</expand>
-                <fill>True</fill>
-              </child>
-            </widget>
-
-            <widget>
-              <class>GtkHScrollbar</class>
-              <name>hscrollbar1</name>
-              <child>
-                <padding>0</padding>
-                <expand>True</expand>
-                <fill>True</fill>
-              </child>
-              <policy>GTK_UPDATE_CONTINUOUS</policy>
-              <hvalue>20</hvalue>
-              <hlower>0</hlower>
-              <hupper>40</hupper>
-              <hstep>1</hstep>
-              <hpage>10</hpage>
-              <hpage_size>10</hpage_size>
-            </widget>
-          </widget>
-        </widget>
+	<widget>
+	  <class>GtkHRuler</class>
+	  <name>hruler3</name>
+	  <metric>GTK_PIXELS</metric>
+	  <lower>0</lower>
+	  <upper>10</upper>
+	  <position>0</position>
+	  <max_size>10</max_size>
+	  <child>
+	    <left_attach>1</left_attach>
+	    <right_attach>2</right_attach>
+	    <top_attach>0</top_attach>
+	    <bottom_attach>1</bottom_attach>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	    <xexpand>True</xexpand>
+	    <yexpand>False</yexpand>
+	    <xshrink>False</xshrink>
+	    <yshrink>False</yshrink>
+	    <xfill>True</xfill>
+	    <yfill>True</yfill>
+	  </child>
+	</widget>
       </widget>
 
       <widget>
-        <class>GtkLabel</class>
-        <child_name>Notebook:tab</child_name>
-        <name>label2</name>
-        <label>Gamma</label>
-        <justify>GTK_JUSTIFY_CENTER</justify>
-        <xalign>0.5</xalign>
-        <yalign>0.5</yalign>
-        <xpad>0</xpad>
-        <ypad>0</ypad>
+	<class>GtkLabel</class>
+	<child_name>Notebook:tab</child_name>
+	<name>label3</name>
+	<label>Rulers</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
       </widget>
 
       <widget>
-        <class>GtkLabel</class>
-        <child_name>Notebook:tab</child_name>
-        <name>label3</name>
-        <label>Rulers</label>
-        <justify>GTK_JUSTIFY_CENTER</justify>
-        <xalign>0.5</xalign>
-        <yalign>0.5</yalign>
-        <xpad>0</xpad>
-        <ypad>0</ypad>
+	<class>GtkFrame</class>
+	<name>frame2</name>
+	<label_xalign>0</label_xalign>
+	<shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+
+	<widget>
+	  <class>GtkVPaned</class>
+	  <name>vpaned1</name>
+	  <handle_size>8</handle_size>
+	  <gutter_size>10</gutter_size>
+
+	  <widget>
+	    <class>GtkHScale</class>
+	    <name>hscale1</name>
+	    <can_focus>True</can_focus>
+	    <draw_value>True</draw_value>
+	    <value_pos>GTK_POS_TOP</value_pos>
+	    <digits>1</digits>
+	    <policy>GTK_UPDATE_CONTINUOUS</policy>
+	    <value>0</value>
+	    <lower>0</lower>
+	    <upper>100</upper>
+	    <step>1</step>
+	    <page>10</page>
+	    <page_size>10</page_size>
+	    <child>
+	      <shrink>True</shrink>
+	      <resize>False</resize>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkVBox</class>
+	    <name>vbox2</name>
+	    <homogeneous>False</homogeneous>
+	    <spacing>0</spacing>
+	    <child>
+	      <shrink>True</shrink>
+	      <resize>True</resize>
+	    </child>
+
+	    <widget>
+	      <class>GtkProgressBar</class>
+	      <name>progressbar1</name>
+	      <value>0</value>
+	      <lower>0</lower>
+	      <upper>100</upper>
+	      <bar_style>GTK_PROGRESS_CONTINUOUS</bar_style>
+	      <orientation>GTK_PROGRESS_LEFT_TO_RIGHT</orientation>
+	      <activity_mode>False</activity_mode>
+	      <show_text>False</show_text>
+	      <format>%P %%</format>
+	      <text_xalign>0.5</text_xalign>
+	      <text_yalign>0.5</text_yalign>
+	      <child>
+		<padding>0</padding>
+		<expand>True</expand>
+		<fill>True</fill>
+	      </child>
+	    </widget>
+
+	    <widget>
+	      <class>GtkHScrollbar</class>
+	      <name>hscrollbar1</name>
+	      <policy>GTK_UPDATE_CONTINUOUS</policy>
+	      <value>20</value>
+	      <lower>0</lower>
+	      <upper>40</upper>
+	      <step>1</step>
+	      <page>10</page>
+	      <page_size>10</page_size>
+	      <child>
+		<padding>0</padding>
+		<expand>True</expand>
+		<fill>True</fill>
+	      </child>
+	    </widget>
+	  </widget>
+	</widget>
       </widget>
 
       <widget>
-        <class>GtkLabel</class>
-        <child_name>Notebook:tab</child_name>
-        <name>label4</name>
-        <label>Ranges</label>
-        <justify>GTK_JUSTIFY_CENTER</justify>
-        <xalign>0.5</xalign>
-        <yalign>0.5</yalign>
-        <xpad>0</xpad>
-        <ypad>0</ypad>
+	<class>GtkLabel</class>
+	<child_name>Notebook:tab</child_name>
+	<name>label4</name>
+	<label>Ranges</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+      </widget>
+
+      <widget>
+	<class>GtkPixmap</class>
+	<name>pixmap1</name>
+	<filename>3DRings.xpm</filename>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+	<build_insensitive>True</build_insensitive>
+      </widget>
+
+      <widget>
+	<class>GtkLabel</class>
+	<child_name>Notebook:tab</child_name>
+	<name>label7</name>
+	<label>label7</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
       </widget>
     </widget>
 
@@ -334,9 +408,9 @@
       <name>statusbar1</name>
       <border_width>5</border_width>
       <child>
-        <padding>0</padding>
-        <expand>False</expand>
-        <fill>True</fill>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>True</fill>
       </child>
     </widget>
   </widget>
@@ -346,17 +420,18 @@
   <class>GtkDialog</class>
   <name>AboutDialog</name>
   <visible>False</visible>
-  <Signal>
+  <signal>
     <name>delete_event</name>
     <handler>gtk_true</handler>
-  </Signal>
-  <Signal>
+  </signal>
+  <signal>
     <name>delete_event</name>
     <handler>gtk_widget_hide</handler>
-  </Signal>
+  </signal>
   <title>About</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
   <allow_shrink>True</allow_shrink>
   <allow_grow>True</allow_grow>
   <auto_shrink>False</auto_shrink>
@@ -372,25 +447,26 @@
       <class>GtkFrame</class>
       <name>frame1</name>
       <border_width>5</border_width>
-      <child>
-        <padding>0</padding>
-        <expand>True</expand>
-        <fill>True</fill>
-      </child>
       <label_xalign>0</label_xalign>
       <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+      <child>
+	<padding>0</padding>
+	<expand>True</expand>
+	<fill>True</fill>
+      </child>
 
       <widget>
-        <class>GtkLabel</class>
-        <name>label1</name>
-        <label>LibGlade Example.
+	<class>GtkLabel</class>
+	<name>label1</name>
+	<label>LibGlade Example.
 This interface (and the signals)
 are all specified in XML.</label>
-        <justify>GTK_JUSTIFY_CENTER</justify>
-        <xalign>0.5</xalign>
-        <yalign>0.5</yalign>
-        <xpad>0</xpad>
-        <ypad>0</ypad>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
       </widget>
     </widget>
 
@@ -399,32 +475,32 @@ are all specified in XML.</label>
       <child_name>Dialog:action_area</child_name>
       <name>dialog-action_area1</name>
       <border_width>10</border_width>
-      <child>
-        <padding>0</padding>
-        <expand>False</expand>
-        <fill>True</fill>
-        <pack>GTK_PACK_END</pack>
-      </child>
       <homogeneous>True</homogeneous>
       <spacing>5</spacing>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>True</fill>
+	<pack>GTK_PACK_END</pack>
+      </child>
 
       <widget>
-        <class>GtkButton</class>
-        <name>button1</name>
-        <child>
-          <padding>0</padding>
-          <expand>True</expand>
-          <fill>True</fill>
-        </child>
-        <height>20</height>
-        <has_default>True</has_default>
-        <can_focus>True</can_focus>
-        <Signal>
-          <name>clicked</name>
-          <handler>gtk_widget_hide</handler>
-          <object>AboutDialog</object>
-        </Signal>
-        <label>OK</label>
+	<class>GtkButton</class>
+	<name>button1</name>
+	<height>20</height>
+	<has_default>True</has_default>
+	<can_focus>True</can_focus>
+	<signal>
+	  <name>clicked</name>
+	  <handler>gtk_widget_hide</handler>
+	  <object>AboutDialog</object>
+	</signal>
+	<label>OK</label>
+	<child>
+	  <padding>0</padding>
+	  <expand>True</expand>
+	  <fill>True</fill>
+	</child>
       </widget>
     </widget>
   </widget>

@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gtk::Layout		PACKAGE = Gtk::Layout		PREFIX = gtk_layout_
 

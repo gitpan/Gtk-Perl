@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::NumberEntry		PACKAGE = Gnome::NumberEntry		PREFIX = gnome_number_entry_
 

@@ -76,5 +76,13 @@ entry (combo)
 	OUTPUT:
 	RETVAL
 
+Gtk::Widget_Up
+popwin (combo)
+	Gtk::Combo	combo
+	CODE:
+	RETVAL = combo->popwin;
+	OUTPUT:
+	RETVAL
+
 #endif
 

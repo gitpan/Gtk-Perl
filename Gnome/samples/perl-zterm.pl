@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #TITLE: Gnome Zvt
-#REQUIRES: Gtk Gnome Zvt
+#REQUIRES: Gtk Gnome
 
 use Gnome;
 init Gnome "perl-zterm.pl";

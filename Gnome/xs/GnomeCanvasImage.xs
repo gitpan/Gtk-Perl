@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::CanvasImage		PACKAGE = Gnome::CanvasImage		PREFIX = gnome_canvas_image_
 

@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::Entry		PACKAGE = Gnome::Entry		PREFIX = gnome_entry_
 

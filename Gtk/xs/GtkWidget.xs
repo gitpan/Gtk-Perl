@@ -247,6 +247,8 @@ gtk_widget_get_ancestor(widget, type_name)
 	CODE:
 	{
 		int t = gtnumber_for_gtname(type_name);
+		if (!t)
+			t = gtnumber_for_ptname(type_name);
 		RETVAL = gtk_widget_get_ancestor(widget, t);
 	}
 	OUTPUT:
@@ -650,8 +652,9 @@ _return_pointer(self)
 	OUTPUT:
 	RETVAL
 
+#if 0
 
-Gtk::Widget_Sink_Up
+SV*
 new(Class, widget_class, ...)
 	SV *	Class
 	char *	widget_class
@@ -671,8 +674,15 @@ new(Class, widget_class, ...)
 		widget_type = gtnumber_for_gtname(widget_class);
 		if (!widget_type)
 			widget_type = gtnumber_for_ptname(widget_class);
-		o = GTK_OBJECT(gtk_widget_new(widget_type, NULL));
-		RETVAL = GTK_WIDGET(o);
+		gtk_type_class(widget_type);
+		o = GTK_OBJECT(gtk_object_new(widget_type, NULL));
+		/*RETVAL = GTK_WIDGET(o);*/
+		RETVAL = newSVGtkObjectRef(o, NULL);
+#if 1
+		printf("created widget SV %p for object %p from perltype %s (gtktype: %d -> %s)\n", RETVAL, o, widget_class, widget_type, gtk_type_name(widget_type));
+#endif
+		
+		gtk_object_sink(o);
 		
 		for(p=2;p<items;) {
 		
@@ -699,6 +709,8 @@ new(Class, widget_class, ...)
 	}
 	OUTPUT:
 	RETVAL
+
+#endif
 
 void
 gtk_widget_shape_combine_mask(widget, shape_mask, offset_x, offset_y)

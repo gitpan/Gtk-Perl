@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::DEntryEdit		PACKAGE = Gnome::DEntryEdit		PREFIX = gnome_dentry_edit_
 

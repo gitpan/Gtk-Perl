@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::RootWin		PACKAGE = Gnome::RootWin		PREFIX = gnome_root_win_
 

@@ -6,59 +6,11 @@
 #include "PerlGtkInt.h"
 
 #include "GtkDefs.h"
-
-#if 0
-
-static SV*
-get_sinfo (char* name, GladeSignalData* data) {
-	HV *h;
-	SV *r;
-	SV *o;
-	
-	h = newHV();
-	r = newRV((SV*)h);
-	SvREFCNT_dec(h);
-
-	if (data->signal_name)
-		hv_store(h, "name", 4, newSVpv(data->signal_name, 0), 0);
-	if (name)
-		hv_store(h, "handler", 7, newSVpv(name, 0), 0);
-	if (data->signal_data)
-		hv_store(h, "data", 4, newSVpv(data->signal_data, 0), 0);
-	hv_store(h, "after", 5, newSViv(data->signal_after), 0);
-	o = newSVsv(newSVGtkObjectRef(data->signal_object, 0));
-	SvREFCNT_dec(SvRV(o));
-	hv_store(h, "object", 6, o, 0);
-	if (data->connect_object) {
-		GladeXML *self = glade_get_widget_tree(GTK_WIDGET(data->signal_object));
-		GtkObject *other = g_hash_table_lookup(self->name_hash,
-			data->connect_object);
-		if (other) {
-			o = newSVsv(newSVGtkObjectRef(other, 0));
-			SvREFCNT_dec(SvRV(o));
-			hv_store(h, "cobject", 7, o, 0);
-		}
-	}
-	return r;
-}
-
+#include "GtkGladeXMLDefs.h"
 
 static void
-autoconnect_foreach(char *signal_handler, GList *signals, SV ***_sp) {
-#define sp (*_sp)
-	dTHR;
-	for (; signals != NULL; signals = signals->next) {
-		GladeSignalData *data = signals->data;
-		XPUSHs(sv_2mortal(get_sinfo(signal_handler, data)));
-	}
-#undef sp
-}
-
-#endif
-
-static void
-connect_func_handler(gchar *handler_name, GtkObject* object, 
-		gchar * signal_name, gchar* signal_data, 
+connect_func_handler(const gchar *handler_name, GtkObject* object, 
+		const gchar * signal_name, const gchar* signal_data, 
 		GtkObject *connect_object, gboolean after, gpointer user_data) {
 
 	AV * stuff;
@@ -100,6 +52,43 @@ connect_func_handler(gchar *handler_name, GtkObject* object,
 	LEAVE;
 }
 
+/* This function needs to be exported to handle custom widgets in the 
+   currently broken way that libglade provides... */
+
+GtkWidget*
+pgtk_glade_custom_widget (char* name, char* string1, char* string2, int int1, int int2) {
+	SV * s;
+	char *handler="Gtk::GladeXML::create_custom_widget";
+	int i;
+	dSP;
+
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(sp);
+
+	if (!name) name = "";
+	if (!string1) string1 = "";
+	if (!string2) string2 = "";
+
+	XPUSHs(sv_2mortal(newSVpv(name, 0)));
+	XPUSHs(sv_2mortal(newSVpv(string1, 0)));
+	XPUSHs(sv_2mortal(newSVpv(string2, 0)));
+	XPUSHs(sv_2mortal(newSViv(int1)));
+	XPUSHs(sv_2mortal(newSViv(int2)));
+
+	PUTBACK;
+
+	i=perl_call_pv(handler, G_SCALAR);
+	SPAGAIN;
+	if (i != 1)
+		croak("create_custom_widget failed");
+	s = POPs;
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+	return (GtkWidget*)SvGtkObjectRef(s, NULL);
+}
+
 MODULE = Gtk::GladeXML		PACKAGE = Gtk::GladeXML		PREFIX = glade_xml_
 
 #ifdef GLADE_XML
@@ -109,7 +98,17 @@ init (Class)
 	SV* Class
 	CODE:
 	{
+		static int did_it = 0;
+		if (did_it)
+			return;
+		did_it = 1;
+#ifdef GNOME_HVER
+		glade_gnome_init();
+#else
 		glade_init();
+#endif
+		GtkGladeXML_InstallObjects();
+		GtkGladeXML_InstallTypedefs();
 	}
 
 
@@ -176,12 +175,12 @@ glade_xml_signal_autoconnect_full (self, func, ...)
 		glade_xml_signal_autoconnect_full(self, connect_func_handler, (gpointer)args);
 	}
 
-Gtk::Widget_Up
+Gtk::Widget_OrNULL_Up
 glade_xml_get_widget (self, name)
 	Gtk::GladeXML self
 	char* name
 
-Gtk::Widget_Up
+Gtk::Widget_OrNULL_Up
 glade_xml_get_widget_by_long_name (self, name)
 	Gtk::GladeXML self
 	char* name
@@ -191,33 +190,6 @@ glade_xml_relative_file (self, filename)
 	Gtk::GladeXML	self
 	char*	filename
 
-
-#if 0
-
-void
-_get_signal_info (self, name)
-	Gtk::GladeXML self
-	char* name
-	PPCODE:
-	{
-		GList *signals;
-		signals = g_hash_table_lookup(self->signals, name);
-		for (; signals != NULL; signals = signals->next) {
-			XPUSHs(sv_2mortal(get_sinfo(name, (GladeSignalData*)signals->data)));
-		}
-	}
-	
-void
-_get_all_signals (self)
-	Gtk::GladeXML self
-	PPCODE:
-	{
-		SV ** _sp = sp;
-		g_hash_table_foreach(self->signals, (GHFunc)autoconnect_foreach, &_sp);
-		sp = _sp;
-	}
-
-#endif 
 
 MODULE = Gtk::GladeXML		PACKAGE = Gtk::Widget		PREFIX = glade_
 
@@ -235,4 +207,11 @@ glade_get_widget_tree (self)
 
 
 #endif
+
+
+INCLUDE: ../build/boxed.xsh
+
+INCLUDE: ../build/objects.xsh
+
+INCLUDE: ../build/extension.xsh
 

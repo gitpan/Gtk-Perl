@@ -4,7 +4,14 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
-	
+#include "GtkGLAreaDefs.h"
+
+/* compatibility stuff for new version of gtkglarea...  */
+typedef GdkGLContext *(*compat_context_share_new)(GdkVisual *visual, GdkGLContext *sharelist, gint direct, gint *attrs);
+
+static compat_context_share_new compat_func;
+
+
 MODULE = Gtk::Gdk::GL		PACKAGE = Gtk::Gdk::GL		PREFIX = gdk_gl_
 
 gint
@@ -59,10 +66,23 @@ gdk_gl_context_new(visual)
 	Gtk::Gdk::Visual	visual
 
 Gtk::Gdk::GL::Context
-gdk_gl_context_share_new(visual, sharelist, direct)
+gdk_gl_context_share_new(visual, sharelist, direct, ...)
 	Gtk::Gdk::Visual	visual
 	Gtk::Gdk::GL::Context	sharelist
 	gint	direct
+	CODE:
+	{
+		int * attr = malloc(sizeof(int)*(items-2));
+		int i;
+		for (i=0; i < items -3; ++i)
+			attr[i] = SvIV(ST(i+3));
+		attr[i] = 0;
+		compat_func = (compat_context_share_new)gdk_gl_context_share_new;
+		RETVAL = compat_func(visual, sharelist, direct, attr);
+		free(attr);
+	}
+	OUTPUT:
+	RETVAL
 
 MODULE = Gtk::Gdk::GL		PACKAGE = Gtk::Gdk::Window	PREFIX = gdk_
 

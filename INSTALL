@@ -1,0 +1,33 @@
+To install Gtk-Perl-0.7000:
+
+ First install the Gtk part of the package by executing the following
+ commands at your shell:
+
+   $ tar -xvzf Gtk-Perl-0.7000.tar.gz
+   $ cd Gtk-Perl-0.7000
+   $ perl Makefile.PL
+   $ make
+   $ make install 
+
+   *** NOTE *** : The 'make install' step must be performed as user root.
+
+ To install any of the optional modules such as Glade, Gnome, GdkImlib,
+ GtkGLArea, GtkHTML, or GtkXmHTML do the following:
+
+   cd <module>           ( Where <module> is the name of the module
+                           you wish to compile and install ).
+   perl Makefile.PL
+   make
+   make install 
+
+   *** NOTE *** : The 'make install' step must be performed as user root.
+
+ Repeat the above steps for each of the modules you wish to install on 
+ your system. 
+
+  *** NOTE *** : GdkImlib MUST be compiled and installed BEFORE Gnome 
+                 support may be installed. Please make sure you install 
+                 GdkImlib first to make sure your Gnome support gets 
+                 installed correctly.  
+
+  

@@ -6,9 +6,7 @@
 #include "PerlGtkInt.h"
 
 #include "GtkDefs.h"
-
-/* FIXME */
-typedef GdkImlibImage * Gtk__Gdk__ImlibImage;
+#include "GnomeDefs.h"
 
 MODULE = Gnome::Animator		PACKAGE = Gnome::Animator		PREFIX = gnome_animator_
 

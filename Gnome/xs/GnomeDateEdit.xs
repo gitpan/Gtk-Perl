@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::DateEdit		PACKAGE = Gnome::DateEdit		PREFIX = gnome_date_edit_
 

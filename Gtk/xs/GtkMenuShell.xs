@@ -29,4 +29,23 @@ void
 gtk_menu_shell_deactivate(self)
 	Gtk::MenuShell	self
 
+#if GTK_HVER >= 0x010200
+
+void
+gtk_menu_shell_select_item (menu_shell, widget)
+	Gtk::MenuShell	menu_shell
+	Gtk::Widget	widget
+
+void
+gtk_menu_shell_deselect (menu_shell)
+	Gtk::MenuShell	menu_shell
+
+void
+gtk_menu_shell_activate_item (menu_shell, widget, force_deactivate)
+	Gtk::MenuShell	menu_shell
+	Gtk::Widget	widget
+	gboolean	force_deactivate
+
+#endif
+
 #endif

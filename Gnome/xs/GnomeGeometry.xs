@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::Geometry		PACKAGE = Gnome::Geometry		PREFIX = gnome_geometry_
 

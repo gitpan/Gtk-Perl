@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::Pixmap		PACKAGE = Gnome::Pixmap		PREFIX = gnome_pixmap_
 

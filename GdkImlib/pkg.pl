@@ -12,3 +12,5 @@ $gdkimlibs = `imlib-config --libs-gdk` || "-lgdk_imlib -lgdk -rdynamic -lgmodule
 $libs = "$libs $gdkimlibs"; 
 
 add_boot "Gtk::Gdk::ImlibImage";
+
+add_headers '"GdkImlibTypes.h"';

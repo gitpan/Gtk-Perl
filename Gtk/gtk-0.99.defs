@@ -26,10 +26,9 @@
   (selection-notify GDK_SELECTION_NOTIFY)
   (other-event GDK_OTHER_EVENT))
 
-;(define-enum GdkFillRule ; FIXME
-;  (even-odd-rule GDK_EVEN_ODD_RULE)
-;  (winding-rule GDK_WINDING_RULE))
-
+(define-enum GdkFillRule
+  (even-odd-rule GDK_EVEN_ODD_RULE)
+  (winding-rule GDK_WINDING_RULE))
 
 (define-enum GtkWindowType
   (toplevel GTK_WINDOW_TOPLEVEL)

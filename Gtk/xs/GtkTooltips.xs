@@ -43,5 +43,13 @@ gtk_tooltips_set_colors(self, background, foreground)
 	Gtk::Gdk::Color background
 	Gtk::Gdk::Color foreground
 
+#if GTK_HVER >= 0x010200
+
+void
+gtk_tooltips_force_window (tooltips)
+	Gtk::Tooltips	tooltips
+
+#endif
+
 #endif
 

@@ -80,6 +80,15 @@ gtk_text_insert(text, font, fg, bg, string)
 		gtk_text_insert(text, font, fg, bg, s, len);
 	}
 
+#if GTK_HVER >= 0x010200
+
+void
+gtk_text_set_line_wrap (text, line_wrap)
+	Gtk::Text	text
+	gint	line_wrap
+
+#endif
+
 Gtk::Adjustment
 hadj(text)
 	Gtk::Text	text

@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::CanvasEllipse		PACKAGE = Gnome::CanvasEllipse		PREFIX = gnome_canvas_ellipse_
 

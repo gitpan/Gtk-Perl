@@ -30,7 +30,9 @@ static HV * ObjectCache = 0;
   */
 
 #define TRY_MM
-
+#if GTK_HVER >= 0x010200
+#define USE_TYPE_QUERY
+#endif
 #undef DEBUG_TYPES
 
 HV * gtname_by_ptname = 0;
@@ -100,8 +102,9 @@ void link_types(char * gtkName, char * perlName, int gtkTypeNumber, gtkTypeInitF
 	
 	if (!gtinit_by_gtname)
 		gtinit_by_gtname = newHV();
-	hv_store(gtinit_by_gtname, gtkName, strlen(gtkName), newSViv((int)ifunc), 0);
+	hv_store(gtinit_by_gtname, gtkName, strlen(gtkName), newSViv((long)ifunc), 0);
 
+#ifndef USE_TYPE_QUERY
 	if (!gtosize_by_gtname)
 		gtosize_by_gtname = newHV();
 	hv_store(gtosize_by_gtname, gtkName, strlen(gtkName), newSViv(obj_size), 0);
@@ -109,10 +112,12 @@ void link_types(char * gtkName, char * perlName, int gtkTypeNumber, gtkTypeInitF
 	if (!gtcsize_by_gtname)
 		gtcsize_by_gtname = newHV();
 	hv_store(gtcsize_by_gtname, gtkName, strlen(gtkName), newSViv(class_size), 0);
+#endif
 }
 
 int obj_size_for_gtname(char * gtkTypeName)
 {
+#ifndef USE_TYPE_QUERY
 	SV ** result;
 
 	if (!gtosize_by_gtname)
@@ -124,10 +129,24 @@ int obj_size_for_gtname(char * gtkTypeName)
 		return 0;
 	else
 		return SvIV(*result);
+#else
+	GtkTypeQuery * q;
+	GtkType type;
+	gint size;
+	
+	if (!(type=gtk_type_from_name(gtkTypeName)))
+			return 0;
+	if (!(q = gtk_type_query(type)))
+		return 0;
+	size = q->object_size;
+	g_free(q);
+	return size;
+#endif
 }
 
 int class_size_for_gtname(char * gtkTypeName)
 {
+#ifndef USE_TYPE_QUERY
 	SV ** result;
 
 	if (!gtcsize_by_gtname)
@@ -139,6 +158,19 @@ int class_size_for_gtname(char * gtkTypeName)
 		return 0;
 	else
 		return SvIV(*result);
+#else
+	GtkTypeQuery * q;
+	GtkType type;
+	gint size;
+	
+	if (!(type=gtk_type_from_name(gtkTypeName)))
+			return 0;
+	if (!(q = gtk_type_query(type)))
+		return 0;
+	size = q->class_size;
+	g_free(q);
+	return size;
+#endif
 }
 
 char * ptname_for_gtname(char * gtkTypeName)
@@ -242,7 +274,8 @@ int gtnumber_for_ptname(char * perlTypeName)
 	printf("gtnumber_for_ptname(%s) =", perlTypeName);
 #endif
 	
-	if (!ptname_by_gtnumber)
+	/*if (!ptname_by_gtnumber)*/
+	if (!gtnumber_by_ptname)
 		result = 0;
 	else
 		result = hv_fetch(gtnumber_by_ptname, perlTypeName, strlen(perlTypeName), 0);
@@ -273,6 +306,8 @@ int gtnumber_for_ptname(char * perlTypeName)
 		gtkTypeNumber = tif();
 
 		complete_types(gtkTypeNumber, perlTypeName, 0);
+		/* no more needed */
+		hv_delete(gtinit_by_gtname, gtkTypeName, strlen(gtkTypeName), G_DISCARD);
 	} else
 		gtkTypeNumber = SvIV(*result);
 
@@ -557,8 +592,14 @@ SV * newSVGtkObjectRef(GtkObject * object, char * classname)
 		return newSVsv(&PL_sv_undef);
 	previous = (HV*)RetrieveGtkObject(object);
 	if (previous) {
+		return newRV((SV*)previous);
+#if 0
 		result = newRV((SV*)previous);
+		/* FIXME: check classname of previous */
+		if (classname)
+			sv_bless(result, gv_stashpv(classname, FALSE));
 		/*printf("Returning previous PO %p, referencing GO %p\n", previous, object);*/
+#endif
 	} else {
 		HV * h;
 		SV * s;
@@ -593,7 +634,7 @@ SV * newSVGtkObjectRef(GtkObject * object, char * classname)
 		}
 
 		h = newHV();
-		s = newSViv((int)object);
+		s = newSViv((long)object);
 		hv_store(h, "_gtk", 4, s, 0);
 		result = newRV((SV*)h);
 		RegisterGtkObject((SV*)h, object);
@@ -612,7 +653,7 @@ GtkObject * SvGtkObjectRef(SV * o, char * name)
 {
 	HV * q;
 	SV ** r;
-	if (!o || !SvOK(o) || !(q=(HV*)SvRV(o)) || (SvTYPE(q) != SVt_PVHV))
+	if (!o || !SvROK(o) || !(q=(HV*)SvRV(o)) || (SvTYPE(q) != SVt_PVHV))
 		return 0;
 	if (name && !PerlGtk_sv_derived_from(o, name))
 		croak("variable is not of type %s", name);
@@ -925,16 +966,23 @@ SV * GtkGetArg(GtkArg * a)
 			break;
 	}
 	
-	if (!result) {
+	if (result)
+		return result;
+	{
 		struct PerlGtkTypeHelper * h = PerlGtkTypeHelpers;
 		while (!result && h) {
-			if (h->GtkGetArg_f)
-				result = h->GtkGetArg_f(a);
+			if (h->GtkGetArg_f && (result = h->GtkGetArg_f(a)))
+				return result;
 			h = h->next;
 		}
-		
 	}
 	
+	/* this can go before the typehelpers once the silly gtk warning is removed */
+	if (GTK_FUNDAMENTAL_TYPE(a->type) == GTK_TYPE_ENUM)
+		result = newSVDefEnumHash(a->type, GTK_VALUE_ENUM(*a));
+	else if (GTK_FUNDAMENTAL_TYPE(a->type) == GTK_TYPE_FLAGS)
+		result = newSVDefFlagsHash(a->type, GTK_VALUE_FLAGS(*a));
+
 	if (!result)
 		croak("Cannot set argument of type %s (fundamental type %s)", gtk_type_name(a->type), gtk_type_name(GTK_FUNDAMENTAL_TYPE(a->type)));
 
@@ -1032,14 +1080,24 @@ void GtkSetArg(GtkArg * a, SV * v, SV * Class, GtkObject * Object)
 			result = 0;
 	}
 
-	if (!result) {
+	if (result)
+		return;
+	{
 		struct PerlGtkTypeHelper * h = PerlGtkTypeHelpers;
 		while (!result && h) {
-			if (h->GtkSetArg_f)
-				result = h->GtkSetArg_f(a, v, Class, Object);
+			if (h->GtkSetArg_f && (result = h->GtkSetArg_f(a, v, Class, Object)))
+				return;
 			h = h->next;
 		}
-		
+	}
+
+	/* this can go before the typehelpers once the silly gtk warning is removed */
+	if (GTK_FUNDAMENTAL_TYPE(a->type) == GTK_TYPE_ENUM) {
+		result = 1;
+		GTK_VALUE_ENUM(*a) = SvDefEnumHash(a->type, v);
+	} else if (GTK_FUNDAMENTAL_TYPE(a->type) == GTK_TYPE_FLAGS) {
+		result = 1;
+		GTK_VALUE_FLAGS(*a) = SvDefFlagsHash(a->type, v);
 	}
 
 	if (!result)
@@ -1081,14 +1139,25 @@ void GtkSetRetArg(GtkArg * a, SV * v, SV * Class, GtkObject * Object)
 			result = 0;
 	}
 	
-	if (!result) {
+	if (result)
+		return;
+	{
 		struct PerlGtkTypeHelper * h = PerlGtkTypeHelpers;
 		while (!result && h) {
-			if (h->GtkSetRetArg_f)
-				result = h->GtkSetRetArg_f(a, v, Class, Object);
+			if (h->GtkSetRetArg_f && (result = h->GtkSetRetArg_f(a, v, Class, Object)))
+				return;
 			h = h->next;
 		}
 		
+	}
+
+	/* this can go before the typehelpers once the silly gtk warning is removed */
+	if (GTK_FUNDAMENTAL_TYPE(a->type) == GTK_TYPE_ENUM) {
+		result = 1;
+		*GTK_RETLOC_ENUM(*a) = SvDefEnumHash(a->type, v);
+	} else if (GTK_FUNDAMENTAL_TYPE(a->type) == GTK_TYPE_FLAGS) {
+		result = 1;
+		*GTK_RETLOC_FLAGS(*a) = SvDefFlagsHash(a->type, v);
 	}
 
 	if (!result)
@@ -1123,15 +1192,23 @@ SV * GtkGetRetArg(GtkArg * a)
 	}
 	
 	
-	if (!result) {
+	if (result)
+		return result;
+	{
 		struct PerlGtkTypeHelper * h = PerlGtkTypeHelpers;
 		while (!result && h) {
-			if (h->GtkGetRetArg_f)
-				result = h->GtkGetRetArg_f(a);
+			if (h->GtkGetRetArg_f && (result = h->GtkGetRetArg_f(a)))
+				return result;
 			h = h->next;
 		}
 		
 	}
+
+	/* this can go before the typehelpers once the silly gtk warning is removed */
+	if (GTK_FUNDAMENTAL_TYPE(a->type) == GTK_TYPE_ENUM)
+		result = newSVDefEnumHash(a->type, *GTK_RETLOC_ENUM(*a));
+	else if (GTK_FUNDAMENTAL_TYPE(a->type) == GTK_TYPE_FLAGS)
+		result = newSVDefFlagsHash(a->type, *GTK_RETLOC_FLAGS(*a));
 
 	if (!result)
 		croak("Cannot get return argument of type %s (fundamental type %s)", gtk_type_name(a->type), gtk_type_name(GTK_FUNDAMENTAL_TYPE(a->type)));
@@ -1152,3 +1229,108 @@ void GtkFreeArg(GtkArg * a)
 	
 }
 
+#if GTK_HVER > 0x010200
+
+GdkGeometry* SvGdkGeometry (SV* data) {
+	HV * h;
+	SV **s;
+	GdkGeometry *g;
+
+	if ((!data) || (!SvOK(data)) || (!SvRV(data)) || (SvTYPE(SvRV(data)) != SVt_PVHV))
+		return 0;
+		
+	h = (HV*)SvRV(data);
+
+	g = alloc_temp(sizeof(GdkGeometry));
+	memset(g, 0, sizeof(GdkGeometry));
+	/* FIXME */
+
+	if ((s=hv_fetch(h, "min_width", 9, 0)) && SvOK(*s)) {
+		g->min_width = SvIV(*s);
+	}
+	if ((s=hv_fetch(h, "min_height", 10, 0)) && SvOK(*s)) {
+		g->min_height = SvIV(*s);
+	}
+	if ((s=hv_fetch(h, "max_width", 9, 0)) && SvOK(*s)) {
+		g->max_width = SvIV(*s);
+	}
+	if ((s=hv_fetch(h, "max_height", 10, 0)) && SvOK(*s)) {
+		g->max_height = SvIV(*s);
+	}
+	if ((s=hv_fetch(h, "base_width", 10, 0)) && SvOK(*s)) {
+		g->base_width = SvIV(*s);
+	}
+	if ((s=hv_fetch(h, "base_height", 11, 0)) && SvOK(*s)) {
+		g->base_height = SvIV(*s);
+	}
+	if ((s=hv_fetch(h, "width_inc", 9, 0)) && SvOK(*s)) {
+		g->width_inc = SvIV(*s);
+	}
+	if ((s=hv_fetch(h, "height_inc", 10, 0)) && SvOK(*s)) {
+		g->height_inc = SvIV(*s);
+	}
+	if ((s=hv_fetch(h, "min_aspect", 10, 0)) && SvOK(*s)) {
+		g->min_aspect = SvNV(*s);
+	}
+	if ((s=hv_fetch(h, "max_aspect", 10, 0)) && SvOK(*s)) {
+		g->max_aspect = SvNV(*s);
+	}
+	return g;
+}
+
+GtkTargetEntry *
+SvGtkTargetEntry(SV * data) {
+	HV * h;
+	AV * a;
+	SV ** s;
+	STRLEN len;
+	GtkTargetEntry * e;
+
+	if ((!data) || (!SvOK(data)) || (!SvRV(data)) || 
+			(SvTYPE(SvRV(data)) != SVt_PVHV && SvTYPE(SvRV(data)) != SVt_PVAV))
+		return NULL;
+	e = alloc_temp(sizeof(GtkTargetEntry));
+	memset(e,0,sizeof(GtkTargetEntry));
+
+	if (SvTYPE(SvRV(data)) == SVt_PVHV) {
+		h = (HV*)SvRV(data);
+		if ((s=hv_fetch(h, "target", 6, 0)) && SvOK(*s))
+			e->target = SvPV(*s, len);
+		if ((s=hv_fetch(h, "flags", 5, 0)) && SvOK(*s))
+			e->flags = SvUV(*s);
+		if ((s=hv_fetch(h, "info", 5, 0)) && SvOK(*s))
+			e->info = SvUV(*s);
+	} else {
+		a = (AV*)SvRV(data);
+		if ((s=av_fetch(a, 0, 0)) && SvOK(*s))
+			e->target = SvPV(*s, len);
+		if ((s=av_fetch(a, 1, 0)) && SvOK(*s))
+			e->flags = SvUV(*s);
+		if ((s=av_fetch(a, 2, 0)) && SvOK(*s))
+			e->info = SvUV(*s);
+	}
+	return e;
+}
+
+SV*
+newSVGtkTargetEntry (GtkTargetEntry* e) {
+	dTHR;
+
+	HV * h;
+	SV * r;
+	
+	if (!e)
+		return &PL_sv_undef;
+		
+	h = newHV();
+	r = newRV((SV*)h);
+	SvREFCNT_dec(h);
+	
+	hv_store(h, "target", 6, e->target ? newSVpv(e->target,0) : newSVsv(&PL_sv_undef), 0);
+	hv_store(h, "flags", 5, newSViv(e->flags), 0);
+	hv_store(h, "info", 5, newSViv(e->info), 0);
+	
+	return r;
+
+}
+#endif

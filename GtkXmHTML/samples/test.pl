@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #TITLE: HTML test
-#REQUIRES: Gtk XmHTML
+#REQUIRES: Gtk GtkXmHTML
 
 use Gtk;
 use Gtk::XmHTML;
@@ -40,9 +40,12 @@ $test_string3 =
 "</html>";
 
 sub click {
-	my($widget) = @_;
+	my($widget, $info, $track) = @_;
 	print "Click!\n";
-	
+	foreach (keys %{$info}) {
+		print "$_ -> $info->{$_}\n";
+	}
+	$widget->source($test_string3) unless $track;
 }
 
 #
@@ -115,12 +118,17 @@ if (open (F, "<$file")) {
 
 $html = new Gtk::XmHTML;
 
-$html->source($contents);
 $window->add($html);
+$html->source($contents);
 show $html;
 
 $html->signal_connect('activate' => \&click);
+$html->signal_connect('anchor_track' => \&click);
+# bug here $html->signal_connect('anchor_track' => \&click, 1);
 $html->signal_connect('frame' => \&frame);
+$window->signal_connect('delete_event' => sub {Gtk->exit(0)});
+
+$window->set_usize(400, 400);
 
 show $window;
 

@@ -6,6 +6,8 @@
 #include "PerlGtkInt.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gtk::PixmapMenuItem		PACKAGE = Gtk::PixmapMenuItem		PREFIX = gtk_pixmap_menu_item_
 

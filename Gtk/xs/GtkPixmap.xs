@@ -46,4 +46,13 @@ gtk_pixmap_get(pixmap)
 		}
 	}
 
+#if GTK_HVER > 0x010103
+
+void
+gtk_pixmap_set_build_insensitive (pixmap, build)
+	Gtk::Pixmap	pixmap
+	int	build
+
+#endif
+
 #endif

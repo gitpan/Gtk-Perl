@@ -6,6 +6,8 @@
 #include "PerlGtkInt.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::CanvasWidget		PACKAGE = Gnome::CanvasWidget		PREFIX = gnome_canvas_widget_
 

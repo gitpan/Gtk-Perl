@@ -61,6 +61,16 @@ gtk_window_set_modal(window, modal)
 
 #endif
 
+
+#if GTK_HVER >= 0x010200
+
+void
+gtk_window_set_transient_for (window, parent)
+	Gtk::Window	window
+	Gtk::Window	parent
+
+#endif
+
 void
 gtk_window_set_policy(window, allow_shrink, allow_grow, auto_shrink)
 	Gtk::Window	window

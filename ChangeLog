@@ -1,3 +1,257 @@
+Sun,  2 Jan 2000 18:02:51 +0100 Paolo Molaro <lupus@debian.org>
+
+	* Gtk/Gtk.pm: handle also readwrite flag.
+	* Gtk/xs/GtkObject.xs: GTK_OBJECT_INIT doesn't need to be defined
+	  anymore (thanks to Marc Lehmann for pointing this out).
+	* README: add notes about source incompatibilities.
+	* Release version 0.7000.
+
+Thu, 30 Dec 1999 10:28:58 +0100 Paolo Molaro <lupus@debian.org>
+
+	* GtkHTML/xs/GtkTML.xs: fixed to compile with latest cvs.
+	* Gtk/xs/GtkWindow.xs: gtk_window_reposition was added in gtk 1.2.6.
+	* INSTALL: remove reference about GtkTTY.
+	* MANIFEST: remove GtkTTY: this lib is long dead.
+
+Wed, 29 Dec 1999 19:25:09 +0100 Paolo Molaro <lupus@debian.org>
+
+	* Makefile.PL: clean up messages.
+	* GdkImlib/Makefile.PL: workaround bug in MakeMaker so that
+	  GdkImlib.c is not compiled at every step.
+	* Glade/xs/GladeXML.xs: support for using a perl func to build
+	  custom widgets (should really be fixed in libglade, though).
+	* Gtk/GtkTypes.c, Gtk/MiscTypes.c, Gtk/MiscTypes.h, Gtk/xs/Gtk.xs:
+	  flag values can now be returned as array refs (instead of hash refs)
+	  and is configurable as well as using '-' or '_' in enums and flags.
+	* tools/gendefs.pl: support for the above stuff and cleaner way to get
+	  enum and flag info from gtk+ itself at compile-time: sadly, Gtk+
+	  is broken in some ways (a flag type is registered, for example, but
+	  the GTK_TYPE_flag_name var is not defined...).
+	* INSTALL: install instruction courtesy of Frank Wiles.
+
+Sun, 19 Dec 1999 22:06:27 +0100  Paolo Molaro <lupus@debian.org>
+
+	* Gtk/MiscTypes.c, Gtk/GtkTypes.c, Gtk/GdkTypes.c: patch
+	  from David Huggins-Daines <dhd@eradicator.org> to remove
+	  32-bit-isms.
+	* Gtk/xs/GtkObject.xs, Gtk/xs/GtkWidget.xs, Gtk/Gtk.pm:
+	  GTK_OBJECT_INIT is no more called with perl_call_method,
+	  so we have correct behaviour and we maintain source
+	  compatibility: GTK_OBJECT_INIT gets the object as only arg.
+	  Implement Gtk::Widget::new with Gtk::Object::new in perl code.
+
+Mon,  6 Dec 1999 01:38:51 +0100 Paolo Molaro <lupus@debian.org>
+
+	* Gtk/xs/GtkLayout.xs: added accessors for bin_window, {x,y}offset, 
+	  width, height.
+	* Gtk/xs/GtkCombo.xs: added accessor for popwin.
+	* tools/gendefs.pl, Gtk/MiscTypes.{c,h}, Gtk/GtkTypes.c: improved
+	  enum/flags handling: faster startup, reduced memory usage, reduced 
+	  code size: still some cleanup and optimizations to do.
+	* GtkGLArea/xs/GtkGdkGL.xs: make it compile with cvs GtkGLArea
+	  which broke source compatibility.
+	* MANIFEST: Bonobo is not ready for public consumption yet.
+	* Gtk/xs/GtkObject.xs: fixed creation of objects subclasses
+	  of a perl subclass. You need to change the GTK_OBJECT_INIT
+	  method of your classes (first argument is classname, second
+	  is the object).
+	* Gnome/xs/GnomeCanvasItem.xs: fixed support for GdkImlibImages
+	  and added support for getting images and points.
+	* Gtk/xs/GtkCtree.xs: added some functions.
+
+Sun Dec  5 03:41:17 CET 1999  Marc Lehmann <marc@gimp.org>
+
+        * Gtk/Gtk.pm: move _get_arg_info into the AUTOLOAD eval, to get
+        useful error reports.
+
+Wed Dec  1 20:42:00 CET 1999  Marc Lehmann <marc@gimp.org>
+
+        * MANIFEST: added some necessary but missing files (Gtk/*) and
+        Bonobo.
+        * Gtk/GtkTypes.c: Do not coredump when an sv is not a reference.
+        (should output an error message, though, rather than keeping quiet).
+
+Mon, 29 Nov 1999 13:42:33 +0100 Paolo Molaro <lupus@debian.org>
+
+	* GtkHTML/*: added GtkHTML binding.
+	* Gtk/gtk-1.2.defs: export some enums and flags.
+	* really fix GLArea.
+
+Sun, 14 Nov 1999 19:12:33 +0100 Paolo Molaro <lupus@debian.org>
+	
+	* GtkGLArea/GtkGLArea.pm, GtkGLArea/Makefile.pm: fix GtkGLArea
+	  support.
+	* */Makefile.PL: create the documentation for the submodules and
+	  implement the clean targets.
+	* tools/gendefs.pl, gendoc.pl: take an arg to set tag for documentation.
+	* Glade/Makefile.PL: enable gnome support if libglade --libs gnome succedes.
+	* Gtk/xs/Gtk.xs: added a couple of missing gtk_rc_* funcs.
+
+Fri, 12 Nov 1999 13:48:18 +0100 Paolo Molaro <lupus@debian.org>
+	
+	* Gtk/gtk-1.2.pkg: workaround bug in gtk to make GtkInvisible
+	  work.
+	* Gtk/xs/GtkList.xs: added missing bindings.
+	* Gtk/xs/Gtk-1.2.xs: added missing bindings for FontSelection
+	  set_filter stuff.
+	* Gtk/gtk-1.2.defs: added GtkFontType GtkFontFilterType.
+	* Gnome/xs/Gnome.xs: added fixups for GnomeDruidPage and 
+	  GnomeIconList signals...
+	* Gtk/xs/Gtk.xs: fixed Gtk->quit_add().
+	* GtkXmHTML/xs/GtkXmHTML.xs: add set_image_procs function.
+	* Gnome/samples/html.pl: test the image_proc fot the GtkXmHTML
+	  widget and make it work with relative urls...
+	* Gtk/xs/GtkCList-1.2.xs: added set_compare_func wrapper.
+	* Gtk/xs/GtkCTree-1.1.1.xs: lotsa functions binded.
+
+Mon Nov  8 20:23:38 CET 1999 Paolo Molaro <lupus@debian.org>
+
+	* Gtk/gtk-0.99.typemap: added gstring type for returned
+	  strings that need to be g_free()ed.
+	* Gtk/xs/Gtk.xs: faster signal marshaling (this also helped
+	  spotting a couple of bugs in the previuos implementation).
+	* Gtk/xs/Gtk.xs, Gtk/xs/Gtk-1.2.xs: binding and fixups for
+	  dnd related functions and signals.
+	* Gtk/samples/testdnd.pl: test dnd stuff.
+	* Gtk/gtk-0.99.defs: enable GdkFillRule enum definition.
+	* Gtk/gtk-1.2.defs: added GtkCornerType enum.
+	* Gtk/xs/*.xs: over 100 more functions bound: too many to
+	  list here.
+
+Sat Nov  6 15:11:01 CET 1999  Paolo Molaro <lupus@debian.org>
+
+	* test.pl: now runs samples with uninstalled sub-modules.
+	* Makefile.PL: disable auto-detection of submodules:
+	  compile them separately!
+	* Bonobo/*: first bonobo support: you need a modified
+	  CORBA::ORBit to compile it though (and anyway it doesn't work, 
+	  yet:-).
+	* */samples/*.pl: some changes to make make test work.
+
+Sat Nov  6 12:16:56 CET 1999  Paolo Molaro <lupus@debian.org>
+
+	* GtkGLArea/GtkGLArea.pm: added missing file.
+	* Gnome/Makefile.PL, Gnome/xs/ZvtTerm.xs: integrate
+	  Zvt in Gnome
+	* *.cvsignore: shut up cvs.
+	* GdkImlib/GdkImlibTypes.h: guard against multiple inclusions.
+	* Gnome/xs/GnomeDruidPageStandard.xs: add vbox accessor
+	  (mentioned by Dermot Musgrove).
+
+Fri, 29 Oct 1999 12:27:38 +0200 Paolo Molaro <lupus@debian.org>
+
+	* Lotsa changes to support separate compilation and
+	  loading of sub-modules: the test framework needs to be
+	  changed a bit to add -Mblib etc.
+	  Seems to work, please test it compiling first the base Gtk
+	  with perl Makefile.PL --without-gnome --without-gdkimlib
+	  and then the required submodules.
+	  The Gnome module requires also the GdkImlib module.
+	  Zvt, AppletWidget, GtkGLArea not yet ported to the new
+	  building mode.
+	  Still cleanups to be done here and there (and build a correct
+	  clean target in makefiles).
+
+Tue, 26 Oct 1999 15:12:02 +0200 Paolo Molaro <lupus@debian.org>
+
+	* GtkXmHTML/xs/GtkXmHTML.xs, GtkXmHTML/GXHTypes.c: make
+	  activate and anchor_track signals work.
+	* Gnome/xs/Gnome.xs: allow params for gnome programs.
+
+Mon Oct 25 01:42:01 CEST 1999 Paolo Molaro <lupus@debian.org>
+
+	* Gtk/GdkTypes.c: fix to switch by Sven Verdoolaege 
+	  <skimo@kotnet.org>.
+	* Gtk/xs/GtkObject.xs, Gtk/samples/widget.pl: new (and correct)
+	  way to add signals to perl-created classes.
+	* Gnome/xs/GnomeDruid*.xs: added GnomeDruid support.
+	* Glade/GladeXML.pm, Glade/xs/GladeXML.xs: fix typo reported
+	  by Brian Warner <warner@lothar.com>. Other fixes and cleanups.
+	* GdkImlib/xs/GdkImlib.xs: fixed gdk_imlib_get_cache_info.
+	  Added set/get border funcs and best_color_match.
+	* Gtk/xs/GtkCtree.xs: applied patch from Jeremy Boulton 
+	  <boultonj@lloyd-210.caltech.edu> to add get_text() and others.
+	* Gtk/xs/Gtk.xs: added a few fixups fot GtkCtree signals.
+
+Thu, 30 Sep 1999 17:01:35 +0200 Paolo Molaro <lupus@debian.org>
+
+	* tools/genext.pl: look for headers only in Gtk/ for now.
+	* Gtk/gtk-1.2.defs: add GtkArgFlags flags.
+	* Gtk/xs/GtkObject.xs: export more arg info.
+	* Gtk/Gtk.pm: get/set only if arg is readable/writable.
+	* Gtk/xs/GtkCList.xs: fix find_row_from_data.
+	* Gnome/xs/GnomeIconList.xs: allow undefined adjustments.
+	* Gnome/xs/GnomeStock.xs: added gnome_stock_pixmap_widget().
+	* Gtk/xs/GtkColorSelectionDialog.xs: fix accessors for buttons
+	  (by Dermot Musgrove).
+	* Gtk/xs/GtkCList.xs: added get/set cell/row style functions.
+
+Tue, 21 Sep 1999 12:59:06 +0200 Paolo Molaro <lupus@debian.org>
+
+	* Gnome/pkg.defs: remove GtkPlug/Socket/Layout.
+	* Gtk/gtk-1.2.defs: add GtkPlug/Socket/Layout.
+	* Gtk/xs/GtkPixmap.xs: add gtk_pixmap_set_build_insensitive().
+
+Mon, 20 Sep 1999 13:59:30 +0200 Paolo Molaro <lupus@debian.org>
+
+	* GdkImlib/xs/GdkImlib.xs: properly DESTROY GdkImlibImages.
+	* Gtk/Gtk.pm: corrected automagic creation of settors/accessors
+	  for args.
+	* Gtk/xs/GtkObject.xs: added _get_arg_info: return information
+	  on an GtkArg.
+	* Gtk/xs/Gtk.xs: added gdk_window_set_transient_for(),
+	  gdk_window_set_role(), gdk_window_set_geometry_hints().
+	* Gtk/xs/GtkWindow.xs: added gtk_window_set_transient_for().
+	* Gnome/xs/GnomeIconList.xs: implemented.
+	* Gtk/xs/Gtk-1.2.xs: added to hold 1.2 specific changes
+	  (gdk_window_set_geometry_hints() and gtk_window_set_geometry_hints()).
+	* Gnome/xs/GnomePropertyBox.xs: added notebook accessor and
+	  gnome_property_box_set_modified().
+	* Gtk/xs/GtkLayout.xs: permit undefined adjustments.
+	* Gtk/xs/GtkInvisible.xs: added.
+	* GdkImlib/GdkImlibTypes.h: export gdkimlib type functions.
+	* GdkImlib/pkg.pl: add the GdkImlibTypes.h header.
+	* Gtk/gtk-0.99.typemap: applied patch from Owen Taylor to fix mem leak.
+	* Gnome/xs/GnomeIconSelection.xs: added.
+
+Sat, 11 Sep 1999 19:20:11 +0200 Paolo Molaro <lupus@debian.org>
+
+	* Gnome/xs/GnomeApp.xs: added wrappers for:
+	  gnome_app_set_statusbar_custom(), gnome_app_add_toolbar(),
+	  gnome_app_add_docked(), gnome_app_add_dock_item(),
+	  gnome_app_get_dock(), gnome_app_get_dock_item_by_name(),
+	  gnome_app_enable_layout_config().
+	* Gtk/xs/GtkCalendar.xs: added.
+	* Gnome/xs/GnomeAppBar.xs: corrected #define.
+	* Gnome/xs/GnomeDockItem.xs: corrected bugs and enabled.
+	* Gtk/xs/Gtk.xs: added gdk_pixmap_colormap_create_from_xpm{_d}.
+	* Gnome/xs/GnomeStock.xs: added.
+	* Gnome/pkg.defs: removed GtkCalendar* enums (now in Gtk).
+	  GnomeDockItemBehavior are flags now.
+	  Corrected casts for some widgets.
+	* Gnome/xs/GnomeSpell.xs: added.
+	* Gnome/samples/gspell.pl: test spell-checker.
+	* Gnome/xs/GnomeMDI*.xs: added support for GnomeMDI.
+	* Gnome/xs/Gnome.xs: added gnome_preferences_* functions.
+	* Gtk/Gtk.pm: added signal_connect_object{_after}.
+	* Glade/GladeXML.pm: enable connect_object stuff.
+	* Gnome/xs/GnomeCanvasItem.xs: added affine trasformation and
+	  other misc functions for the aa canvas.
+	* Makefile.PL, Gnome/pkg.pl: corrected version define generation.
+
+Sun Sep  5 03:59:34 1999 Timur Bakeyev <timur@gnu.org>
+
+	* Makefile.PL: Add PERL_POLLUTE to the list of defines in case of
+	Perl 5.005 and above. Problem that sv_undef now is PL_sv_undef to
+	protect name space from pollution. There is no clean solution in
+	this situation - should be cleaned when 5.004 becomes obsolete.
+	
+	* tools/gendoc.pl: Fix several warnings about undefined variables.
+
+Sun Aug 29 22:43:34 EEST 1999 Tuomas J. Lukka <lukka@iki.fi>
+
+	* Gnome/xs/GnomeCanvas.xs: added set_close_enough
+
 Wed, 18 Aug 1999 22:52:43 PDT Kenneth Albanowski <kjahds@kjahds.com>
 
 	* Point release Gtk-Perl-0.6123.tar.gz

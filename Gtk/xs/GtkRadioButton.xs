@@ -53,4 +53,28 @@ group(self)
 		}
 	}
 
+#if GTK_HVER >= 0x010200
+
+Gtk::RadioButton_Sink
+gtk_radio_button_new_from_widget (Class, group)
+	SV *	Class
+	Gtk::RadioButton	group
+	CODE:
+	RETVAL = GTK_RADIO_BUTTON(gtk_radio_button_new_from_widget(group));
+	OUTPUT:
+	RETVAL
+
+Gtk::RadioButton_Sink
+gtk_radio_button_new_with_label_from_widget (Class, group, label)
+	SV *	Class
+	Gtk::RadioButton	group
+	char *	label
+	CODE:
+	RETVAL = GTK_RADIO_BUTTON(gtk_radio_button_new_with_label_from_widget(group, label));
+	OUTPUT:
+	RETVAL
+
+#endif
+
+
 #endif

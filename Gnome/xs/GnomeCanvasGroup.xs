@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::CanvasGroup		PACKAGE = Gnome::CanvasGroup		PREFIX = gnome_canvas_group_
 

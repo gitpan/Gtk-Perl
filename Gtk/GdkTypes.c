@@ -329,7 +329,7 @@ SV * newSVGdkEvent(GdkEvent * e)
  	
 	e2 = gdk_event_copy(e);
 	
-	hv_store(h, "_ptr", 4, newSViv((int)e2), 0);
+	hv_store(h, "_ptr", 4, newSViv((long)e2), 0);
 	
 	/*printf("Turning GdkEvent %d, type %d, into SV %d, ptr %d\n", e, e->type, r, e2);*/
 	
@@ -561,6 +561,7 @@ GdkEvent * SvSetGdkEvent(SV * data, GdkEvent * e)
 			e->key.keyval = SvIV(*s);
 		else
 			croak("event must contain keyval");
+		break;
 	case GDK_FOCUS_CHANGE:
 		if (s=hv_fetch(h, "in", 2, 0))
 			e->focus_change.in = SvIV(*s);
@@ -723,3 +724,9 @@ GdkWindowAttr * SvGdkWindowAttr(SV * data, GdkWindowAttr * attr, gint * mask)
 	return attr;
 }
 
+#if GTK_HVER >= 0x010200
+
+SV * newSVGdkDragContextRef(GdkDragContext* f) { return newSVMiscRef(f, "Gtk::Gdk::DragContext", 0); }
+GdkDragContext* SvGdkDragContextRef(SV * data) { return SvMiscRef(data, "Gtk::Gdk::DragContext"); }
+
+#endif

@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gtk::Socket		PACKAGE = Gtk::Socket		PREFIX = gtk_socket_
 

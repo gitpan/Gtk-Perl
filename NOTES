@@ -8,6 +8,11 @@
 
 Revision notes:
 
+	As of public release 0.7000, the submodules in Perl/Gtk need to be
+	built separately as outlined in the INSTALL file. This may change
+	in a future point release if there is demand for compiling all the 
+	modules at once.
+
 	As of public release 0.5000, Perl/Gtk+ now contains both the Gtk and
 	Gnome sections (in 0.4 they were split apart), and a build mechanism
 	capable of building everything that the user desires. The files have

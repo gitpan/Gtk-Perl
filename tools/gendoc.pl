@@ -3,7 +3,7 @@
 use Data::Dumper;
 
 my ($package, $prefix, $lastl) = (undef, undef);
-my (%funcs);
+my (%funcs, $tag);
 my (%keywords, $mode, %current, %taboo);
 
 @keywords{qw/ARG OUTPUT PROTO CONSTRUCTOR RETURNS DESC PARAMS SEEALSO EXAMPLE/} = ();
@@ -11,7 +11,6 @@ my (%keywords, $mode, %current, %taboo);
 
 %dataout = (
 	'void'	=> undef,
-	'char *'	=> "string",
 	'char*'	=> "string",
 	'gfloat'	=> "float",
 	'gint'	=> 'integer',
@@ -22,11 +21,19 @@ my (%keywords, $mode, %current, %taboo);
 	'bool'	=> 'boolean',
 );
 
+$tag = 'gtk';
+
+if ($ARGV[0] eq '-t') {
+	shift;
+	$tag = shift || 'gtk';
+}
+
 foreach (@ARGV) {
 	$lastl = $package = $prefix = $mode = undef;
 	%current = ();
 	open (F, $_) || die "Cannot open $_: $!";
 	while (<F>) {
+		next if !defined($_);
 		chomp;
 		if (/^\s*$/) {
 			$current{'PACKAGE'} = $package unless $current{'PACKAGE'};
@@ -66,7 +73,7 @@ foreach (@ARGV) {
 
 my %funcdesc;
 
-open(DOC, ">build/perl-gtk-ref.pod") || die "Cannot open doc: $!";
+open(DOC, ">build/perl-$tag-ref.pod") || die "Cannot open doc: $!";
 select DOC;
 #print "\n=head1 NAME\n\nGtk/Perl Reference Manual\n\n";
 foreach my $p (sort keys %funcs) {
@@ -135,6 +142,7 @@ sub handle_proto {
 
 sub crunch_type {
 	$_[0] =~ s/\s+/ /o;
+	$_[0] =~ s/\s+(?=\B)//g;
 	$_[0] =~ s/(_Sink_Up|_Sink|_Up)$//o;
 	$_[0] = $dataout{$_[0]} if exists $dataout{$_[0]};
 }
@@ -179,7 +187,9 @@ sub output_func {
 		next if /^Class/;
 		next if /\.\.\./;
 		s/\s*=.*$//;
-		print "=item * B<$data->{'ARG'}->{$_}[0]> $_ ";
+		print "=item * ";
+		print "B<$data->{'ARG'}->{$_}[0]> " if $data->{'ARG'}->{$_}[0];
+		print "$_ ";
 		print "($data->{'ARG'}->{$_}[1])" if $data->{'ARG'}->{$_}[1];
 		print "\n\n";
 	}

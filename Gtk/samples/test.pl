@@ -238,7 +238,7 @@ sub cursor_expose_event {
 
 sub cursor_event {
 	my($widget,$spinner, $event) = @_;
-	if ($event->{type} eq 'button_press' and ($event->{button} == 1 or $event->{button} == 3)) {
+	if ($event->{type} =~ /button[-_]press/ and ($event->{button} == 1 or $event->{button} == 3)) {
 		$spinner->spin(($event->{button} == 1) ? 'up' : 'down', $spinner->get_adjustment->step_increment);
 		return 1;
 	}
@@ -602,32 +602,38 @@ sub create_spins {
 
 sub shape_pressed {
 	my($widget, $event) = @_;
-	
-	return if $event->{type} ne 'button_press';
+
+	return 0 if $event->{type} !~ /button[-_]press/;
 
 	my($w);
 	
 	$widget->{save_x} = $event->{'x'};
 	$widget->{save_y} = $event->{'y'};
-	
+	$widget->{in_grab} = 1;
+
 	$widget->grab_add;
 	$w = $widget->window;
 	Gtk::Gdk->pointer_grab($w, 1, 
 		['button_release_mask', 'button_motion_mask', 'pointer_motion_hint_mask'], 
 		undef, undef ,0);
+	return 1;
 }
 
 sub shape_released {
 	my($widget) = @_;
+	$widget->{in_grab} = 0;
 	$widget->grab_remove;
 	Gtk::Gdk->pointer_ungrab(0);
+	return 1;
 }
 
 sub shape_motion {
 	my($widget, $event) = @_;
 
+	return 0 unless $widget->{in_grab};
 	my ($x, $y) = $root_win->get_pointer;
 	$widget->set_uposition($x - $widget->{save_x}, $y - $widget->{save_y});
+	return 1;
 }
 
 
@@ -645,7 +651,7 @@ sub shape_create_icon {
 	$window->add($fixed);
 	show $fixed;
 	
-	$window->set_events( [@{$window->get_events}, 'button_motion_mask', 'pointer_motion_hint_mask', 'button_press_mask']);
+	$window->set_events( [keys %{$window->get_events}, 'button_motion_mask', 'pointer_motion_hint_mask', 'button_press_mask']);
 	
 	realize $window;
 	
@@ -2523,12 +2529,12 @@ sub ctree_button_press {
 		my $children = $work->children;
 		if ( defined $children && $ctree->is_hot_spot( $event->{'x'}, $event->{'y'} ) ) {
 			if ( $work->expanded() ) {
-				$ctree->collapse_recursive( $work );
+				$ctree->collapse_recursive( $work->children );
 			} else {
-				$ctree->expand_recursive( $work );
+				$ctree->expand_recursive( $work->children );
 			}
 			ctree_after_press( $ctree, undef );
-			$ctree->signal_emit_stop_by_name( 'button_pres_event' );
+			$ctree->signal_emit_stop_by_name( 'button_press_event' );
 		}
 	}
 
@@ -2867,6 +2873,17 @@ sub create_ctree {
 		$ctree->signal_connect( 'button_press_event', \&ctree_button_press );
 		$ctree->signal_connect_after( 'button_press_event', \&ctree_after_press );
 		$ctree->signal_connect( 'button_release_event', \&ctree_button_release );
+		$ctree->signal_connect( 'tree_select_row', sub {
+			my ($ct, $node, $col) = @_;
+			my ($t, $space);
+			# print "Column: $col -> $node\n";
+			($t, undef, undef) = $ct->node_get_pixtext($node, 0);
+			print "Info 0: $t\n";
+			$t = $ct->node_get_text($node, 1);
+			print "Info 1: $t\n";
+			($t, $space) = $ct->get_node_info($node);
+			print "NInfo: '$t' $space\n";
+		} );
 		$ctree->signal_connect_after( 'button_release_event', \&ctree_after_press );
 		$ctree->signal_connect_after( 'tree_move', \&ctree_after_move );
 		$ctree->signal_connect_after( 'end_selection', \&ctree_after_press );
@@ -3544,6 +3561,8 @@ my $notebook_window;
 
 sub notebook_page_switch {
 	my( $widget, $new_page, $page_num) = @_;
+
+	print "switch page $page_num\n";
 
 	my $old_page = $widget->cur_page();
 	if ( defined $old_page ) {

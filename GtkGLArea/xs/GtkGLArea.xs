@@ -4,8 +4,32 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GtkGLAreaDefs.h"
+
+static void     callXS (void (*subaddr)(CV* cv), CV *cv, SV **mark)
+{
+        int items;
+        dSP;
+        PUSHMARK (mark);
+        (*subaddr)(cv);
+
+        PUTBACK;  /* Forget the return values */
+}
 
 MODULE = Gtk::GLArea		PACKAGE = Gtk::GLArea		PREFIX = gtk_gl_area_
+
+void
+init(Class)
+	SV *	Class
+	CODE:
+	{
+		static int did_it = 0;
+		if (did_it)
+			return;
+		did_it = 1;
+		GtkGLArea_InstallTypedefs();
+		GtkGLArea_InstallObjects();
+	}
 
 Gtk::GLArea_Sink
 new(Class,...)
@@ -67,3 +91,10 @@ glcontext(self)
  	RETVAL = self->glcontext;
  	OUTPUT:
  	RETVAL
+
+INCLUDE: ../build/boxed.xsh
+
+INCLUDE: ../build/objects.xsh
+
+INCLUDE: ../build/extension.xsh
+

@@ -6,7 +6,7 @@ require AutoLoader;
 
 use Carp;
 
-$VERSION = '0.6123';
+$VERSION = '0.7000';
 
 @ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export
@@ -47,6 +47,9 @@ sub AUTOLOAD {
     eval "sub $AUTOLOAD { $val }";
     goto &$AUTOLOAD;
 }
+
+# use RTLD_GLOBAL
+sub dl_load_flags {0x01}
 
 bootstrap Gtk;
 
@@ -113,12 +116,16 @@ sub AUTOLOAD {
     # for Gtk object data members, in lieu of defined functions.
     
     my($result);
-   
+    my ($realname) = $AUTOLOAD;
+    $realname =~ s/^.*:://;
     eval {
-	    if (@_ == 2) {
-	    	$_[0]->set($AUTOLOAD, $_[1]);
-	    } elsif (@_ == 1) {
-	    	$result = $_[0]->get($AUTOLOAD);
+            my ($argn, $classn, $flags) = $_[0]->_get_arg_info($realname);
+            #print STDERR "GOT ARG: $AUTOLOAD -> $argn ($classn) ", join(' ', keys %{$flags}), " - ",  join(' ', values %{$flags}),"\n";
+   
+	    if (@_ == 2 && ($flags->{writable} || $flags->{readwrite})) {
+	    	$_[0]->set($argn, $_[1]);
+	    } elsif (@_ == 1 && ($flags->{readable} || $flags->{readwrite})) {
+	    	$result = $_[0]->get($argn);
 	    } else {
 	    	die;
 	    }
@@ -126,13 +133,13 @@ sub AUTOLOAD {
 	    # Set up real method, to speed subsequent access
 	    eval <<"EOT";
 	    
-	    sub $AUTOLOAD {
-	    	if (\@_ == 2) {
-	    		\$_[0]->set('$AUTOLOAD', \$_[1]);
-	    	} elsif (\@_ == 1) {
-	    		\$_[0]->get('$AUTOLOAD');
+	    sub ${classn}::$realname {
+	    	if (\@_ == 2 && ( $flags->{writable} || $flags->{readwrite})) {
+	    		\$_[0]->set('$argn', \$_[1]);
+	    	} elsif (\@_ == 1 && ( $flags->{readable} || $flags->{readwrite})) {
+	    		\$_[0]->get('$argn');
 	    	} else {
-	    		die "Usage: $AUTOLOAD (Object [, new_value])";
+	    		die "Usage: ${classn}::$realname (Object [, new_value])";
 	    	}
 	    }
 EOT
@@ -148,6 +155,38 @@ EOT
 	}
 	$result;
 }
+
+# Note: $handler and $slot_object are swapped!
+sub signal_connect_object {
+	my ($obj, $signal, $slot_object, $handler, @data) = @_;
+
+	$obj->signal_connect($signal, sub {
+		# throw away the object
+		shift; 
+		$handler->($slot_object, @_);
+	}, @data);
+}
+
+sub signal_connect_object_after {
+	my ($obj, $signal, $slot_object, $handler, @data) = @_;
+
+	$obj->signal_connect_after($signal, sub {
+		# throw away the object
+		shift; 
+		$handler->($slot_object, @_);
+	}, @data);
+}
+
+package Gtk::Widget;
+
+sub new {
+	my ($class, @args) = @_;
+	my ($obj) = Gtk::Object::new(@args);
+	$class->add($obj) if ref($class);
+	return $obj;
+}
+
+sub new_child {return new @_}
 
 package Gtk;
 

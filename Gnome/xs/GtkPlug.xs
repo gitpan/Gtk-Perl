@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gtk::Plug		PACKAGE = Gtk::Plug		PREFIX = gtk_plug_
 

@@ -92,5 +92,25 @@ gtk_spin_button_set_snap_to_ticks(self, snap_to_ticks)
 		gtk_spin_button_set_update_policy(self, GTK_UPDATE_ALWAYS);
 #endif
 
+#if GTK_HVER >= 0x010200
+
+void
+gtk_spin_button_update (spin_button)
+	Gtk::SpinButton	spin_button
+
+void
+gtk_spin_button_set_shadow_type (spin_button, type)
+	Gtk::SpinButton	spin_button
+	Gtk::ShadowType	type
+
+void
+gtk_spin_button_configure (spin_button, adj, climb_rate, digits)
+	Gtk::SpinButton	spin_button
+	Gtk::Adjustment	adj
+	double	climb_rate
+	guint	digits
+
+#endif
+
 #endif
 

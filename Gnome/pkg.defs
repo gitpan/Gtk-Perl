@@ -14,12 +14,16 @@
 (define-object GnomeFontSelector (GtkDialog))
 (define-object GnomePixmap (GtkWidget))
 (define-object GnomeScores (GtkWindow))
-(define-object GnomeMessageBox (GtkWindow) (cast GNOME_MESSAGEBOX))
+; this changed in gnome-libs sometime
+;(define-object GnomeMessageBox (GtkWindow) (cast GNOME_MESSAGE_BOX))
+(define-object GnomeMessageBox (GnomeDialog) (cast GNOME_MESSAGE_BOX))
 (define-object GtkClock (GtkLabel))
 (define-object GtkTed (GtkTable))
 
-(define-object GtkSocket (GtkContainer))
-(define-object GtkPlug (GtkWindow))
+; moved to Gtk
+;(define-object GtkSocket (GtkContainer))
+;(define-object GtkPlug (GtkWindow))
+
 (define-object GnomeCanvas (GtkLayout))
 (define-object GnomeCanvasItem (GtkObject))
 (define-object GnomeCanvasGroup (GnomeCanvasItem))
@@ -42,7 +46,8 @@
 (define-object GnomePropertyBox (GnomeDialog))
 (define-object GnomeRootWin (GtkWindow) (cast GNOME_ROOTWIN))
 
-(define-object GtkLayout (GtkContainer))
+; moved to Gtk
+; (define-object GtkLayout (GtkContainer))
 
 ;; 0.30 widgets
 
@@ -64,6 +69,14 @@
 (define-object GnomeDockLayout (GtkObject))
 (define-object GnomeAnimator (GtkWidget))
 (define-object GtkPixmapMenuItem (GtkMenuItem))
+(define-object GnomeIconSelection (GtkVBox))
+
+(define-object GnomeStock (GnomePixmap))
+(define-object GnomeSpell (GtkVBox))
+(define-object GnomeMDI (GtkObject))
+(define-object GnomeMDIChild (GtkObject) (cast GNOME_MDI_CHILD))
+(define-object GnomeMDIGenericChild (GnomeMDIChild) (cast GNOME_MDI_GENERIC_CHILD))
+
 
 (define-enum GnomeDockPlacement
 	(top GNOME_DOCK_TOP)
@@ -72,7 +85,7 @@
 	(left GNOME_DOCK_LEFT)
 	(floating GNOME_DOCK_FLOATING))
 
-(define-enum GnomeDockItemBehavior
+(define-flags GnomeDockItemBehavior
 	(normal GNOME_DOCK_ITEM_BEH_NORMAL)
 	(exclusive GNOME_DOCK_ITEM_BEH_EXCLUSIVE)
 	(never-float GNOME_DOCK_ITEM_BEH_NEVER_FLOATING)
@@ -251,10 +264,12 @@
 
 ; enumerations from "./gtkcalendar.h"
 
-(define-enum GtkCalendarDisplayOptions
-   (show-heading GTK_CALENDAR_SHOW_HEADING)
-   (show-day-names GTK_CALENDAR_SHOW_DAY_NAMES)
-   (no-month-change GTK_CALENDAR_NO_MONTH_CHANGE))
+; now in Gtk
+
+;(define-enum GtkCalendarDisplayOptions
+;   (show-heading GTK_CALENDAR_SHOW_HEADING)
+;   (show-day-names GTK_CALENDAR_SHOW_DAY_NAMES)
+;   (no-month-change GTK_CALENDAR_NO_MONTH_CHANGE))
 
 ; (define-enum GtkCalendarFont
 ;    (heading GTK_CALENDAR_FONT_HEADING)
@@ -267,3 +282,21 @@
 ;    (prev-month GTK_CALENDAR_COLOR_PREV_MONTH)
 ;    (next-month GTK_CALENDAR_COLOR_NEXT_MONTH)
 ;    (normal-day GTK_CALENDAR_COLOR_NORMAL_DAY))
+
+(export-enum GnomeAnimatorStatus)
+(export-enum GnomeAnimatorLoopType)
+(export-enum GnomeUIInfoType)
+(export-enum GnomeUIPixmapType)
+(export-enum GnomeCalculatorMode)
+(export-enum GnomeInteractStyle)
+(export-enum GnomeDialogType)
+(export-enum GnomeSaveStyle)
+(export-enum GnomeRestartStyle)
+;(export-enum GnomeClientState)
+(export-enum GnomeDockPlacement)
+(export-flags GnomeDockItemBehavior)
+(export-enum GnomeFontPickerMode)
+(export-enum GnomeIconListMode)
+;(export-enum GnomeMDIMode)
+(export-enum GnomeStockPixmapType)
+(export-enum GnomePreferencesType)

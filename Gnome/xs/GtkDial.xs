@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gtk::Dial		PACKAGE = Gtk::Dial		PREFIX = gtk_dial_
 

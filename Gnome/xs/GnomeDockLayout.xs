@@ -6,6 +6,8 @@
 #include "PerlGtkInt.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::DockLayout		PACKAGE = Gnome::DockLayout		PREFIX = gnome_dock_layout_
 

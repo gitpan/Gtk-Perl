@@ -15,6 +15,8 @@
 # define GTK_1_1
 #endif
 
+typedef gchar * gstring;
+
 struct PerlGtkTypeHelper {
 	SV * (*GtkGetArg_f)(GtkArg *);
 	int (*GtkSetArg_f)(GtkArg * a, SV * v, SV * Class, GtkObject * Object);
@@ -95,6 +97,13 @@ PerlGtkDeclareFunc(int, obj_size_for_gtname)(char * gtkTypeName);
 
 PerlGtkDeclareFunc(GtkType, FindArgumentTypeWithObject)(GtkObject * object, SV * name, GtkArg * result);
 PerlGtkDeclareFunc(GtkType, FindArgumentTypeWithClass)(GtkObjectClass * klass, SV * name, GtkArg * result);
+
+#if GTK_HVER >= 0x010200
+
+PerlGtkDeclareFunc(SV *, newSVGtkTargetEntry)(GtkTargetEntry * o);
+PerlGtkDeclareFunc(GtkTargetEntry *, SvGtkTargetEntry)(SV * o);
+
+#endif
 
 #define newSVgchar(x) newSViv(x)
 #define Svgchar(x) SvIV(x)

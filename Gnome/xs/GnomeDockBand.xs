@@ -6,6 +6,8 @@
 #include "PerlGtkInt.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::DockBand		PACKAGE = Gnome::DockBand		PREFIX = gnome_dock_band_
 

@@ -35,6 +35,15 @@ void
 gtk_file_selection_hide_fileop_buttons (self)
 	Gtk::FileSelection	self
 
+#if GTK_HVER >= 0x010200
+
+void
+gtk_file_selection_complete (self, pattern)
+	Gtk::FileSelection	self
+	char *	pattern
+
+#endif
+
 Gtk::Widget_Up
 ok_button(fs)
 	Gtk::FileSelection	fs

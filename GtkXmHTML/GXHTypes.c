@@ -5,6 +5,15 @@
 
 #include "GtkDefs.h"
 
+#include <gtk-xmhtml/gtk-xmhtml.h>
+#include "GtkXmHTMLDefs.h"
+
+static char *urls [] = {
+        "unknown", "named (...)", "jump (#...)",
+        "file_local (file.html)", "file_remote (file://foo.bar/file)",
+        "ftp", "http", "gopher", "wais", "news", "telnet", "mailto",
+        "exec:foo_bar", "internal"
+};
 
 	/* completely busted */
 XmAnyCallbackStruct * SvGtkXmHTMLCallbackStruct(SV * data)
@@ -31,86 +40,37 @@ SV * newSVXmAnyCallbackStruct(XmAnyCallbackStruct * e)
 	r = newRV((SV*)h);
 	SvREFCNT_dec(h);
 
-	sv_bless(r, gv_stashpv("Gtk::XmHTMLCallback", FALSE));
+	/*sv_bless(r, gv_stashpv("Gtk::XmHTMLCallback", FALSE));*/
  	
 	hv_store(h, "_ptr", 4, newSViv((int)e), 0);
-	
+
+	/*g_warning("html reason: %d\n", e->reason);*/
+	/* workaround bug in gtkxmhtml */
 	if (e->reason) {
-	hv_store(h, "reason", 4, newSVXmHTMLCallbackReason(e->reason), 0);
-	switch (e->reason) {
-/*	case GDK_EXPOSE:
-		hv_store(h, "area", 4, newSVGdkRectangle(&e->expose.area), 0);
-		hv_store(h, "count", 5, newSViv(e->expose.count), 0);
-		break;
-	case GDK_MOTION_NOTIFY:
-		hv_store(h, "is_hint", 7, newSViv(e->motion.is_hint), 0);
-		hv_store(h, "x", 1, newSVnv(e->motion.x), 0);
-		hv_store(h, "y", 1, newSVnv(e->motion.y), 0);
-		hv_store(h, "pressure", 8, newSVnv(e->motion.pressure), 0);
-		hv_store(h, "xtilt", 5, newSVnv(e->motion.xtilt), 0);
-		hv_store(h, "ytilt", 5, newSVnv(e->motion.ytilt), 0);
-		hv_store(h, "time", 4, newSViv(e->motion.time), 0);
-		hv_store(h, "state", 5, newSViv(e->motion.state), 0);
-		hv_store(h, "source", 6, newSVGdkInputSource(e->motion.source), 0);
-		hv_store(h, "deviceid", 8, newSViv(e->motion.deviceid), 0);
-		break;
-	case GDK_BUTTON_PRESS:
-	case GDK_2BUTTON_PRESS:
-	case GDK_3BUTTON_PRESS:
-	case GDK_BUTTON_RELEASE:
-		hv_store(h, "x", 1, newSViv(e->button.x), 0);
-		hv_store(h, "y", 1, newSViv(e->button.y), 0);
-		hv_store(h, "time", 4, newSViv(e->button.time), 0);
-		hv_store(h, "pressure", 8, newSVnv(e->motion.pressure), 0);
-		hv_store(h, "xtilt", 5, newSVnv(e->motion.xtilt), 0);
-		hv_store(h, "ytilt", 5, newSVnv(e->motion.ytilt), 0);
-		hv_store(h, "state", 5, newSViv(e->button.state), 0);
-		hv_store(h, "button", 6, newSViv(e->button.button), 0);
-		hv_store(h, "source", 6, newSVGdkInputSource(e->motion.source), 0);
-		hv_store(h, "deviceid", 8, newSViv(e->motion.deviceid), 0);
-		break;
-	case GDK_KEY_PRESS:
-	case GDK_KEY_RELEASE:
-		hv_store(h, "time", 4, newSViv(e->key.time), 0);
-		hv_store(h, "state", 5, newSViv(e->key.state), 0);
-		hv_store(h, "keyval", 6, newSViv(e->key.keyval), 0);
-		break;
-	case GDK_FOCUS_CHANGE:
-		hv_store(h, "in", 2, newSViv(e->focus_change.in), 0);
-		break;
-	case GDK_ENTER_NOTIFY:
-	case GDK_LEAVE_NOTIFY:
-		hv_store(h, "window", 6, newSVGdkWindow(e->crossing.window), 0);
-		hv_store(h, "subwindow", 9, newSVGdkWindow(e->crossing.subwindow), 0);
-		hv_store(h, "detail", 6, newSVGdkNotifyType(e->crossing.detail), 0);
-		break;
-	case GDK_CONFIGURE:
-		hv_store(h, "x", 1, newSViv(e->configure.x), 0);
-		hv_store(h, "y", 1, newSViv(e->configure.y), 0);
-		hv_store(h, "width", 5, newSViv(e->configure.width), 0);
-		hv_store(h, "height", 6, newSViv(e->configure.height), 0);
-		break;
-	case GDK_PROPERTY_NOTIFY:
-		hv_store(h, "time", 4, newSViv(e->property.time), 0);
-		hv_store(h, "state", 5, newSViv(e->property.state), 0);
-		hv_store(h, "atom", 4, newSVGdkAtom(e->property.atom), 0);
-		break;
-	case GDK_SELECTION_CLEAR:
-	case GDK_SELECTION_REQUEST:
-	case GDK_SELECTION_NOTIFY:
-		hv_store(h, "requestor", 9, newSViv(e->selection.requestor), 0);
-		hv_store(h, "time", 4, newSViv(e->selection.time), 0);
-		hv_store(h, "selection", 9, newSVGdkAtom(e->selection.selection), 0);
-		hv_store(h, "property", 8, newSVGdkAtom(e->selection.property), 0);
-		break;
-	case GDK_PROXIMITY_IN:
-	case GDK_PROXIMITY_OUT:
-		hv_store(h, "time", 4, newSViv(e->proximity.time), 0);
-		hv_store(h, "source", 6, newSVGdkInputSource(e->motion.source), 0);
-		hv_store(h, "deviceid", 8, newSViv(e->motion.deviceid), 0);
-		break;
-*/		
+		hv_store(h, "reason", 6, newSVXmHTMLCallbackReason(e->reason), 0);
+	} else {
+		hv_store(h, "reason", 6, newSVpv("activate", 0), 0);
 	}
+	hv_store(h, "event", 5, newSVGdkEvent(e->event), 0);
+	switch (e->reason) {
+	case XmCR_HTML_ANCHORTRACK:
+	case XmCR_ACTIVATE:
+		{
+			XmHTMLAnchorCallbackStruct *cbs = (XmHTMLAnchorCallbackStruct*)e;
+			hv_store(h, "urltype", 7, newSVpv(urls[cbs->url_type], 0), 0);
+			hv_store(h, "line", 4, newSViv(cbs->line), 0);
+			if (cbs->href)
+				hv_store(h, "href", 4, newSVpv(cbs->href, 0), 0);
+			if (cbs->target)
+				hv_store(h, "target", 6, newSVpv(cbs->target, 0), 0);
+			if (cbs->rel)
+				hv_store(h, "rel", 3, newSVpv(cbs->rel, 0), 0);
+			if (cbs->title)
+				hv_store(h, "title", 5, newSVpv(cbs->title, 0), 0);
+			hv_store(h, "doit", 4, newSViv(cbs->doit), 0);
+			hv_store(h, "visited", 7, newSViv(cbs->visited), 0);
+		}
+		break;
 	}
 	
 	return r;

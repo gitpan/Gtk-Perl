@@ -4,8 +4,10 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
 
-int GnomeCanvasItem_SetArg(GtkArg * a, SV * v, SV * Class, GtkObject * Object)
+
+static int GnomeCanvasItem_SetArg(GtkArg * a, SV * v, SV * Class, GtkObject * Object)
 {
 	int result = 1;
 	if (a->type == GTK_TYPE_GNOME_CANVAS_POINTS)
@@ -25,25 +27,47 @@ int GnomeCanvasItem_SetArg(GtkArg * a, SV * v, SV * Class, GtkObject * Object)
 
 			GTK_VALUE_POINTER(*a) = p;
 		}
+	else if (a->type == GTK_TYPE_GDK_IMLIB_IMAGE)
+		{
+			GTK_VALUE_POINTER(*a) = SvGdkImlibImage(v);
+		}
 	else
 		result = 0;
 	
 	return result;
 }
 
-int GnomeCanvasItem_FreeArg(GtkArg * a)
+static int GnomeCanvasItem_FreeArg(GtkArg * a)
 {
 	if (a->type == GTK_TYPE_GNOME_CANVAS_POINTS) {
 			gnome_canvas_points_free((GnomeCanvasPoints*)GTK_VALUE_POINTER(*a));
 			return 1;
-	}
+	} else if (a->type == GTK_TYPE_GDK_IMLIB_IMAGE)
+		return 1;
 	
 	return 0;
 }
 
+static SV * GnomeCanvasItem_GetArg (GtkArg * a) {
+	if (a->type == GTK_TYPE_GNOME_CANVAS_POINTS) {
+		AV * av = newAV();
+		SV *r = newRV((SV*)av);
+		int i;
+		GnomeCanvasPoints * points = (GnomeCanvasPoints*)GTK_VALUE_POINTER(*a);
+		
+		SvREFCNT_dec(av);
+		for(i=0; i < points->num_points*2; ++i)
+			av_push(av, newSVnv(points->coords[i]));
+		return r;
+	} else if (a->type == GTK_TYPE_GDK_IMLIB_IMAGE)
+		return newSVGdkImlibImage(GTK_VALUE_POINTER(*a));
+	
+	return NULL;
+}
+
 static struct PerlGtkTypeHelper type_help =
 {
-	0/*GnomeCanvasItem_GetArg*/,
+	GnomeCanvasItem_GetArg,
 	GnomeCanvasItem_SetArg,
 	0/*GnomeCanvasItem_SetRetArg*/,
 	0/*GnomeCanvasItem_GetRetArg*/,
@@ -150,6 +174,90 @@ gnome_canvas_item_move(self, dx, dy)
 	double	dx
 	double	dy
 
+#ifdef NEW_GNOME
+
+void
+gnome_canvas_item_affine_relative (item, aff0, aff1, aff2, aff3, aff4, aff5)
+	Gnome::CanvasItem	item
+	double	aff0
+	double	aff1
+	double	aff2
+	double	aff3
+	double	aff4
+	double	aff5
+	CODE:
+	{
+		double affine[6];
+		affine[0] = aff0; affine[1] = aff1; affine[2] = aff2;
+		affine[3] = aff3; affine[4] = aff4; affine[5] = aff5;
+		gnome_canvas_item_affine_relative(item, affine);
+	}
+
+void
+gnome_canvas_item_affine_absolute (item, aff0, aff1, aff2, aff3, aff4, aff5)
+	Gnome::CanvasItem	item
+	double	aff0
+	double	aff1
+	double	aff2
+	double	aff3
+	double	aff4
+	double	aff5
+	CODE:
+	{
+		double affine[6];
+		affine[0] = aff0; affine[1] = aff1; affine[2] = aff2;
+		affine[3] = aff3; affine[4] = aff4; affine[5] = aff5;
+		gnome_canvas_item_affine_absolute(item, affine);
+	}
+
+
+void
+gnome_canvas_item_i2w_affine (item)
+	Gnome::CanvasItem	item
+	PPCODE:
+	{
+		double affine[6];
+		int i;
+		gnome_canvas_item_i2w_affine(item, affine);
+		EXTEND(sp, 6);
+		for(i=0; i < 6; ++i)
+			PUSHs(sv_2mortal(newSVnv(affine[i])));
+	}
+
+void
+gnome_canvas_item_i2c_affine (item)
+	Gnome::CanvasItem	item
+	PPCODE:
+	{
+		double affine[6];
+		int i;
+		gnome_canvas_item_i2c_affine(item, affine);
+		EXTEND(sp, 6);
+		for(i=0; i < 6; ++i)
+			PUSHs(sv_2mortal(newSVnv(affine[i])));
+	}
+
+#if 0
+
+void
+gnome_canvas_item_scale (item, x, y, scale_x, scale_y)
+	Gnome::CanvasItem	item
+	double	x
+	double	y
+	double	scale_x
+	double	scale_y
+
+void
+gnome_canvas_item_rotate (item, x, y, angle)
+	Gnome::CanvasItem	item
+	double	x
+	double	y
+	double	angle
+
+#endif
+
+#endif
+
 void
 gnome_canvas_item_raise(self, positions)
 	Gnome::CanvasItem	self
@@ -168,6 +276,14 @@ void
 gnome_canvas_item_lower_to_bottom(self)
 	Gnome::CanvasItem	self
 
+void
+gnome_canvas_item_show(self)
+	Gnome::CanvasItem	self
+
+void
+gnome_canvas_item_hide(self)
+	Gnome::CanvasItem	self
+
 int
 gnome_canvas_item_grab(self, event_mask, cursor, time)
 	Gnome::CanvasItem	self
@@ -179,6 +295,33 @@ void
 gnome_canvas_item_ungrab(self, time)
 	Gnome::CanvasItem	self
 	int		time
+
+void
+gnome_canvas_item_reparent (item, new_group)
+	Gnome::CanvasItem	item
+	Gnome::CanvasGroup	new_group
+
+void
+gnome_canvas_item_grab_focus (item)
+	Gnome::CanvasItem	item
+
+void
+gnome_canvas_item_get_bounds (item)
+	Gnome::CanvasItem	item
+	PPCODE:
+	{
+		double x1, y1, x2, y2;
+		gnome_canvas_item_get_bounds(item, &x1, &y1, &x2, &y2);
+		EXTEND(sp, 4);
+		PUSHs(sv_2mortal(newSVnv(x1)));
+		PUSHs(sv_2mortal(newSVnv(y1)));
+		PUSHs(sv_2mortal(newSVnv(x2)));
+		PUSHs(sv_2mortal(newSVnv(y2)));
+	}
+
+void
+gnome_canvas_item_request_update (item)
+	Gnome::CanvasItem	item
 
 void
 gnome_canvas_item_w2i(self, x, y)

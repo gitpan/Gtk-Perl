@@ -103,4 +103,13 @@ gtk_range_calc_value(self, position)
 
 #endif
 
+#if GTK_HVER >= 0x010200
+
+void
+gtk_range_clear_background (range)
+	Gtk::Range	range
+
+#endif
+
+
 #endif

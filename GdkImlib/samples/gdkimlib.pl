@@ -3,6 +3,8 @@
 #TITLE: GdkImlib
 #REQUIRES: Gtk GdkImlib
 
+#use Gtk;
+use Gtk::Gdk::ImlibImage;
 use Gtk;
 
 init Gtk;

@@ -3,9 +3,10 @@
 # This is GPL'ed code.
 
 # TITLE: Slide
-# REQUIRES: Gtk
+# REQUIRES: Gtk GkdImlib
 
 use Gtk;
+use Gtk::Gdk::ImlibImage;
 use Gtk::Keysyms;
 use Getopt::Std;
 
@@ -122,7 +123,7 @@ while($i < @data) {
 	if (/^image\s+(\w+)\s+([^ \t]+)$/) {
 		$images{$1} = load_image Gtk::Gdk::ImlibImage($2);
 		if (!defined $images{$1}) {
-			$images{$1} = create_image_from_data Gtk::Gdk::ImlibImage("\xff\x0\x0" x 9, undef, 3, 3);
+			$images{$1} = create_image_from_data Gtk::Gdk::ImlibImage("\xff\x00\x00" x 9, undef, 3, 3);
 		}
 	} elsif (/^image\s+(\w+)\s+([clrn])\s+(\d+)\s+(\d+)$/) {
 		my ($im) = $images{$1};

@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gtk::Ted		PACKAGE = Gtk::Ted		PREFIX = gtk_ted_
 

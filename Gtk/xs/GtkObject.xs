@@ -89,32 +89,6 @@ static void generic_perl_gtk_class_init(GtkObjectClass * klass)
 #ifdef DEBUG_TYPES	
 	printf("Within generic class init\n");
 #endif
-	
-	temp = newSVpv(perlClass, 0);
-	sv_catpv(temp, "::_signalids");
-	signal_ids = perl_get_av(SvPV(temp, PL_na), FALSE);
-#ifdef DEBUG_TYPES	
-	printf("Retreive of %s = %x\n", SvPV(temp, PL_na), signal_ids);
-#endif
-	SvREFCNT_dec(temp);
-	
-		
-	if (signal_ids && (av_len(signal_ids)>=0)) {		
-		int sigs = av_len(signal_ids)+1;
-		guint * sig = malloc(sizeof(guint) * sigs);
-#ifdef DEBUG_TYPES	
-		printf("%d signals in new class\n", sigs);
-#endif
-		for (i=0;i<sigs;i++) {
-			sig[i] = SvIV(*av_fetch(signal_ids, i, 0));
-#ifdef DEBUG_TYPES	
-			printf("%d = %d\n", i, sig[i]);
-#endif
-		}
-		
-		gtk_object_class_add_signals(klass, sig, sigs);
-		free(sig);
-	}
 
 #ifdef GTK_1_1
 	klass->set_arg = (GtkArgGetFunc)generic_perl_gtk_arg_set_func;
@@ -129,21 +103,32 @@ static void generic_perl_gtk_class_init(GtkObjectClass * klass)
 
 }
 
-static void generic_perl_gtk_object_init(GtkObject * object)
+static void generic_perl_gtk_object_init(GtkObject * object, GtkObjectClass *klass)
 {
-	SV * s = newSVGtkObjectRef(object, 0);
+	SV * s;
 	dSP;
+	char * func;
+	CV *cv;
 
+	s = newSVGtkObjectRef(object, ptname_for_gtnumber(klass->type));
 	if (!s) {
 		fprintf(stderr, "Object is not of registered type\n");
 		return;
 	}
 
 	PUSHMARK(sp);
+	/*XPUSHs(sv_2mortal(newSVpv(ptname_for_gtnumber(object->klass->type), 0)));*/
 	XPUSHs(sv_2mortal(s));
 	PUTBACK;
-	perl_call_method("GTK_OBJECT_INIT", G_DISCARD);
-	
+	func = g_strdup_printf("%s::GTK_OBJECT_INIT", ptname_for_gtnumber(object->klass->type));
+	/*perl_call_method("GTK_OBJECT_INIT", G_DISCARD);*/
+#ifdef DEBUG_TYPES	
+	printf("Within generic object init (obj: %s, class: %s): %s\n", ptname_for_gtnumber(object->klass->type), ptname_for_gtnumber(klass->type), func);
+#endif
+
+	if ((cv=perl_get_cv(func, 0)))
+		perl_call_sv((SV*)cv, G_DISCARD);
+	g_free(func);	
 }
 
 
@@ -268,6 +253,34 @@ DESTROY(self)
 	FreeHVObject((HV*)SvRV(ST(0)));
 
 void
+_get_arg_info(obj, name)
+	Gtk::Object	obj
+	SV * name
+	PPCODE:
+	{
+		GtkArg argv;
+		GtkType type;
+		GtkArgInfo * arginfo = NULL;
+		char* error;
+		int klass = obj->klass->type;
+
+		type = FindArgumentTypeWithObject(obj, name, &argv);
+		error = gtk_object_arg_get_info(klass, argv.name, &arginfo);
+		if (error) {
+			g_warning("cannot get arg info: %s", error);
+			g_free(error);
+		} else {
+			EXTEND(sp, 1);
+			PUSHs(sv_2mortal(newSVpv(arginfo->full_name, 0)));
+			EXTEND(sp, 1);
+			PUSHs(sv_2mortal(newSVpv(ptname_for_gtnumber(arginfo->class_type), 0)));
+			/* export more stuff here newSVGtkArgFlags() */
+			EXTEND(sp, 1);
+			PUSHs(sv_2mortal(newSVGtkArgFlags(arginfo->arg_flags)));
+		}
+	}
+
+void
 set(self, name, value, ...)
 	Gtk::Object	self
 	SV *	name
@@ -341,13 +354,18 @@ new(klass, ...)
 		GtkArg	argv[3];
 		int p;
 		int argc;
+		GtkObject *object;
 		
 		int type = gtnumber_for_ptname(SvPV(klass, PL_na));
-		
-		GtkObject *	object = gtk_object_new(type, NULL);
-		
+		if (!type)
+			croak("Invalid class name '%s'", SvPV(klass, PL_na));
+	
+		object = gtk_object_new(type, NULL);
+
 		RETVAL = newSVGtkObjectRef(object, SvPV(klass, PL_na));
-		
+#ifdef DEBUG_TYPES
+		printf("created SV %p for object %p from perltype %s (gtktype: %d -> %s)\n", RETVAL, object, SvPV(klass, PL_na), type, gtk_type_name(type));
+#endif
 		gtk_object_sink(object);
 		
 		for(p=1;p<items;) {
@@ -617,7 +635,7 @@ register_subtype(parentClass, perlClass...)
 			} while(*s++);
 		}
 #ifdef DEBUG_TYPES	
-		printf("GtkName = %s, ParentClass = %s\n", SvPV(gtkName, PL_na), SvPV(parentClass, PL_na));
+		printf("GtkName = %s, PerlName = %s, ParentClass = %s\n", SvPV(gtkName, PL_na), SvPV(perlClass, PL_na), SvPV(parentClass, PL_na));
 #endif
 		
 		info.type_name = SvPV(newSVsv(gtkName), PL_na); /* Yes, this leaks until interpreter cleanup */
@@ -722,13 +740,25 @@ register_subtype(parentClass, perlClass...)
 #ifdef DEBUG_TYPES	
 		printf("New type = %d\n", RETVAL);
 #endif
-		
 		link_types(SvPV(gtkName, PL_na), SvPV(perlClass,PL_na), RETVAL, 0, info.object_size, info.class_size);
-#ifdef DEBUG_TYPES	
-		printf("Type linked\n");
-#endif		
-		
-		for (i=2;i<items-1;i+=2) {
+
+	}
+	OUTPUT:
+	RETVAL
+
+void
+add_signals (Class, ...)
+	SV *	Class
+	CODE:
+	{
+		GtkType klasstype;
+		int i;
+		gint sigs = (items-1)/2;
+		guint * sig = malloc(sizeof(guint) * sigs);
+	
+		klasstype = gtnumber_for_ptname(SvPV(Class, PL_na));
+
+		for (i=1;i<items-1;i+=2) {
 			char * name = SvPV(ST(i), PL_na);
 			AV * args = (AV*)SvRV(ST(i+1));
 			GtkSignalRunType run_type = SvGtkSignalRunType(*av_fetch(args, 0, 0));
@@ -748,20 +778,19 @@ register_subtype(parentClass, perlClass...)
 				name, gtk_type_name(types[0]), params-1);
 #endif
 			
-			j = gtk_signal_newv(name, run_type, RETVAL, 0/*offset*/, generic_perl_gtk_signal_marshaller, types[0], params - 1, (params>1) ? types+1 : 0);
+			j = gtk_signal_newv(name, run_type, klasstype, 0/*offset*/, generic_perl_gtk_signal_marshaller, types[0], params - 1, (params>1) ? types+1 : 0);
 #ifdef DEBUG_TYPES	
-			printf("signal id = %d\n", j);
+			printf("signal '%s' => id = %d\n", name, j);
 #endif
+			sig[(i-1)/2] = j;
 			
-			av_push(signal_ids, newSViv(j));
+			/*av_push(signal_ids, newSViv(j));*/
 			
 			/*offset += sizeof(GtkSignalFunc);*/
 		}
-		
+		gtk_object_class_add_signals(gtk_type_class(klasstype), sig, sigs);
+		free(sig);
 	}
-	OUTPUT:
-	RETVAL
-
 
 void
 destroy(self)

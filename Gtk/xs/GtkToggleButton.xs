@@ -47,6 +47,14 @@ void
 gtk_toggle_button_toggled(self)
 	Gtk::ToggleButton	self
 
+#if GTK_HVER >= 0x010200
+
+gboolean
+gtk_toggle_button_get_active (toggle_botton)
+	Gtk::ToggleButton	toggle_botton
+
+#endif
+
 int
 active(self, new_value=0)
 	Gtk::ToggleButton	self

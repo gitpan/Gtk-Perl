@@ -24,7 +24,14 @@ if ( $gnome_version =~ /(\d+)\.(\d+)\.(\d+)/) {
 	$gnome_major = $gnome_minor = $gnome_micro = 0;
 }
 
-$gnome_hverstr = sprintf("0x%02d%02d%02d", $gnome_major, $gnome_minor, $gnome_micro);
+$gnome_hverstr = sprintf("0x%02x%02x%02x", $gnome_major, $gnome_minor, $gnome_micro);
 
 push @defines, "-DGNOME_HVER=$gnome_hverstr";
 
+# fixme
+if ($gnome_major >= 1 && $gnome_minor >= 0 && $gnome_micro >= 50) {
+	print "Got October Gnome!\n";
+	do "Gnome/gnome-october.pl";
+} else {
+	print "Got no October Gnome!\n";
+}

@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::ColorPicker		PACKAGE = Gnome::ColorPicker		PREFIX = gnome_color_picker_
 

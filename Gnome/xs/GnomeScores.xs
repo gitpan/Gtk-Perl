@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::Scores		PACKAGE = Gnome::Scores		PREFIX = gnome_scores_
 

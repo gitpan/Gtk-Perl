@@ -4,6 +4,7 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
 
 
 static void interaction_handler(GnomeClient * client, gint key, GnomeDialogType dialog_type, gpointer data)

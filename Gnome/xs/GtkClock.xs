@@ -4,6 +4,8 @@
 #include "XSUB.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gtk::Clock		PACKAGE = Gtk::Clock		PREFIX = gtk_clock_
 
@@ -15,6 +17,7 @@ new(Class, type)
 	Gtk::ClockType	type
 	CODE:
 	RETVAL = GTK_CLOCK(gtk_clock_new(type));
+	RETVAL->type = type;
 	OUTPUT:
 	RETVAL
 

@@ -8,45 +8,58 @@ require DynaLoader;
 require AutoLoader;
 
 use Carp;
+use strict;
 
-@ISA = qw(Exporter DynaLoader);
+$Gtk::GladeXML::VERSION = '0.7000';
+
+@Gtk::GladeXML::ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
-@EXPORT = qw(
+@Gtk::GladeXML::EXPORT = qw(
         
 );
 # Other items we are prepared to export if requested
-@EXPORT_OK = qw(
+@Gtk::GladeXML::EXPORT_OK = qw(
 );
+
+bootstrap Gtk::GladeXML;
+
+require Gtk::GladeXML::Types;
+
+sub dl_load_flags {0x01}
 
 # Autoload methods go after __END__, and are processed by the autosplit program.
 
 sub _connect_helper {
 	my ($handler_name, $object, $signal_name, $signal_data, 
-		$connect_object, $after, @handler) = @_;
-	my ($func) = $after? "signal_connect_after" : "signal_connect";
+		$connect_object, $after, $handler, @data) = @_;
+	
+	no strict qw/refs/;
 
 	if ($connect_object) {
-		warn "connect_object not supported for $handler_name\n";
+		my ($func) = $after? "signal_connect_object_after" : "signal_connect_object";
+		$object->$func ($signal_name, $connect_object, $handler, @data, $signal_data);
 	} else {
-		no strict qw/refs/;
-		$object->$func ($signal_name, @handler, $signal_data);
+		my ($func) = $after? "signal_connect_after" : "signal_connect";
+		$object->$func ($signal_name, $handler, $signal_data);
 	}
 }
 
 sub _autoconnect_helper {
 	my ($handler_name, $object, $signal_name, $signal_data, 
 		$connect_object, $after, $package) = @_;
-	my ($func) = $after? "signal_connect_after" : "signal_connect";
 	my ($handler) = $handler_name;
+	
+	no strict qw/refs/;
 
 	$handler = $package ."::". $handler_name if $package;
 
 	if ($connect_object) {
-		warn "connect_object not supported for $handler_name\n";
+		my ($func) = $after? "signal_connect_object_after" : "signal_connect_object";
+		$object->$func ($signal_name, $connect_object, $handler, $signal_data);
 	} else {
-		no strict qw/refs/;
+		my ($func) = $after? "signal_connect_after" : "signal_connect";
 		$object->$func ($signal_name, $handler, $signal_data);
 	}
 }
@@ -62,7 +75,7 @@ sub signal_autoconnect_from_package {
 	my ($handler);
 	my ($chunk);
 	($package, undef, undef) = caller() unless $package;
-	$self->signal_autoconnect_full(\&_autoconnect_helper, @handler);
+	$self->signal_autoconnect_full(\&_autoconnect_helper, $package);
 }
 
 1;

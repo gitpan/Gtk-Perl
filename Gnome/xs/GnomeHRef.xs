@@ -6,6 +6,8 @@
 #include "PerlGtkInt.h"
 
 #include "GtkDefs.h"
+#include "GnomeDefs.h"
+
 
 MODULE = Gnome::HRef		PACKAGE = Gnome::HRef		PREFIX = gnome_href_
 

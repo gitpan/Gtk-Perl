@@ -191,6 +191,71 @@ gtk_notebook_set_tab_vborder(self, border)
 
 #endif
 
+#if GTK_HVER >= 0x010200
+
+void
+gtk_notebook_query_tab_label_packing (notebook, child)
+	Gtk::Notebook	notebook
+	Gtk::Widget	child
+	PPCODE:
+	{
+		gboolean expand, fill;
+		GtkPackType pack_type;
+		gtk_notebook_query_tab_label_packing(notebook, child, &expand, &fill, &pack_type);
+		XPUSHs(sv_2mortal(newSViv(expand)));
+		XPUSHs(sv_2mortal(newSViv(fill)));
+		XPUSHs(sv_2mortal(newSVGtkPackType(pack_type)));
+	}
+
+void
+gtk_notebook_reorder_child (notebook, child, position)
+	Gtk::Notebook	notebook
+	Gtk::Widget	child
+	gint	position
+
+Gtk::Widget_Up
+gtk_notebook_get_menu_label (notebook, child)
+	Gtk::Notebook	notebook
+	Gtk::Widget	child
+
+void
+gtk_notebook_set_menu_label_text (notebook, child, label)
+	Gtk::Notebook	notebook
+	Gtk::Widget	child
+	char *	label
+
+void
+gtk_notebook_set_menu_label (notebook, child, label)
+	Gtk::Notebook	notebook
+	Gtk::Widget	child
+	Gtk::Widget	label
+
+Gtk::Widget_Up
+gtk_notebook_get_tab_label (notebook, child)
+	Gtk::Notebook	notebook
+	Gtk::Widget	child
+
+void
+gtk_notebook_set_tab_label_text (notebook, child, label)
+	Gtk::Notebook	notebook
+	Gtk::Widget	child
+	char *	label
+
+void
+gtk_notebook_set_tab_label (notebook, child, label)
+	Gtk::Notebook	notebook
+	Gtk::Widget	child
+	Gtk::Widget	label
+
+void
+gtk_notebook_set_tab_label_packing (notebook, child, expand, fill, pack_type)
+	Gtk::Notebook	notebook
+	Gtk::Widget	child
+	gboolean	expand
+	gboolean	fill
+	Gtk::PackType	pack_type
+
+#endif
 
 #endif
 

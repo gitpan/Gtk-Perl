@@ -41,20 +41,11 @@ gtk_editable_delete_text (editable, start, end)
 	int           start
 	int           end
 
-void
+gstring
 gtk_editable_get_chars (editable, start, end)
 	Gtk::Editable editable
 	int           start
 	int           end
-	PPCODE:
-	{
-		char *res = gtk_editable_get_chars (editable, start, end);
-		SV *result = newSVpv(res, 0);
-		g_free(res);
-		EXTEND(sp, 1);
-		PUSHs(sv_2mortal(result));
-	}
-	
 
 #if (GTK_MAJOR_VERSION > 1) || ((GTK_MAJOR_VERSION == 1) && (GTK_MINOR_VERSION >= 1))
 
