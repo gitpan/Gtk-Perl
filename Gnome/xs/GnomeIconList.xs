@@ -19,7 +19,7 @@ new(Class, icon_width, adj, is_editable)
 	Gtk::Adjustment_OrNULL	adj
 	bool	is_editable
 	CODE:
-	RETVAL = GNOME_ICON_LIST(gnome_icon_list_new(icon_width, adj, is_editable));
+	RETVAL = (GnomeIconList*)(gnome_icon_list_new(icon_width, adj, is_editable));
 	OUTPUT:
 	RETVAL
 
@@ -30,7 +30,7 @@ new_flags(Class, icon_width, adj, flags)
 	Gtk::Adjustment_OrNULL	adj
 	Gnome::IconListMode	flags
 	CODE:
-	RETVAL = GNOME_ICON_LIST(gnome_icon_list_new_flags(icon_width, adj, flags));
+	RETVAL = (GnomeIconList*)(gnome_icon_list_new_flags(icon_width, adj, flags));
 	OUTPUT:
 	RETVAL
 

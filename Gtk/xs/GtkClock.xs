@@ -14,7 +14,7 @@ new(Class, type)
 	SV *	Class
 	Gtk::ClockType	type
 	CODE:
-	RETVAL = GTK_CLOCK(gtk_clock_new(type));
+	RETVAL = (GtkClock*)(gtk_clock_new(type));
 	OUTPUT:
 	RETVAL
 

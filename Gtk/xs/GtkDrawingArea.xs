@@ -13,7 +13,7 @@ Gtk::DrawingArea_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_DRAWING_AREA(gtk_drawing_area_new());
+	RETVAL = (GtkDrawingArea*)(gtk_drawing_area_new());
 	OUTPUT:
 	RETVAL
 

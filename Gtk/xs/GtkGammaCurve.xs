@@ -13,7 +13,7 @@ Gtk::GammaCurve_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_GAMMA_CURVE(gtk_gamma_curve_new());
+	RETVAL = (GtkGammaCurve*)(gtk_gamma_curve_new());
 	OUTPUT:
 	RETVAL
 

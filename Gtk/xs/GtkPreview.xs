@@ -14,7 +14,7 @@ new(Class, type)
 	SV *	Class
 	Gtk::PreviewType	type
 	CODE:
-	RETVAL = GTK_PREVIEW(gtk_preview_new(type));
+	RETVAL = (GtkPreview*)(gtk_preview_new(type));
 	OUTPUT:
 	RETVAL
 

@@ -16,7 +16,7 @@ Gnome::PrintMeta
 gnome_print_meta_new (Class)
 	SV	*Class
 	CODE:
-	RETVAL = GNOME_PRINT_META(gnome_print_meta_new());
+	RETVAL = (GnomePrintMeta*)(gnome_print_meta_new());
 	OUTPUT:
 	RETVAL
 

@@ -18,9 +18,9 @@ gnome_dentry_edit_new_notebook(notebook)
 	Gtk::Notebook	notebook
 	CODE:
 #if GNOME_HVER >= 0x010200
-	RETVAL = GNOME_DENTRY_EDIT(gnome_dentry_edit_new_notebook(notebook));
+	RETVAL = (GnomeDEntryEdit*)(gnome_dentry_edit_new_notebook(notebook));
 #else
-	RETVAL = GNOME_DENTRY_EDIT(gnome_dentry_edit_new(notebook));
+	RETVAL = (GnomeDEntryEdit*)(gnome_dentry_edit_new(notebook));
 #endif
 	OUTPUT:
 	RETVAL
@@ -35,9 +35,9 @@ gnome_dentry_edit_new(notebook=0)
 		Gnome::DEntryEdit::new_notebook = 1
 	CODE:
 #if GNOME_HVER >= 0x010200
-	RETVAL = GNOME_DENTRY_EDIT(gnome_dentry_edit_new());
+	RETVAL = (GnomeDEntryEdit*)(gnome_dentry_edit_new());
 #else
-	RETVAL = GNOME_DENTRY_EDIT(gnome_dentry_edit_new(notebook));
+	RETVAL = (GnomeDEntryEdit*)(gnome_dentry_edit_new(notebook));
 #endif
 	OUTPUT:
 	RETVAL

@@ -16,7 +16,7 @@ gnome_printer_new_generic_ps (Class, filename)
 	SV	*Class
 	char*	filename
 	CODE:
-	RETVAL = GNOME_PRINTER(gnome_printer_new_generic_ps (filename));
+	RETVAL = (GnomePrinter*)(gnome_printer_new_generic_ps (filename));
 	OUTPUT:
 	RETVAL
 

@@ -13,7 +13,7 @@ Gtk::HSeparator_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_HSEPARATOR(gtk_hseparator_new());
+	RETVAL = (GtkHSeparator*)(gtk_hseparator_new());
 	OUTPUT:
 	RETVAL
 

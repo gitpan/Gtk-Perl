@@ -19,7 +19,7 @@ new (Class, url, label)
 	char *	url
 	char *	label
 	CODE:
-	RETVAL = GNOME_HREF(gnome_href_new(url, label));
+	RETVAL = (GnomeHRef*)(gnome_href_new(url, label));
 	OUTPUT:
 	RETVAL
 

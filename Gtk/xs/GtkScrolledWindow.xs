@@ -15,7 +15,7 @@ new(Class, hadj=0, vadj=0)
 	Gtk::Adjustment_OrNULL	hadj
 	Gtk::Adjustment_OrNULL	vadj
 	CODE:
-	RETVAL = GTK_SCROLLED_WINDOW(gtk_scrolled_window_new(hadj, vadj));
+	RETVAL = (GtkScrolledWindow*)(gtk_scrolled_window_new(hadj, vadj));
 	OUTPUT:
 	RETVAL
 

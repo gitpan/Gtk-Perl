@@ -18,7 +18,7 @@ new (Class, desc, uih)
 	char *	desc
 	Gnome::UIHandler	uih
 	CODE:
-	RETVAL = GNOME_BONOBO_WIDGET(gnome_bonobo_widget_new(desc, uih));
+	RETVAL = (GnomeBonoboWidget*)(gnome_bonobo_widget_new(desc, uih));
 	OUTPUT:
 	RETVAL
 

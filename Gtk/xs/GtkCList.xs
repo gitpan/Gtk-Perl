@@ -19,7 +19,7 @@ new(Class, columns)
 	SV* Class
 	int columns
 	CODE:
-	RETVAL = GTK_CLIST(gtk_clist_new(columns));
+	RETVAL = (GtkCList*)(gtk_clist_new(columns));
 	OUTPUT:
 	RETVAL
 
@@ -36,7 +36,7 @@ new_with_titles(Class, title, ...)
 		char** titles = malloc(columns * sizeof(gchar*));
 		for (i=1; i < items; ++i)
 			titles[i-1] = SvPV(ST(i),PL_na);
-		RETVAL = GTK_CLIST(gtk_clist_new_with_titles(columns, titles));
+		RETVAL = (GtkCList*)(gtk_clist_new_with_titles(columns, titles));
 		free(titles);
 	}
 	OUTPUT:

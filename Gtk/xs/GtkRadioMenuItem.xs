@@ -23,9 +23,9 @@ new(Class, label=0, previous=0)
 		if (previous)	
 			group = gtk_radio_menu_item_group(previous);
 		if (label && SvOK(label))
-			RETVAL = GTK_RADIO_MENU_ITEM(gtk_radio_menu_item_new_with_label(group, SvPV(label,PL_na)));
+			RETVAL = (GtkRadioMenuItem*)(gtk_radio_menu_item_new_with_label(group, SvPV(label,PL_na)));
 		else
-			RETVAL = GTK_RADIO_MENU_ITEM(gtk_radio_menu_item_new(group));
+			RETVAL = (GtkRadioMenuItem*)(gtk_radio_menu_item_new(group));
 	}
 	OUTPUT:
 	RETVAL

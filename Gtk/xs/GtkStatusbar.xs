@@ -12,7 +12,7 @@ MODULE = Gtk::Statusbar		PACKAGE = Gtk::Statusbar		PREFIX = gtk_statusbar_
 Gtk::Statusbar_Sink
 new(Class)
 	CODE:
-	RETVAL = GTK_STATUSBAR(gtk_statusbar_new());
+	RETVAL = (GtkStatusbar*)(gtk_statusbar_new());
 	OUTPUT:
 	RETVAL
 

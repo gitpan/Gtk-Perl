@@ -471,6 +471,8 @@ SvGnomeUIInfo(SV *data, GnomeUIInfo *info)
 			croak("GnomeUIInfo type requires a 'moreinfo' or 'subtree' argument, "
 			      "but none was specified");
 		/* Now we can recurse */
+		/* Hope user_data doesn't get mangled... */
+		info->user_data = info->moreinfo;
 		info->moreinfo = svrv_to_uiinfo_tree(info->moreinfo);
 		break;
 

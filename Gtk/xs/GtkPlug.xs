@@ -14,7 +14,7 @@ new(Class, socket_id)
 	SV *	Class
 	int     socket_id
 	CODE:
-	RETVAL = GTK_PLUG(gtk_plug_new(socket_id));
+	RETVAL = (GtkPlug*)(gtk_plug_new(socket_id));
 	OUTPUT:
 	RETVAL
 

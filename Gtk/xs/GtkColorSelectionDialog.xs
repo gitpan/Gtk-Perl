@@ -14,7 +14,7 @@ new(Class, title)
 	SV *	Class
 	char *	title
 	CODE:
-	RETVAL = GTK_COLOR_SELECTION_DIALOG(gtk_color_selection_dialog_new(title));
+	RETVAL = (GtkColorSelectionDialog*)(gtk_color_selection_dialog_new(title));
 	OUTPUT:
 	RETVAL
 

@@ -13,7 +13,7 @@ Gtk::FontSelection_Sink
 gtk_font_selection_new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_FONT_SELECTION(gtk_font_selection_new());
+	RETVAL = (GtkFontSelection*)(gtk_font_selection_new());
 	OUTPUT:
 	RETVAL
 

@@ -17,9 +17,9 @@ new(Class, label=0)
 		Gtk::MenuItem::new_with_label = 1
 	CODE:
 	if (label)
-		RETVAL = GTK_MENU_ITEM(gtk_menu_item_new_with_label(label));
+		RETVAL = (GtkMenuItem*)(gtk_menu_item_new_with_label(label));
 	else
-		RETVAL = GTK_MENU_ITEM(gtk_menu_item_new());
+		RETVAL = (GtkMenuItem*)(gtk_menu_item_new());
 	OUTPUT:
 	RETVAL
 

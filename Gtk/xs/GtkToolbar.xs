@@ -15,7 +15,7 @@ new(Class, orientation=GTK_ORIENTATION_HORIZONTAL, style=GTK_TOOLBAR_BOTH)
 	Gtk::Orientation	orientation
 	Gtk::ToolbarStyle	style
 	CODE:
-	RETVAL = GTK_TOOLBAR(gtk_toolbar_new(orientation, style));
+	RETVAL = (GtkToolbar*)(gtk_toolbar_new(orientation, style));
 	OUTPUT:
 	RETVAL
 

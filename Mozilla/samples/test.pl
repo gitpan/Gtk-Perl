@@ -3,12 +3,10 @@
 # TITLE: Mozilla embedding
 # REQUIRES: Gtk Mozilla
 use POSIX qw(getenv);
-BEGIN {
-	$ENV{LD_LIBRARY_PATH} = '/usr/lib/mozilla'; # uhm, works only if set before starting ....
-	$ENV{MOZILLA_FIVE_HOME} = '/usr/lib/mozilla';
-}
-
 use Gtk::MozEmbed;
+
+# unless you use a threaded perl, you need to run this app with:
+# LD_PRELOAD=libpthread-0.9.so or something like that to make use of networking
 
 Gtk->set_locale;
 init Gtk;
@@ -21,12 +19,12 @@ $moz = new Gtk::MozEmbed;
 #Gtk::MozEmbed->preference_set("network.proxy.http", 'localhost');
 #Gtk::MozEmbed->preference_set_int("network.proxy.http_port", 80);
 $win->add($moz);
-$win->show_all;
 #$moz->signal_connect('net_stop', sub {warn "net stop\n"});
 #$moz->signal_connect('net_state', sub {shift; warn "STATE: @_\n"});
 #$moz->signal_connect('progress_all', sub {shift; warn "PROGRESS: @_\n"});
 #$moz->signal_connect('open_uri', sub {shift; warn "open uri: @_\n"; 0});
 $moz->load_url(shift || 'http://www.gtk.org/');
+$win->show_all;
 
 main Gtk;
 

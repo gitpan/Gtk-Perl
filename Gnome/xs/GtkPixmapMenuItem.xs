@@ -18,7 +18,7 @@ Gtk::PixmapMenuItem_Sink
 new (Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_PIXMAP_MENU_ITEM(gtk_pixmap_menu_item_new());
+	RETVAL = (GtkPixmapMenuItem*)(gtk_pixmap_menu_item_new());
 	OUTPUT:
 	RETVAL
 

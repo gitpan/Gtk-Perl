@@ -117,7 +117,7 @@ Gtk::HTML_Sink
 gtk_html_new (Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_HTML(gtk_html_new());
+	RETVAL = (GtkHTML*)(gtk_html_new());
 	OUTPUT:
 	RETVAL
 

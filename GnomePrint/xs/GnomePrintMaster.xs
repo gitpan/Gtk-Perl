@@ -15,7 +15,7 @@ Gnome::PrintMaster
 gnome_print_master_new (Class)
 	SV	*Class
 	CODE:
-	RETVAL = GNOME_PRINT_MASTER(gnome_print_master_new());
+	RETVAL = (GnomePrintMaster*)(gnome_print_master_new());
 	OUTPUT:
 	RETVAL
 
@@ -24,7 +24,7 @@ gnome_print_master_new_from_dialog (Class, dialog)
 	SV	*Class
 	Gnome::PrintDialog	dialog
 	CODE:
-	RETVAL = GNOME_PRINT_MASTER(gnome_print_master_new_from_dialog(dialog));
+	RETVAL = (GnomePrintMaster*)(gnome_print_master_new_from_dialog(dialog));
 	OUTPUT:
 	RETVAL
 

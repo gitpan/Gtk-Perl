@@ -14,7 +14,7 @@ gtk_font_selection_dialog_new(Class, title)
 	SV *	Class
 	char*	title
 	CODE:
-	RETVAL = GTK_FONT_SELECTION_DIALOG(gtk_font_selection_dialog_new(title));
+	RETVAL = (GtkFontSelectionDialog*)(gtk_font_selection_dialog_new(title));
 	OUTPUT:
 	RETVAL
 

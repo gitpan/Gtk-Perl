@@ -27,7 +27,7 @@ gtk_moz_embed_new (Class)
 	SV *	Class
 	CODE:
 	pgtk_mozembed_init ();
-	RETVAL = GTK_MOZ_EMBED(gtk_moz_embed_new ());
+	RETVAL = (GtkMozEmbed*)(gtk_moz_embed_new ());
 	OUTPUT:
 	RETVAL
 
@@ -56,8 +56,11 @@ gtk_moz_embed_pop_startup (Class)
 	gtk_moz_embed_pop_startup ();
 
 void
-gtk_moz_embed_set_comp_path (aPath)
+gtk_moz_embed_set_comp_path (Class, aPath)
+	SV *	Class
 	char *	aPath
+	CODE:
+	gtk_moz_embed_set_comp_path(aPath);
 
 void
 gtk_moz_embed_load_url (embed, url)
@@ -88,9 +91,14 @@ void
 gtk_moz_embed_render_data (embed, data, len, base_uri, mime_type)
 	Gtk::MozEmbed	embed
 	char *	data
-	guint	len
 	char *	base_uri
 	char *	mime_type
+	CODE:
+	{
+		STRLEN len;
+		char * p = SvPV(data);
+		gtk_moz_embed_render_data (embed, p, len,  base_uri, mime_type);
+	}
 
 void
 gtk_moz_embed_open_stream (embed, base_uri, mime_type)
@@ -103,6 +111,12 @@ gtk_moz_embed_append_data (embed, data, len)
 	Gtk::MozEmbed	embed
 	char *	data
 	guint	len
+	CODE:
+	{
+		STRLEN len;
+		char * p = SvPV(data);
+		gtk_moz_embed_append_data (embed, p, len);
+	}
 
 void
 gtk_moz_embed_close_stream (embed)

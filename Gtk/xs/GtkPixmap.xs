@@ -15,7 +15,7 @@ new(Class, pixmap, mask)
 	Gtk::Gdk::Pixmap	pixmap
 	Gtk::Gdk::Bitmap_OrNULL	mask
 	CODE:
-	RETVAL = GTK_PIXMAP(gtk_pixmap_new(pixmap,mask));
+	RETVAL = (GtkPixmap*)(gtk_pixmap_new(pixmap,mask));
 	OUTPUT:
 	RETVAL
 

@@ -18,9 +18,9 @@ new(Class, label=0)
 		Gtk::ToggleButton::new_with_label = 1
 	CODE:
 	if (label)
-		RETVAL = GTK_TOGGLE_BUTTON(gtk_toggle_button_new_with_label(label));
+		RETVAL = (GtkToggleButton*)(gtk_toggle_button_new_with_label(label));
 	else
-		RETVAL = GTK_TOGGLE_BUTTON(gtk_toggle_button_new());
+		RETVAL = (GtkToggleButton*)(gtk_toggle_button_new());
 	OUTPUT:
 	RETVAL
 

@@ -22,7 +22,7 @@ new (Class, name)
 	SV *	Class
 	char *	name
 	CODE:
-	RETVAL = GNOME_MDI_GENERIC_CHILD(gnome_mdi_generic_child_new(name));
+	RETVAL = (GnomeMDIGenericChild*)(gnome_mdi_generic_child_new(name));
 	OUTPUT:
 	RETVAL
 

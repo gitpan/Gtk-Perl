@@ -18,9 +18,9 @@ new(Class, label=0)
 		Gtk::CheckButton::new_with_label = 1
 	CODE:
 	if (!label)
-		RETVAL = GTK_CHECK_BUTTON(gtk_check_button_new());
+		RETVAL = (GtkCheckButton*)(gtk_check_button_new());
 	else
-		RETVAL = GTK_CHECK_BUTTON(gtk_check_button_new_with_label(label));
+		RETVAL = (GtkCheckButton*)(gtk_check_button_new_with_label(label));
 	OUTPUT:
 	RETVAL
 

@@ -17,7 +17,7 @@ new(Class, history_id, calc_dialog_title)
 	char *	history_id
 	char *	calc_dialog_title
 	CODE:
-	RETVAL = GNOME_NUMBER_ENTRY(gnome_number_entry_new(history_id, calc_dialog_title));
+	RETVAL = (GnomeNumberEntry*)(gnome_number_entry_new(history_id, calc_dialog_title));
 	OUTPUT:
 	RETVAL
 

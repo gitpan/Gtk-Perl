@@ -1,8 +1,7 @@
 #!/usr/bin/perl
-
 #TITLE: Gnome applet new
 #REQUIRES: Gtk GdkImlib Gnome Applet
-
+use Gtk::lazy;
 use Gnome::Applet;
 
 Gtk::Rc->parse_string(<<"EOF");

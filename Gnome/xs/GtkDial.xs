@@ -16,7 +16,7 @@ new(Class, adjustment)
 	SV *	Class
 	Gtk::Adjustment_OrNULL	adjustment
 	CODE:
-	RETVAL = GTK_DIAL(gtk_dial_new(adjustment));
+	RETVAL = (GtkDial*)(gtk_dial_new(adjustment));
 	OUTPUT:
 	RETVAL
 

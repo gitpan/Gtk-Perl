@@ -14,7 +14,7 @@ gtk_accel_label_new(Class, string)
 	SV 	*Class
 	char	*string
 	CODE:
-	RETVAL = GTK_ACCEL_LABEL(gtk_accel_label_new(string));
+	RETVAL = (GtkAccelLabel*)(gtk_accel_label_new(string));
 	OUTPUT:
 	RETVAL
 

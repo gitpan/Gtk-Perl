@@ -18,7 +18,7 @@ gnome_font_new(Class, name, size)
 	char*	name
 	double	size
 	CODE:
-	RETVAL = GNOME_FONT(gnome_font_new(name, size));
+	RETVAL = (GnomeFont*)(gnome_font_new(name, size));
 	OUTPUT:
 	RETVAL
 
@@ -30,7 +30,7 @@ gnome_font_new_closest (Class, family, weight, italic, size)
 	bool	italic
 	double	size
 	CODE:
-	RETVAL = GNOME_FONT(gnome_font_new_closest(family, weight, italic, size));
+	RETVAL = (GnomeFont*)(gnome_font_new_closest(family, weight, italic, size));
 	OUTPUT:
 	RETVAL
 
@@ -39,7 +39,7 @@ gnome_font_new_from_full_name(Class, name)
 	SV 	*Class
 	char*	name
 	CODE:
-	RETVAL = GNOME_FONT(gnome_font_new_from_full_name(name));
+	RETVAL = (GnomeFont*)(gnome_font_new_from_full_name(name));
 	OUTPUT:
 	RETVAL
 

@@ -16,7 +16,7 @@ new(Class, rows, cols, homogeneous=FALSE)
 	int	cols
 	int homogeneous
 	CODE:
-	RETVAL = GTK_TABLE(gtk_table_new(rows, cols, homogeneous));
+	RETVAL = (GtkTable*)(gtk_table_new(rows, cols, homogeneous));
 	OUTPUT:
 	RETVAL
 

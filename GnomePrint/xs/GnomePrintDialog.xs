@@ -17,7 +17,7 @@ MODULE = Gnome::PrintDialog		PACKAGE = Gnome::PrintDialog		PREFIX = gnome_print_
 #	char*	title
 #	Gnome::PrintFlags	flags
 #	CODE:
-#	RETVAL = GNOME_PRINT_DIALOG(gnome_print_dialog_new(title, flags));
+#	RETVAL = (GnomePrintDialog*)(gnome_print_dialog_new(title, flags));
 #	OUTPUT:
 #	RETVAL
 

@@ -42,7 +42,7 @@ gtk_ctree_new(Class, columns, tree_column=0)
 	int	columns
 	int	tree_column
 	CODE:
-	RETVAL = GTK_CTREE(gtk_ctree_new(columns, tree_column));
+	RETVAL = (GtkCTree*)(gtk_ctree_new(columns, tree_column));
 	OUTPUT:
 	RETVAL
 
@@ -60,7 +60,7 @@ gtk_ctree_new_with_titles(Class, tree_column, title, ...)
 		char** titles = malloc(columns * sizeof(gchar*));
 		for (i=2; i < items; ++i)
 			titles[i-2] = SvPV(ST(i),PL_na);
-		RETVAL = GTK_CTREE(gtk_ctree_new_with_titles(columns, tree_column, titles));
+		RETVAL = (GtkCTree*)(gtk_ctree_new_with_titles(columns, tree_column, titles));
 		free(titles);
 	}
 	OUTPUT:

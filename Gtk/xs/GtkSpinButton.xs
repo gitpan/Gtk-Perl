@@ -16,7 +16,7 @@ new(Class, adjustment, climb_rate, digits)
 	double climb_rate
 	int digits
 	CODE:
-	RETVAL = GTK_SPIN_BUTTON(gtk_spin_button_new(adjustment, climb_rate, digits));
+	RETVAL = (GtkSpinButton*)(gtk_spin_button_new(adjustment, climb_rate, digits));
 	OUTPUT:
 	RETVAL
 

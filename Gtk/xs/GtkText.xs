@@ -15,7 +15,7 @@ new(Class, hadjustment=0, vadjustment=0)
 	Gtk::Adjustment_OrNULL	hadjustment
 	Gtk::Adjustment_OrNULL	vadjustment
 	CODE:
-	RETVAL = GTK_TEXT(gtk_text_new(hadjustment, vadjustment));
+	RETVAL = (GtkText*)(gtk_text_new(hadjustment, vadjustment));
 	OUTPUT:
 	RETVAL
 

@@ -20,7 +20,7 @@ new (Class, classid, name, type, width, height)
 	int	width
 	int	height
 	CODE:
-	RETVAL = GTK_HTML_EMBEDDED(gtk_html_embedded_new(classid, name, type, width, height));
+	RETVAL = (GtkHTMLEmbedded*)(gtk_html_embedded_new(classid, name, type, width, height));
 	OUTPUT:
 	RETVAL
 

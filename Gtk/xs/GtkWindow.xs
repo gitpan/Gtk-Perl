@@ -16,7 +16,7 @@ new(Class, type=0)
 	SV *	Class
 	Gtk::WindowType	type
 	CODE:
-	RETVAL = GTK_WINDOW(gtk_window_new(type));
+	RETVAL = (GtkWindow*)(gtk_window_new(type));
 	OUTPUT:
 	RETVAL
 

@@ -15,7 +15,7 @@ new(Class, hadjustment, vadjustment)
 	Gtk::Adjustment_OrNULL	hadjustment
 	Gtk::Adjustment_OrNULL	vadjustment
 	CODE:
-	RETVAL = GTK_VIEWPORT(gtk_viewport_new(hadjustment, vadjustment));
+	RETVAL = (GtkViewport*)(gtk_viewport_new(hadjustment, vadjustment));
 	OUTPUT:
 	RETVAL
 

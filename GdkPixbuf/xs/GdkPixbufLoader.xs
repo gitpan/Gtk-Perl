@@ -15,7 +15,7 @@ Gtk::Gdk::PixbufLoader_Sink
 gdk_pixbuf_loader_new (Class)
 	SV	*Class
 	CODE:
-	RETVAL = GDK_PIXBUF_LOADER(gdk_pixbuf_loader_new());
+	RETVAL = (GdkPixbufLoader*)(gdk_pixbuf_loader_new());
 	OUTPUT:
 	RETVAL
 

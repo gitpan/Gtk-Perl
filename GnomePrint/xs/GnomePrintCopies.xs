@@ -15,7 +15,7 @@ Gnome::PrintCopies_Sink
 new(Class)
 	SV*	Class
 	CODE:
-	RETVAL = GNOME_PRINT_COPIES(gnome_print_copies_new());
+	RETVAL = (GnomePrintCopies*)(gnome_print_copies_new());
 	OUTPUT:
 	RETVAL
 

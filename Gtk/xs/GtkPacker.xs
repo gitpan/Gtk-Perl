@@ -14,7 +14,7 @@ MODULE = Gtk::Packer		PACKAGE = Gtk::Packer		PREFIX = gtk_packer_
 Gtk::Packer_Sink
 new(Class)
 	CODE:
-	RETVAL = GTK_PACKER(gtk_packer_new());
+	RETVAL = (GtkPacker*)(gtk_packer_new());
 	OUTPUT:
 	RETVAL
 

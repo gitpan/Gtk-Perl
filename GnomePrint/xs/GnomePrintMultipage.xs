@@ -16,7 +16,7 @@ gnome_print_multipage_new (Class, subpc)
 	SV	*Class
 	Gnome::PrintContext	subpc
 	CODE:
-	RETVAL = GNOME_PRINT_MULTIPAGE(gnome_print_multipage_new(subpc, NULL));
+	RETVAL = (GnomePrintMultipage*)(gnome_print_multipage_new(subpc, NULL));
 	OUTPUT:
 	RETVAL
 
@@ -29,7 +29,7 @@ gnome_print_multipage_new_from_sizes (Class, subpc, paper_width, paper_height, p
 	double	page_width
 	double	page_height
 	CODE:
-	RETVAL = GNOME_PRINT_MULTIPAGE(gnome_print_multipage_new_from_sizes (subpc, paper_width, paper_height, page_width, page_height));
+	RETVAL = (GnomePrintMultipage*)(gnome_print_multipage_new_from_sizes (subpc, paper_width, paper_height, page_width, page_height));
 	OUTPUT:
 	RETVAL
 

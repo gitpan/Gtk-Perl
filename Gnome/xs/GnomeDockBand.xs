@@ -17,7 +17,7 @@ Gnome::DockBand_Sink
 new (Class)
 	SV *	Class
 	CODE:
-	RETVAL =  GNOME_DOCK_BAND(gnome_dock_band_new());
+	RETVAL =  (GnomeDockBand*)(gnome_dock_band_new());
 	OUTPUT:
 	RETVAL
 

@@ -19,7 +19,7 @@ new (Class, history_id, browse_dialog_title)
 	char *	history_id
 	char *	browse_dialog_title
 	CODE:
-	RETVAL = GNOME_ICON_ENTRY(gnome_icon_entry_new(history_id, browse_dialog_title));
+	RETVAL = (GnomeIconEntry*)(gnome_icon_entry_new(history_id, browse_dialog_title));
 	OUTPUT:
 	RETVAL
 

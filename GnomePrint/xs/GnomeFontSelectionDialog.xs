@@ -16,7 +16,7 @@ new (Class, title)
 	SV *Class
 	char* title
 	CODE:
-	RETVAL = GNOME_FONT_SELECTION_DIALOG(gnome_font_selection_dialog_new(title));
+	RETVAL = (GnomeFontSelectionDialog*)(gnome_font_selection_dialog_new(title));
 	OUTPUT:
 	RETVAL
 

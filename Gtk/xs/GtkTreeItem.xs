@@ -17,9 +17,9 @@ new(Class, label=0)
 		Gtk::TreeItem::new_with_label = 1
 	CODE:
 	if (label)
-		RETVAL = GTK_TREE_ITEM(gtk_tree_item_new_with_label(label));
+		RETVAL = (GtkTreeItem*)(gtk_tree_item_new_with_label(label));
 	else
-		RETVAL = GTK_TREE_ITEM(gtk_tree_item_new());
+		RETVAL = (GtkTreeItem*)(gtk_tree_item_new());
 	OUTPUT:
 	RETVAL
 

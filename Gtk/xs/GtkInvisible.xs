@@ -15,7 +15,7 @@ Gtk::Invisible_Sink
 new (Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_INVISIBLE(gtk_invisible_new());
+	RETVAL = (GtkInvisible*)(gtk_invisible_new());
 	OUTPUT:
 	RETVAL
 

@@ -15,7 +15,7 @@ Gtk::Calendar_Sink
 new (Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_CALENDAR(gtk_calendar_new());
+	RETVAL = (GtkCalendar*)(gtk_calendar_new());
 	OUTPUT:
 	RETVAL
 

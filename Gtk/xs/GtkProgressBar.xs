@@ -12,7 +12,7 @@ MODULE = Gtk::ProgressBar		PACKAGE = Gtk::ProgressBar		PREFIX = gtk_progress_bar
 Gtk::ProgressBar_Sink
 new(Class)
 	CODE:
-	RETVAL = GTK_PROGRESS_BAR(gtk_progress_bar_new());
+	RETVAL = (GtkProgressBar*)(gtk_progress_bar_new());
 	OUTPUT:
 	RETVAL
 

@@ -118,7 +118,7 @@ Gtk::XmHTML_Sink
 new(Class)
 	SV * Class
 	CODE:
-	RETVAL = GTK_XMHTML(gtk_xmhtml_new());
+	RETVAL = (GtkXmHTML*)(gtk_xmhtml_new());
 	OUTPUT:
 	RETVAL
 

@@ -13,7 +13,7 @@ Gtk::List_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_LIST(gtk_list_new());
+	RETVAL = (GtkList*)(gtk_list_new());
 	OUTPUT:
 	RETVAL
 

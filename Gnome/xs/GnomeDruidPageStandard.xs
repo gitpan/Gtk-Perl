@@ -18,7 +18,7 @@ Gnome::DruidPageStandard_Sink
 new (Class)
 	SV *	Class
 	CODE:
-	RETVAL = GNOME_DRUID_PAGE_STANDARD(gnome_druid_page_standard_new());
+	RETVAL = (GnomeDruidPageStandard*)(gnome_druid_page_standard_new());
 	OUTPUT:
 	RETVAL
 
@@ -28,7 +28,7 @@ new_with_vals (Class, title,logo)
 	char*	title
 	Gtk::Gdk::ImlibImage	logo
 	CODE:
-	RETVAL = GNOME_DRUID_PAGE_STANDARD(gnome_druid_page_standard_new_with_vals(title, logo));
+	RETVAL = (GnomeDruidPageStandard*)(gnome_druid_page_standard_new_with_vals(title, logo));
 	OUTPUT:
 	RETVAL
 

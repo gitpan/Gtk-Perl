@@ -16,7 +16,7 @@ Gnome::StatusDocklet_Sink
 status_docklet_new (Class)
 	SV *	Class
 	CODE:
-	RETVAL = STATUS_DOCKLET(status_docklet_new ());
+	RETVAL = (StatusDocklet*)(status_docklet_new ());
 	OUTPUT:
 	RETVAL
 
@@ -26,7 +26,7 @@ status_docklet_new_full (Class, maximum_retries, handle_restarts)
 	int	maximum_retries
 	bool	handle_restarts
 	CODE:
-	RETVAL = STATUS_DOCKLET(status_docklet_new_full (maximum_retries, handle_restarts));
+	RETVAL = (StatusDocklet*)(status_docklet_new_full (maximum_retries, handle_restarts));
 	OUTPUT:
 	RETVAL
 

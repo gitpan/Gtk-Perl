@@ -19,7 +19,7 @@ new(Class, appname, title)
 	char *	appname
 	char *	title
 	CODE:
-	RETVAL = GNOME_MDI(gnome_mdi_new(appname, title));
+	RETVAL = (GnomeMDI*)(gnome_mdi_new(appname, title));
 	OUTPUT:
 	RETVAL
 

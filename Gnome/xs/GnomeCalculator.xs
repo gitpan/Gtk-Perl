@@ -14,9 +14,7 @@ MODULE = Gnome::Calculator		PACKAGE = Gnome::Calculator		PREFIX = gnome_calculat
 Gnome::Calculator_Sink
 new(Class)
 	CODE:
-	printf("c1\n");
-	RETVAL = GNOME_CALCULATOR(gnome_calculator_new());
-	printf("c2\n");
+	RETVAL = (GnomeCalculator*)(gnome_calculator_new());
 	OUTPUT:
 	RETVAL
 

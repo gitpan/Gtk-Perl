@@ -16,7 +16,7 @@ Gnome::ZvtTerm_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = ZVT_TERM(zvt_term_new());
+	RETVAL = (ZvtTerm*)(zvt_term_new());
 	OUTPUT:
 	RETVAL
 
@@ -26,7 +26,7 @@ new_with_size(Class, cols, rows)
 	int	cols
 	int	rows
 	CODE:
-	RETVAL = ZVT_TERM(zvt_term_new_with_size(cols, rows));
+	RETVAL = (ZvtTerm*)(zvt_term_new_with_size(cols, rows));
 	OUTPUT:
 	RETVAL
 

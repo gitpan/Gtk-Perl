@@ -17,7 +17,7 @@ Gnome::Stock_Sink
 new(Class)
 	SV*	Class
 	CODE:
-	RETVAL = GNOME_STOCK(gnome_stock_new());
+	RETVAL = (GnomeStock*)(gnome_stock_new());
 	OUTPUT:
 	RETVAL
 
@@ -26,7 +26,7 @@ new_with_icon(Class, icon)
 	SV*	Class
 	char*	icon
 	CODE:
-	RETVAL = GNOME_STOCK(gnome_stock_new_with_icon(icon));
+	RETVAL = (GnomeStock*)(gnome_stock_new_with_icon(icon));
 	OUTPUT:
 	RETVAL
 
@@ -41,7 +41,7 @@ gnome_stock_pixmap_widget (Class, window, icon)
 	Gtk::Widget	window
 	char *	icon
 	CODE:
-	RETVAL = GNOME_STOCK(gnome_stock_pixmap_widget(window, icon));
+	RETVAL = (GnomeStock*)(gnome_stock_pixmap_widget(window, icon));
 	OUTPUT:
 	RETVAL
 
@@ -53,7 +53,7 @@ gnome_stock_pixmap_widget_at_size (Class, window, icon, width, height)
 	unsigned int	width
 	unsigned int	height
 	CODE:
-	RETVAL = GNOME_STOCK(gnome_stock_pixmap_widget_at_size(window, icon, width, height));
+	RETVAL = (GnomeStock*)(gnome_stock_pixmap_widget_at_size(window, icon, width, height));
 	OUTPUT:
 	RETVAL
 
@@ -63,7 +63,7 @@ gnome_pixmap_button(Class, pixmap, text)
 	Gtk::Widget_OrNULL	pixmap
 	char *	text
 	CODE:
-	RETVAL = GTK_BUTTON(gnome_pixmap_button(pixmap, text));
+	RETVAL = (GtkButton*)(gnome_pixmap_button(pixmap, text));
 	OUTPUT:
 	RETVAL
 
@@ -72,7 +72,7 @@ gnome_stock_button (Class, type)
 	SV *	Class
 	char *	type
 	CODE:
-	RETVAL = GTK_BUTTON(gnome_stock_button(type));
+	RETVAL = (GtkButton*)(gnome_stock_button(type));
 	OUTPUT:
 	RETVAL
 
@@ -81,7 +81,7 @@ gnome_stock_or_ordinary_button (Class, type)
 	SV *	Class
 	char *	type
 	CODE:
-	RETVAL = GTK_BUTTON(gnome_stock_or_ordinary_button(type));
+	RETVAL = (GtkButton*)(gnome_stock_or_ordinary_button(type));
 	OUTPUT:
 	RETVAL
 
@@ -91,7 +91,7 @@ gnome_stock_menu_item (Class, type, text)
 	char *	type
 	char *	text
 	CODE:
-	RETVAL = GTK_MENU_ITEM(gnome_stock_menu_item(type, text));
+	RETVAL = (GtkMenuItem*)(gnome_stock_menu_item(type, text));
 	OUTPUT:
 	RETVAL
 

@@ -16,7 +16,7 @@ new(Class, label=&PL_sv_undef)
 	CODE:
 	{
 		char * l = SvOK(label) ? SvPV(label, PL_na) : 0;
-		RETVAL = GTK_FRAME(gtk_frame_new(l));
+		RETVAL = (GtkFrame*)(gtk_frame_new(l));
 	}
 	OUTPUT:
 	RETVAL

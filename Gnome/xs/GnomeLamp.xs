@@ -15,7 +15,7 @@ Gnome::Lamp_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GNOME_LAMP(gnome_lamp_new());
+	RETVAL = (GnomeLamp*)(gnome_lamp_new());
 	OUTPUT:
 	RETVAL
 
@@ -24,7 +24,7 @@ new_with_color(Class, color)
 	SV *	Class
 	Gtk::Gdk::Color	color
 	CODE:
-	RETVAL = GNOME_LAMP(gnome_lamp_new_with_color(color));
+	RETVAL = (GnomeLamp*)(gnome_lamp_new_with_color(color));
 	OUTPUT:
 	RETVAL
 
@@ -33,7 +33,7 @@ new_with_type(Class, type)
 	SV *	Class
 	char *	type
 	CODE:
-	RETVAL = GNOME_LAMP(gnome_lamp_new_with_type(type));
+	RETVAL = (GnomeLamp*)(gnome_lamp_new_with_type(type));
 	OUTPUT:
 	RETVAL
 

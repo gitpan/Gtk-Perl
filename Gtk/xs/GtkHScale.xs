@@ -14,7 +14,7 @@ new(Class, adjustment)
 	SV *	Class
 	Gtk::Adjustment	adjustment
 	CODE:
-	RETVAL = GTK_HSCALE(gtk_hscale_new(adjustment));
+	RETVAL = (GtkHScale*)(gtk_hscale_new(adjustment));
 	OUTPUT:
 	RETVAL
 

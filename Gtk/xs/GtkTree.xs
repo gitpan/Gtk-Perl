@@ -13,7 +13,7 @@ Gtk::Tree_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_TREE(gtk_tree_new());
+	RETVAL = (GtkTree*)(gtk_tree_new());
 	OUTPUT:
 	RETVAL
 

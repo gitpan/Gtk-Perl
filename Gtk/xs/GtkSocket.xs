@@ -13,7 +13,7 @@ Gtk::Socket_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_SOCKET(gtk_socket_new());
+	RETVAL = (GtkSocket*)(gtk_socket_new());
 	OUTPUT:
 	RETVAL
 

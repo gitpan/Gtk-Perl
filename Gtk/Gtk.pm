@@ -26,8 +26,12 @@ Perl-style calling conventions.
 
 You will find the reference documentation for the Gtk module in the
 C<Gtk::reference> manpage. There is also a cookbook style manual in
-C<Gtk::cookbook>. More information can be found on 
-http://gtkperl.org.
+C<Gtk::cookbook>. The C<Gtk::objects> manpage contains a list of
+the arguments and signals for each of the classes available in the
+Gtk, Gnome and related modules. There is also a list of the flags
+and enumerations along with their possible values.
+
+More information can be found on http://www.gtkperl.org.
 
 =head1 AUTHOR
 
@@ -45,7 +49,7 @@ require AutoLoader;
 
 require Carp;
 
-$VERSION = '0.7007';
+$VERSION = '0.7008';
 
 @ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export
@@ -223,6 +227,7 @@ sub insert_node_defaults {
 	$values{spacing} = 5 unless defined $values{spacing};
 	$values{is_leaf} = 1 unless defined $values{is_leaf};
 	$values{expanded} = 0 unless defined $values{expanded};
+	$values{titles} = $values{text} unless defined $values{titles};
 	
 	return $ctree->insert_node(@values{qw/parent sibling titles spacing pixmap_closed mask_closed pixmap_opened mask_opened is_leaf expanded/});
 }

@@ -25,9 +25,9 @@ new(Class, label=0, previous=0)
 			group = gtk_radio_button_group(previous);
 		
 		if (label && SvOK(label) )
-			RETVAL = GTK_RADIO_BUTTON(gtk_radio_button_new_with_label(group, SvPV(label,PL_na)));
+			RETVAL = (GtkRadioButton*)(gtk_radio_button_new_with_label(group, SvPV(label,PL_na)));
 		else
-			RETVAL = GTK_RADIO_BUTTON(gtk_radio_button_new(group));
+			RETVAL = (GtkRadioButton*)(gtk_radio_button_new(group));
 	}
 	OUTPUT:
 	RETVAL
@@ -60,7 +60,7 @@ gtk_radio_button_new_from_widget (Class, group)
 	SV *	Class
 	Gtk::RadioButton	group
 	CODE:
-	RETVAL = GTK_RADIO_BUTTON(gtk_radio_button_new_from_widget(group));
+	RETVAL = (GtkRadioButton*)(gtk_radio_button_new_from_widget(group));
 	OUTPUT:
 	RETVAL
 
@@ -70,7 +70,7 @@ gtk_radio_button_new_with_label_from_widget (Class, group, label)
 	Gtk::RadioButton	group
 	char *	label
 	CODE:
-	RETVAL = GTK_RADIO_BUTTON(gtk_radio_button_new_with_label_from_widget(group, label));
+	RETVAL = (GtkRadioButton*)(gtk_radio_button_new_with_label_from_widget(group, label));
 	OUTPUT:
 	RETVAL
 

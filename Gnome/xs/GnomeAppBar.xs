@@ -17,7 +17,7 @@ new(Class, has_progress, has_status, interactivity)
 	gboolean	has_status
 	Gnome::PreferencesType	interactivity
 	CODE:
-	RETVAL = GNOME_APPBAR(gnome_appbar_new(has_progress, has_status, interactivity));
+	RETVAL = (GnomeAppBar*)(gnome_appbar_new(has_progress, has_status, interactivity));
 	OUTPUT:
 	RETVAL
 

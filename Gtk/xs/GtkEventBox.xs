@@ -13,7 +13,7 @@ Gtk::EventBox_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_EVENT_BOX(gtk_event_box_new());
+	RETVAL = (GtkEventBox*)(gtk_event_box_new());
 	OUTPUT:
 	RETVAL
 

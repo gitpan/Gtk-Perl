@@ -20,7 +20,7 @@ new_with_size (Class, width, height)
 	unsigned int	width
 	unsigned int	height
 	CODE:
-	RETVAL = GNOME_ANIMATOR(gnome_animator_new_with_size(width, height));
+	RETVAL = (GnomeAnimator*)(gnome_animator_new_with_size(width, height));
 	OUTPUT:
 	RETVAL
 

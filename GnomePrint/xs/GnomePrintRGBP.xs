@@ -17,7 +17,7 @@ gnome_print_rgbp_new (Class, paper_size, dpi)
 	char*	paper_size
 	int	dpi
 	CODE:
-	RETVAL = GNOME_PRINT_RGBP(gnome_print_rgbp_new (paper_size, dpi));
+	RETVAL = (GnomePrintRGBP*)(gnome_print_rgbp_new (paper_size, dpi));
 	OUTPUT:
 	RETVAL
 

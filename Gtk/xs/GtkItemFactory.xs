@@ -126,7 +126,7 @@ gtk_item_factory_new(Class, container_type, path, accel_group)
 		wtype = gtnumber_for_gtname(container_type); 
 		if (!wtype)
 			wtype = gtnumber_for_ptname(container_type);
-		RETVAL = GTK_ITEM_FACTORY(gtk_item_factory_new(wtype, path, accel_group));
+		RETVAL = (GtkItemFactory*)(gtk_item_factory_new(wtype, path, accel_group));
 	}
 	OUTPUT:
 	RETVAL

@@ -13,7 +13,7 @@ Gtk::InputDialog_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_INPUT_DIALOG(gtk_input_dialog_new());
+	RETVAL = (GtkInputDialog*)(gtk_input_dialog_new());
 	OUTPUT:
 	RETVAL
 

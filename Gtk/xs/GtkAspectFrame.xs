@@ -18,7 +18,7 @@ new(Class, label, xalign=0.5, yalign=0.5, ratio=1.0, obey_child=TRUE)
 	double	ratio
 	bool	obey_child
 	CODE:
-	RETVAL = GTK_ASPECT_FRAME(gtk_aspect_frame_new(label, xalign, yalign, ratio, obey_child));
+	RETVAL = (GtkAspectFrame*)(gtk_aspect_frame_new(label, xalign, yalign, ratio, obey_child));
 	OUTPUT:
 	RETVAL
 

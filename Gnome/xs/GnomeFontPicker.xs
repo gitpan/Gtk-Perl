@@ -17,7 +17,7 @@ Gnome::FontPicker_Sink
 new (Class)
 	SV *	Class
 	CODE:
-	RETVAL = GNOME_FONT_PICKER(gnome_font_picker_new());
+	RETVAL = (GnomeFontPicker*)(gnome_font_picker_new());
 	OUTPUT:
 	RETVAL
 

@@ -15,7 +15,7 @@ Gtk::TearoffMenuItem_Sink
 new(Class)
 	SV * Class
 	CODE:
-	RETVAL = GTK_TEAROFF_MENU_ITEM(gtk_tearoff_menu_item_new());
+	RETVAL = (GtkTearoffMenuItem*)(gtk_tearoff_menu_item_new());
 	OUTPUT:
 	RETVAL
 

@@ -40,10 +40,10 @@ master(Class)
 		Gnome::Client::new_without_connection = 3
 	CODE:
 	switch (ix) {
-	case 0: RETVAL = GNOME_CLIENT(gnome_master_client()); break;
-	case 1: RETVAL = GNOME_CLIENT(gnome_cloned_client()); break;
-	case 2: RETVAL = GNOME_CLIENT(gnome_client_new()); break;
-	case 3: RETVAL = GNOME_CLIENT(gnome_client_new_without_connection()); break;
+	case 0: RETVAL = (GnomeClient*)(gnome_master_client()); break;
+	case 1: RETVAL = (GnomeClient*)(gnome_cloned_client()); break;
+	case 2: RETVAL = (GnomeClient*)(gnome_client_new()); break;
+	case 3: RETVAL = (GnomeClient*)(gnome_client_new_without_connection()); break;
 	}
 	OUTPUT:
 	RETVAL

@@ -18,7 +18,7 @@ new(Class, parent, embeddable)
 	Gnome::CanvasGroup	parent
 	Gnome::ObjectClient	embeddable
 	CODE:
-	RETVAL = GNOME_BONOBO_ITEM(gnome_bonobo_item_new(parent, embeddable));
+	RETVAL = (BonoboItem*)(gnome_bonobo_item_new(parent, embeddable));
 	OUTPUT:
 	RETVAL
 

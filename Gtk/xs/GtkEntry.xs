@@ -18,9 +18,9 @@ new(Class, max_length=0)
 		Gtk::Entry::new_with_max_length = 1
 	CODE:
 	if (items == 1)
-		RETVAL = GTK_ENTRY(gtk_entry_new());
+		RETVAL = (GtkEntry*)(gtk_entry_new());
 	else
-		RETVAL = GTK_ENTRY(gtk_entry_new_with_max_length(max_length));
+		RETVAL = (GtkEntry*)(gtk_entry_new_with_max_length(max_length));
 	OUTPUT:
 	RETVAL
 

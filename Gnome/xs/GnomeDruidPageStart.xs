@@ -18,7 +18,7 @@ Gnome::DruidPageStart_Sink
 new (Class)
 	SV *	Class
 	CODE:
-	RETVAL = GNOME_DRUID_PAGE_START(gnome_druid_page_start_new());
+	RETVAL = (GnomeDruidPageStart*)(gnome_druid_page_start_new());
 	OUTPUT:
 	RETVAL
 
@@ -30,7 +30,7 @@ new_with_vals (Class, title, text, logo, watermark)
 	Gtk::Gdk::ImlibImage	logo
 	Gtk::Gdk::ImlibImage	watermark
 	CODE:
-	RETVAL = GNOME_DRUID_PAGE_START(gnome_druid_page_start_new_with_vals(title, text, logo, watermark));
+	RETVAL = (GnomeDruidPageStart*)(gnome_druid_page_start_new_with_vals(title, text, logo, watermark));
 	OUTPUT:
 	RETVAL
 

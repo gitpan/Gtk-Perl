@@ -60,7 +60,7 @@ share_new(Class, share, ...)
 		for (i=0; i < items -2; ++i)
 			attr[i] = SvIV(ST(i+2));
 		attr[i] = 0;
-		RETVAL = GTK_GL_AREA(gtk_gl_area_share_new(attr, share));
+		RETVAL = (GtkGLArea*)(gtk_gl_area_share_new(attr, share));
 		free(attr);
 	}
 	OUTPUT:

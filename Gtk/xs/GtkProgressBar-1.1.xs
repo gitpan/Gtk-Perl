@@ -14,7 +14,7 @@ new_with_adjustment(Class, adjustment)
 	SV *	Class
 	Gtk::Adjustment	adjustment
 	CODE:
-	RETVAL = GTK_PROGRESS_BAR(gtk_progress_bar_new_with_adjustment(adjustment));
+	RETVAL = (GtkProgressBar*)(gtk_progress_bar_new_with_adjustment(adjustment));
 	OUTPUT:
 	RETVAL
 

@@ -13,7 +13,7 @@ Gtk::VPaned_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_VPANED(gtk_vpaned_new());
+	RETVAL = (GtkVPaned*)(gtk_vpaned_new());
 	OUTPUT:
 	RETVAL
 

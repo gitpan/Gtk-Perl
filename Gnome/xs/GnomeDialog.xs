@@ -25,10 +25,10 @@ new(Class, title, ...)
 			b[i] = SvPV(ST(i+2), PL_na);
 		b[i] = 0;
 #if GNOME_HVER >= 0x010200
-		RETVAL = GNOME_DIALOG(gnome_dialog_newv(title, b));
+		RETVAL = (GnomeDialog*)(gnome_dialog_newv(title, b));
 #else
 		/* I don't think this is right... */
-		RETVAL = GNOME_DIALOG(gnome_dialog_new(title, b));
+		RETVAL = (GnomeDialog*)(gnome_dialog_new(title, b));
 #endif
 		free(b);
 	}

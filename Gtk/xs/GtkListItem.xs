@@ -18,9 +18,9 @@ new(Class, string=0)
 		Gtk::ListItem::new_with_label = 1
 	CODE:
 	if (!string)
-		RETVAL = GTK_LIST_ITEM(gtk_list_item_new());
+		RETVAL = (GtkListItem*)(gtk_list_item_new());
 	else
-		RETVAL = GTK_LIST_ITEM(gtk_list_item_new_with_label(string));
+		RETVAL = (GtkListItem*)(gtk_list_item_new_with_label(string));
 	OUTPUT:
 	RETVAL
 

@@ -17,7 +17,7 @@ Gnome::Druid_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GNOME_DRUID(gnome_druid_new());
+	RETVAL = (GnomeDruid*)(gnome_druid_new());
 	OUTPUT:
 	RETVAL
 

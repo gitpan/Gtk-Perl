@@ -20,7 +20,7 @@ new (Class, name, behavior)
 	char *	name
 	Gnome::DockItemBehavior behavior
 	CODE:
-	RETVAL = GNOME_DOCK_ITEM(gnome_dock_item_new(name, behavior));
+	RETVAL = (GnomeDockItem*)(gnome_dock_item_new(name, behavior));
 	OUTPUT:
 	RETVAL
 

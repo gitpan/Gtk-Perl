@@ -13,7 +13,7 @@ Gtk::Curve_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_CURVE(gtk_curve_new());
+	RETVAL = (GtkCurve*)(gtk_curve_new());
 	OUTPUT:
 	RETVAL
 

@@ -13,7 +13,7 @@ Gtk::VRuler_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_VRULER(gtk_vruler_new());
+	RETVAL = (GtkVRuler*)(gtk_vruler_new());
 	OUTPUT:
 	RETVAL
 

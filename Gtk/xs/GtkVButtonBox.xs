@@ -13,7 +13,7 @@ Gtk::VButtonBox_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_VBUTTON_BOX(gtk_vbutton_box_new());
+	RETVAL = (GtkVButtonBox*)(gtk_vbutton_box_new());
 	OUTPUT:
 	RETVAL
 

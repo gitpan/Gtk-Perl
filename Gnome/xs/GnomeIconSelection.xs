@@ -17,7 +17,7 @@ Gnome::IconSelection_Sink
 new (Class)
 	SV *	Class
 	CODE:
-	RETVAL = GNOME_ICON_SELECTION(gnome_icon_selection_new());
+	RETVAL = (GnomeIconSelection*)(gnome_icon_selection_new());
 	OUTPUT:
 	RETVAL
 

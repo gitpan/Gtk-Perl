@@ -14,7 +14,7 @@ new(Class, title)
 	SV *	Class
 	char *	title
 	CODE:
-	RETVAL = GTK_FILE_SELECTION(gtk_file_selection_new(title));
+	RETVAL = (GtkFileSelection*)(gtk_file_selection_new(title));
 	OUTPUT:
 	RETVAL
 

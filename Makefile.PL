@@ -11,30 +11,31 @@ use Config;
 #	needed	bool		module must be compiled
 #	skip	bool		do not compile nor check this module
 #	force	bool		compile even if check fails
+#	depends array ref	names of the submodules the module depends upon
 
 %detect = (
 	gtk => {order => 1, dir => 'Gtk', needed => 1, 
 		check => sub {cconfig('gtk-config --version', '1\.2\.')}},
-	gdkimlib => {order => 2, dir => 'GdkImlib', 
+	gdkimlib => {order => 2, dir => 'GdkImlib', depends => [qw(gtk)],
 		check => sub {cconfig('imlib-config --version', '1\.9\.') && `imlib-config --libs-gdk`}},
-	gtkglarea => {order => 2, dir => 'GtkGLArea',
+	gtkglarea => {order => 2, dir => 'GtkGLArea', depends => [qw(gtk)],
 		check => sub {ccompile('#include <gtkgl/gtkglarea.h>', "", `gtk-config --cflags`,
 					"-lgtkgl  -lGL -lGLU " . `gtk-config --libs`)}},
-	gdkpixbuf => {order => 2, dir => 'GdkPixbuf',
-		check => sub {cconfig('gdk-pixbuf-config --version', '0\.(9|1\d)\.?')}},
-	gtkhtml => {order => 2, dir => 'GtkHTML',
+	gdkpixbuf => {order => 2, dir => 'GdkPixbuf', depends => [qw(gtk)],
+		check => sub {cconfig('gdk-pixbuf-config --version', '0\.(8|9|1\d)\.?')}},
+	gtkhtml => {order => 2, dir => 'GtkHTML', depends => [qw(gtk)],
 		check => sub {cconfig('gnome-config --modversion gtkhtml', 'gtkhtml-0\.[89]')}},
-	gtkxmhtml => {order => 2, dir => 'GtkXmHTML',
+	gtkxmhtml => {order => 2, dir => 'GtkXmHTML', depends => [qw(gtk)],
 		check => sub {cconfig('gnome-config --libs gtkxmhtml', '-lgtkxmhtml')}},
-	gnome => {order => 3, dir => 'Gnome',
+	gnome => {order => 3, dir => 'Gnome', depends => [qw(gdkimlib)],
 		check => sub {cconfig('gnome-config --version', '1\.[234]\.')}},
-	gnomeprint => {order => 4, dir => 'GnomePrint',
+	gnomeprint => {order => 4, dir => 'GnomePrint', depends => [qw(gnome gdkpixbuf)],
 		check => sub {cconfig('gnome-config --modversion print', 'gnome-print-0\.2[5-9]')}},
-	applets => {order => 4, dir => 'Applet',
+	applets => {order => 4, dir => 'Applet', depends => [qw(gnome)],
 		check => sub {cconfig('gnome-config --modversion applets', 'applets-1\.[234]\.') &&
 			# --modversion capplet is broken
 			cconfig('gnome-config --modversion capplet', 'capplet-')}},
-	glade => {order => 4, dir => 'Glade',
+	glade => {order => 4, dir => 'Glade', depends => [qw(gtk)],
 		check => sub {cconfig('libglade-config --version', '0\.1\d')}},
 );
 
@@ -61,13 +62,19 @@ foreach (sort {$detect{$a}->{order} <=> $detect{$b}->{order}} keys %detect) {
 	my $pkg = $detect{$_};
 	next if $pkg->{skip};
 	next if ($dontguess && !$pkg->{needed});
+	foreach my $submodule (@{$pkg->{depends}}) {
+		die "Submodule $submodule is needed to build $_ but it appears \nit's misdetected or not selected for compilation.\n".Usage()
+			unless ($detect{$submodule}->{ok});
+	}
 	if ($pkg->{check}->()) {
 		push @subdirs, $pkg->{dir};
+		$pkg->{ok} = 1;
 		next;
 	}
 	if ($pkg->{force}) {
 		warn "Adding package $_ even if it's misdetected.\n";
 		push @subdirs, $pkg->{dir};
+		$pkg->{ok} = 1;
 		next;
 	}
 	if ($pkg->{needed}) {
@@ -159,7 +166,7 @@ EOTEST
 sub Usage {
 	my $out = shift;
 	my @pkgs = sort {$detect{$a}->{order} <=> $detect{$b}->{order}} keys %detect;
-	$out .= "Available modules: @pkgs\n";
+	$out .= "Available modules: @pkgs.\n\n";
 	$out .= "You can disable the inclusion of a module using --without-pkgname.\n";
 	$out .= "If a package is misdetected and you still want it to compile \nuse --with-pkgname-force.\n";
 	$out .= "To disable autodetection of modules use --without-guessing.\n";

@@ -40,7 +40,7 @@ new(Class, clear, ...)
 			}
 		}
 
-		RETVAL = GNOME_SCORES(gnome_scores_new(count, names, scores, times, clear));
+		RETVAL = (GnomeScores*)(gnome_scores_new(count, names, scores, times, clear));
 		
 		free(names);
 		free(scores);

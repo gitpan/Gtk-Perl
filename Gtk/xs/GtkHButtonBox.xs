@@ -12,7 +12,7 @@ MODULE = Gtk::HButtonBox		PACKAGE = Gtk::HButtonBox		PREFIX = gtk_hbutton_box_
 Gtk::HButtonBox_Sink
 new(Class)
 	CODE:
-	RETVAL = GTK_HBUTTON_BOX(gtk_hbutton_box_new());
+	RETVAL = (GtkHButtonBox*)(gtk_hbutton_box_new());
 	OUTPUT:
 	RETVAL
 

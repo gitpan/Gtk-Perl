@@ -20,9 +20,9 @@ new_from_file(Class, filename, width=0, height=0)
 	int	height
 	CODE:
 	if (items==4)
-		RETVAL = GNOME_PIXMAP(gnome_pixmap_new_from_file_at_size(filename, width, height));
+		RETVAL = (GnomePixmap*)(gnome_pixmap_new_from_file_at_size(filename, width, height));
 	else
-		RETVAL = GNOME_PIXMAP(gnome_pixmap_new_from_file(filename));
+		RETVAL = (GnomePixmap*)(gnome_pixmap_new_from_file(filename));
 	OUTPUT:
 	RETVAL
 
@@ -33,7 +33,7 @@ new_from_file_at_size(Class, filename, width, height)
 	int	width
 	int	height
 	CODE:
-	RETVAL = GNOME_PIXMAP(gnome_pixmap_new_from_file_at_size(filename, width, height));
+	RETVAL = (GnomePixmap*)(gnome_pixmap_new_from_file_at_size(filename, width, height));
 	OUTPUT:
 	RETVAL
 
@@ -46,7 +46,7 @@ new_from_xpm_d(Class, data, ...)
 		int i;
 		for(i=1;i<items;i++)
 			lines[i-1] = SvPV(ST(i),PL_na);
-		RETVAL = GNOME_PIXMAP(gnome_pixmap_new_from_xpm_d(lines));
+		RETVAL = (GnomePixmap*)(gnome_pixmap_new_from_xpm_d(lines));
 		free(lines);
 	}
 	OUTPUT:
@@ -63,7 +63,7 @@ new_from_xpm_d_at_size(Class, width, height, data, ...)
 		int i;
 		for(i=2;i<items;i++)
 			lines[i-2] = SvPV(ST(i),PL_na);
-		RETVAL = GNOME_PIXMAP(gnome_pixmap_new_from_xpm_d_at_size(lines, width, height));
+		RETVAL = (GnomePixmap*)(gnome_pixmap_new_from_xpm_d_at_size(lines, width, height));
 		free(lines);
 	}
 	OUTPUT:
@@ -80,9 +80,9 @@ new_from_rgb_d(Class, data, alpha, rgb_width, rgb_height, width=0, height=0)
 	int	height
 	CODE:
 	if (items==7)
-		RETVAL = GNOME_PIXMAP(gnome_pixmap_new_from_rgb_d_at_size(data,alpha,rgb_width, rgb_height, width, height));
+		RETVAL = (GnomePixmap*)(gnome_pixmap_new_from_rgb_d_at_size(data,alpha,rgb_width, rgb_height, width, height));
 	else
-		RETVAL = GNOME_PIXMAP(gnome_pixmap_new_from_rgb_d(data, alpha, rgb_width, rgb_height));
+		RETVAL = (GnomePixmap*)(gnome_pixmap_new_from_rgb_d(data, alpha, rgb_width, rgb_height));
 	OUTPUT:
 	RETVAL
 
@@ -96,7 +96,7 @@ new_from_rgb_d_at_size(Class, data, alpha, rgb_width, rgb_height, width, height)
 	int	width
 	int	height
 	CODE:
-	RETVAL = GNOME_PIXMAP(gnome_pixmap_new_from_rgb_d_at_size(data,alpha,rgb_width, rgb_height, width, height));
+	RETVAL = (GnomePixmap*)(gnome_pixmap_new_from_rgb_d_at_size(data,alpha,rgb_width, rgb_height, width, height));
 	OUTPUT:
 	RETVAL
 

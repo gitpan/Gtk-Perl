@@ -17,7 +17,7 @@ Gnome::DockLayout_Sink
 new (Class)
 	SV *	Class
 	CODE:
-	RETVAL = GNOME_DOCK_LAYOUT(gnome_dock_layout_new());
+	RETVAL = (GnomeDockLayout*)(gnome_dock_layout_new());
 	OUTPUT:
 	RETVAL
 

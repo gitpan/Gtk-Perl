@@ -16,7 +16,7 @@ new(Class, label=0)
 	SV *	Class
 	char *	label
 	CODE:
-	RETVAL = GTK_ROOTWIN(gtk_rootwin_new());
+	RETVAL = (GtkRootWin*)(gtk_rootwin_new());
 	OUTPUT:
 	RETVAL
 

@@ -15,7 +15,7 @@ new(Class, val, mask)
 	Gtk::Gdk::Image	val
 	Gtk::Gdk::Bitmap_OrNULL	mask
 	CODE:
-	RETVAL = GTK_IMAGE(gtk_image_new(val, mask));
+	RETVAL = (GtkImage*)(gtk_image_new(val, mask));
 	OUTPUT:
 	RETVAL
 

@@ -19,7 +19,7 @@ gnome_print_preview_new (Class, canvas, paper_size)
 	Gnome::Canvas	canvas
 	char*	paper_size
 	CODE:
-	RETVAL = GNOME_PRINT_PREVIEW(gnome_print_preview_new (canvas, paper_size));
+	RETVAL = (GnomePrintPreview*)(gnome_print_preview_new (canvas, paper_size));
 	OUTPUT:
 	RETVAL
 

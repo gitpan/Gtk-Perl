@@ -18,9 +18,9 @@ new(Class, label=0)
 		Gtk::Button::new_with_label = 1
 	CODE:
 	if (!label)
-		RETVAL = GTK_BUTTON(gtk_button_new());
+		RETVAL = (GtkButton*)(gtk_button_new());
 	else
-		RETVAL = GTK_BUTTON(gtk_button_new_with_label(label));
+		RETVAL = (GtkButton*)(gtk_button_new_with_label(label));
 	OUTPUT:
 	RETVAL
 

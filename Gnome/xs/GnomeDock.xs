@@ -17,7 +17,7 @@ Gnome::Dock_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GNOME_DOCK(gnome_dock_new());
+	RETVAL = (GnomeDock*)(gnome_dock_new());
 	OUTPUT:
 	RETVAL
 

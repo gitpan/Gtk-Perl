@@ -13,7 +13,7 @@ Gtk::Fixed_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_FIXED(gtk_fixed_new());
+	RETVAL = (GtkFixed*)(gtk_fixed_new());
 	OUTPUT:
 	RETVAL
 

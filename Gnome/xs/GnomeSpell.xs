@@ -79,7 +79,7 @@ new (Class)
 	CODE:
 	{
 		init_gspell();
-		RETVAL = GNOME_SPELL(gnome_spell_new());
+		RETVAL = (GnomeSpell*)(gnome_spell_new());
 	}
 	OUTPUT:
 	RETVAL

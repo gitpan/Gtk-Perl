@@ -15,7 +15,7 @@ Gnome::PrinterWidget_Sink
 gnome_printer_widget_new (Class)
 	SV	*Class
 	CODE:
-	RETVAL = GNOME_PRINTER_WIDGET(gnome_printer_widget_new());
+	RETVAL = (GnomePrinterWidget*)(gnome_printer_widget_new());
 	OUTPUT:
 	RETVAL
 

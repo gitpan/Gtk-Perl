@@ -15,7 +15,7 @@ new(Class, hadj=0, vadj=0)
 	Gtk::Adjustment_OrNULL	hadj
 	Gtk::Adjustment_OrNULL	vadj
 	CODE:
-	RETVAL=GTK_LAYOUT(gtk_layout_new(hadj, vadj));
+	RETVAL = (GtkLayout*)(gtk_layout_new(hadj, vadj));
 	OUTPUT:
 	RETVAL
 

@@ -162,7 +162,7 @@ new(Class, param=0)
 	SV *	Class
 	char *	param
 	CODE:
-	RETVAL = APPLET_WIDGET(applet_widget_new(param));
+	RETVAL = (AppletWidget*)(applet_widget_new(param));
 	OUTPUT:
 	RETVAL
 

@@ -18,7 +18,7 @@ gnome_print_pixbuf_new (Class, printer, paper_size, dpi)
 	char*	paper_size
 	int	dpi
 	CODE:
-	RETVAL = GNOME_PRINT_PIXBUF(gnome_print_pixbuf_new (printer, paper_size, dpi));
+	RETVAL = (GnomePrintPixbuf*)(gnome_print_pixbuf_new (printer, paper_size, dpi));
 	OUTPUT:
 	RETVAL
 

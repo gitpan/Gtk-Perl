@@ -13,7 +13,7 @@ Gtk::Dialog_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_DIALOG(gtk_dialog_new());
+	RETVAL = (GtkDialog*)(gtk_dialog_new());
 	OUTPUT:
 	RETVAL
 

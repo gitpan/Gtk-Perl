@@ -20,6 +20,44 @@
 		infos[count].type = GNOME_APP_UI_ENDOFINFO; \
 
 
+#define refill_uiinfo(index, count, infos) \
+		count = items - index; \
+		for (i = 0; i < count; i++) { \
+			refill_one (ST(i+index),  &infos[i]); \
+		} \
+
+
+static void
+refill_one (SV *data, GnomeUIInfo *info) {
+
+	if (info->widget) {
+		if (SvTYPE(SvRV(data)) == SVt_PVHV) {
+			hv_store ((HV*)SvRV(data), "widget", 6, newSVGtkObjectRef(GTK_OBJECT(info->widget), 0), 0);
+		} else {
+			/* Always on the last psoition */
+			int pos = av_len((AV*)SvRV(data)) + 1;
+			av_store ((AV*)SvRV(data), pos, newSVGtkObjectRef(GTK_OBJECT(info->widget), 0));
+		}
+	}
+	switch (info->type) {
+	case GNOME_APP_UI_SUBTREE:
+	case GNOME_APP_UI_SUBTREE_STOCK:
+	case GNOME_APP_UI_RADIOITEMS:
+	{
+		int i, count;
+		GnomeUIInfo *subtree = info->moreinfo;
+		AV* a = (AV*)SvRV((SV*)info->user_data);
+		count = av_len(a) + 1;
+		for (i = 0; i < count; i++) {
+			SV** s = av_fetch(a, i, 0);
+			refill_one (*s, subtree + i);
+		}
+	}
+	default:
+		break;
+	}
+}
+
 static void
 string_callback (gchar * string, gpointer data) {
 	SV * handler;
@@ -75,7 +113,7 @@ new(Class, appname, title)
 	char *	appname
 	char *	title
 	CODE:
-	RETVAL = GNOME_APP(gnome_app_new(appname, title));
+	RETVAL = (GnomeApp*)(gnome_app_new(appname, title));
 	OUTPUT:
 	RETVAL
 
@@ -99,6 +137,7 @@ gnome_app_create_menus(app, info, ...)
 			gnome_app_create_toolbar(app, infos);
 		else
 			gnome_app_create_menus(app, infos);
+		refill_uiinfo(1, count, infos);
 	}
 
 
@@ -116,6 +155,7 @@ gnome_app_fill_menu (Class, menu_shell, uiinfo, accel_group, uline_accels, pos, 
 
 		fill_uiinfo(6, count, infos);
 		gnome_app_fill_menu (menu_shell, infos, accel_group, uline_accels, pos);
+		refill_uiinfo(6, count, infos);
 	}
 
 void
@@ -130,6 +170,7 @@ gnome_app_fill_toolbar (Class, toolbar, accel_group, ...)
 
 		fill_uiinfo(3, count, infos);
 		gnome_app_fill_toolbar (toolbar, infos, accel_group);
+		refill_uiinfo(3, count, infos);
 	}
 
 void

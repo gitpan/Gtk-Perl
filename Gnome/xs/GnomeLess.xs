@@ -15,7 +15,7 @@ Gnome::Less_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GNOME_LESS(gnome_less_new());
+	RETVAL = (GnomeLess*)(gnome_less_new());
 	OUTPUT:
 	RETVAL
 

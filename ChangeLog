@@ -1,3 +1,31 @@
+Fri Jun 29 21:02:18 CEST 2001 Paolo Molaro <lupus@ximian.com>
+
+	* */*.pm: update version number.
+	* Released version 0.7008.
+
+Tue Jun 26 17:17:50 CEST 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Glade/GladeXML.xs: handle missing .so link for glade-gnome.
+	* */xs/*.xs: avoid evil macros.
+	* Bonobo/*: make Bonobo binding better suited for display-less execution.
+	* Mozilla/*: update for Mozilla 0.9.1.
+	* Gnome/xs/GnomeCanvas.xs: compilation fix for older versions of gnome-libs.
+	* Makefile.PL: accept also gdk-pixbuf 0.8.0.
+
+Thu Jun  7 23:51:51 CEST 2001 Paolo Molaro <lupus@ximian.com>
+
+	* Gtk/xs/Gtk.xs: apply patch from Michael Jakob, mjakob@web.de
+	to fix stack indexes in gdk_draw_lines mapping.
+
+Thu Jun  7 22:48:28 CEST 2001 Paolo Molaro <lupus@ximian.com>
+
+	* GnomePrint/xs/GnomePrintContext.xs: fix for some perl 5.6 build setups.
+	* Gnome/xs/GnomeApp.xs, Gnome/xs/Gnome.xs: when using the GnomeUIInfo
+	mapping code to create toolbars and menus, set the "widget" key in the hash
+	(or in the last slot of the array) to the widget just created for that entry.
+	* Gnome/samples/app-helper.pl: some test code for the above change.
+	* Makefile.PL: better dependency checking for weird configurations.
+
 Fri Jun  1 12:52:08 CEST 2001 Paolo Molaro <lupus@ximian.com>
 
 	* Released version 0.7007.

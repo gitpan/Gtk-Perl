@@ -12,7 +12,7 @@ Gtk::OptionMenu_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_OPTION_MENU(gtk_option_menu_new());
+	RETVAL = (GtkOptionMenu*)(gtk_option_menu_new());
 	OUTPUT:
 	RETVAL
 

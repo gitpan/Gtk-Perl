@@ -14,7 +14,7 @@ new(Class, string="")
 	SV *	Class
 	char *	string
 	CODE:
-	RETVAL = GTK_LABEL(gtk_label_new(string));
+	RETVAL = (GtkLabel*)(gtk_label_new(string));
 	OUTPUT:
 	RETVAL
 

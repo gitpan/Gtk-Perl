@@ -15,7 +15,7 @@ new(Class, homogeneous=FALSE, spacing=5)
 	bool	homogeneous
 	int	spacing
 	CODE:
-	RETVAL = GTK_VBOX(gtk_vbox_new(homogeneous, spacing));
+	RETVAL = (GtkVBox*)(gtk_vbox_new(homogeneous, spacing));
 	OUTPUT:
 	RETVAL
 

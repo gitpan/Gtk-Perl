@@ -8,7 +8,7 @@ require Gnome;
 require Exporter;
 require DynaLoader;
 
-$VERSION = '0.7007';
+$VERSION = '0.7008';
 
 @ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export

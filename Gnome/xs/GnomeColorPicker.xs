@@ -15,7 +15,7 @@ Gnome::ColorPicker_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GNOME_COLOR_PICKER(gnome_color_picker_new());
+	RETVAL = (GnomeColorPicker*)(gnome_color_picker_new());
 	OUTPUT:
 	RETVAL
 

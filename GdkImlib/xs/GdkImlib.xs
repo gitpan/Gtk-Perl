@@ -140,7 +140,8 @@ MODULE = Gtk::Gdk::ImlibImage	PACKAGE = Gtk::Gdk::ImlibImage	PREFIX = gdk_imlib_
 void
 gdk_imlib_init(Class)
 	CODE:
-	gdk_imlib_init();
+	if (pgtk_did_we_init_gtk)
+		gdk_imlib_init();
 
 int
 gdk_imlib_get_render_type(Class)

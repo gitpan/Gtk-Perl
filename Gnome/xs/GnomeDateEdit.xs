@@ -18,7 +18,7 @@ new(Class, the_time, show_time, use_24_format)
 	bool	show_time
 	bool	use_24_format
 	CODE:
-	RETVAL = GNOME_DATE_EDIT(gnome_date_edit_new(the_time, show_time, use_24_format));
+	RETVAL = (GnomeDateEdit*)(gnome_date_edit_new(the_time, show_time, use_24_format));
 	OUTPUT:
 	RETVAL
 

@@ -23,7 +23,7 @@ new(Class, message, messagebox_type, button1=0, button2=0, button3=0, button4=0,
 	char *	button5
 	char *	button6
 	CODE:
-	RETVAL = GNOME_MESSAGE_BOX(gnome_message_box_new(message,messagebox_type,button1,button2,button3,button4,button5,button6,NULL));
+	RETVAL = (GnomeMessageBox*)(gnome_message_box_new(message,messagebox_type,button1,button2,button3,button4,button5,button6,NULL));
 	OUTPUT:
 	RETVAL
 

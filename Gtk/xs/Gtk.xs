@@ -876,6 +876,28 @@ gc(Class)
 	CODE:
 	GCGtkObjects();
 
+SV*
+constsubstr (data, offset=0, len=0)
+	SV *	data
+	unsigned int offset
+	unsigned int len
+	CODE:
+	{
+		STRLEN alen;
+		char *ptr = SvPV(data, alen);
+		if (len == 0)
+			len = alen-offset;
+		if (offset+len > alen)
+			croak("constsubstr out of bounds");
+		RETVAL = newSVpv("", 0);
+		SvPVX(RETVAL) = ptr+offset;
+		SvLEN(RETVAL) = 0;
+		SvCUR(RETVAL) = len;
+		SvREADONLY_on(RETVAL);
+	}
+	OUTPUT:
+	RETVAL
+
  #PROTO: init_check
  #DESC:
  # Initialize the Gtk module checking for a connection to the display.
@@ -934,6 +956,7 @@ init(Class)
 				XPUSHs(sv_2mortal(newSVsv(&PL_sv_undef)));
 				if (argv)
 					free(argv);
+				GtkInit_internal();
 				XSRETURN_UNDEF;
 			} else if ( ix == 0 ) {
 				gtk_init(&argc, &argv);
@@ -954,6 +977,12 @@ init(Class)
 		
 		GtkInit_internal();
 	}
+
+void
+init_types (Class)
+	SV *	Class
+	CODE:
+	GtkInit_internal();
 
  #DESC: Run an instance of the main loop.
 void
@@ -3506,12 +3535,12 @@ gdk_draw_lines (pixmap, gc, ...)
 	{
 		GdkPoint *points;
 		int np = (items-2)/2;
-		int i;
+		int i,j;
 		
-		points = (GdkPoint*)g_new0(GdkPoint, np);
-		for (i=0; i < np; ++i) {
-			points[i].x = SvIV(ST(i*2));
-			points[i].y = SvIV(ST(i*2+1));
+		points = (GdkPoint*)g_new(GdkPoint, np);
+		for (i=0,j=2; i < np; ++i,j+=2) {
+			points[i].x = SvIV(ST(j));
+			points[i].y = SvIV(ST(j+1));
 		}
 		gdk_draw_lines (pixmap, gc, points, np);
 		g_free(points);

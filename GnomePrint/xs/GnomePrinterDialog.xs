@@ -15,7 +15,7 @@ Gnome::PrinterDialog_Sink
 gnome_printer_dialog_new (Class)
 	SV*	Class
 	CODE:
-	RETVAL = GNOME_PRINTER_DIALOG (gnome_printer_dialog_new());
+	RETVAL = (GnomePrinterDialog*) (gnome_printer_dialog_new());
 	OUTPUT:
 	RETVAL
 

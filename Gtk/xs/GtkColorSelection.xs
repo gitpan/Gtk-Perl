@@ -12,7 +12,7 @@ Gtk::ColorSelection_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_COLOR_SELECTION(gtk_color_selection_new());
+	RETVAL = (GtkColorSelection*)(gtk_color_selection_new());
 	OUTPUT:
 	RETVAL
 

@@ -18,7 +18,7 @@ new(Class, value, lower, upper, step_increment, page_increment, page_size)
 	double	page_increment
 	double	page_size
 	CODE:
-	RETVAL = GTK_ADJUSTMENT(gtk_adjustment_new(value, lower, upper, step_increment, page_increment, page_size));
+	RETVAL = (GtkAdjustment*)(gtk_adjustment_new(value, lower, upper, step_increment, page_increment, page_size));
 	OUTPUT:
 	RETVAL
 

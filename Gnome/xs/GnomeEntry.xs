@@ -16,7 +16,7 @@ new(Class, history_id)
 	SV *	Class
 	char *	history_id
 	CODE:
-	RETVAL = GNOME_ENTRY(gnome_entry_new(history_id));
+	RETVAL = (GnomeEntry*)(gnome_entry_new(history_id));
 	OUTPUT:
 	RETVAL
 

@@ -15,7 +15,7 @@ Gnome::PropertyBox_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GNOME_PROPERTY_BOX(gnome_property_box_new());
+	RETVAL = (GnomePropertyBox*)(gnome_property_box_new());
 	OUTPUT:
 	RETVAL
 

@@ -15,7 +15,7 @@ Gtk::Notebook_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_NOTEBOOK(gtk_notebook_new());
+	RETVAL = (GtkNotebook*)(gtk_notebook_new());
 	OUTPUT:
 	RETVAL
 

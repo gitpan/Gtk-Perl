@@ -17,7 +17,7 @@ gnome_print_master_preview_new (Class, gpm, title)
 	Gnome::PrintMaster	gpm
 	char*	title
 	CODE:
-	RETVAL = GNOME_PRINT_MASTER_PREVIEW(gnome_print_master_preview_new(gpm, title));
+	RETVAL = (GnomePrintMasterPreview*)(gnome_print_master_preview_new(gpm, title));
 	OUTPUT:
 	RETVAL
 
@@ -28,7 +28,7 @@ gnome_print_master_preview_new_with_orientation (Class, gpm, title, landscape)
 	char*	title
 	bool	landscape
 	CODE:
-	RETVAL = GNOME_PRINT_MASTER_PREVIEW(gnome_print_master_preview_new_with_orientation(gpm, title, landscape));
+	RETVAL = (GnomePrintMasterPreview*)(gnome_print_master_preview_new_with_orientation(gpm, title, landscape));
 	OUTPUT:
 	RETVAL
 

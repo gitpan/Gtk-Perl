@@ -2,21 +2,18 @@
 
 package Bonobo;
 
-require Gtk;
-require Gtk::Gdk::ImlibImage;
 require Gnome;
 require Exporter;
 require DynaLoader;
 require AutoLoader;
 use CORBA::ORBit 
-	vnamespace => 1,
 	defines => "-D__ORBIT_IDL__ -D__BONOBO_COMPILATION",
 	idl_path => "/usr/share/idl:/usr/local/share/idl:/opt/idl", 
 	idl => ['Bonobo.idl'];
 
-use Carp;
+require Carp;
 
-$VERSION = '0.7007';
+$VERSION = '0.7008';
 
 my $orb =  CORBA::ORB_init("orbit-local-orb");
 my $poa = $orb->resolve_initial_references("RootPOA");
@@ -116,16 +113,17 @@ sub removeListener {
 sub notify {
 	my ($self, $event, $val) = @_;
 	foreach my $id (keys %{$self->{__listeners}}) {
+		my $listener = $self->{__listeners}->{$id};
 		if (!exists $self->{__emasks}->{$id}) {
-			$self->{__listeners}->{$id}->event($event, $val);
+			$listener->event($event, $val);
 		} else {
 			# implement the same undocumented way the C version uses
 			foreach my $m (@{$self->{__emasks}->{$id}}) {
 				if ($m =~ /^=/ && $event eq substr($m, 1)) {
-					$self->{__listeners}->{$id}->event($event, $val);
+					$listener->event($event, $val);
 					next;
 				} elsif ($m eq substr($event, 0, length($m))) {
-					$self->{__listeners}->{$id}->event($event, $val);
+					$listener->event($event, $val);
 				}
 			}
 		}

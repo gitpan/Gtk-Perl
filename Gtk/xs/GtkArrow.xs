@@ -15,7 +15,7 @@ new(Class, arrow_type=GTK_ARROW_RIGHT, shadow_type=GTK_SHADOW_OUT)
 	Gtk::ArrowType	arrow_type
 	Gtk::ShadowType	shadow_type
 	CODE:
-	RETVAL = GTK_ARROW(gtk_arrow_new(arrow_type, shadow_type));
+	RETVAL = (GtkArrow*)(gtk_arrow_new(arrow_type, shadow_type));
 	OUTPUT:
 	RETVAL
 

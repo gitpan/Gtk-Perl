@@ -13,7 +13,7 @@ Gtk::TipsQuery_Sink
 new(Class)
 	SV * Class
 	CODE:
-	RETVAL = GTK_TIPS_QUERY(gtk_tips_query_new());
+	RETVAL = (GtkTipsQuery*)(gtk_tips_query_new());
 	OUTPUT:
 	RETVAL
 

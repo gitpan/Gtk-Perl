@@ -13,7 +13,7 @@ Gtk::Tooltips_Sink
 new(Class)
 	SV * Class
 	CODE:
-	RETVAL = GTK_TOOLTIPS(gtk_tooltips_new());
+	RETVAL = (GtkTooltips*)(gtk_tooltips_new());
 	OUTPUT:
 	RETVAL
 

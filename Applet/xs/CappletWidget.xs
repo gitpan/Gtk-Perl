@@ -23,7 +23,7 @@ Gnome::CappletWidget
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = CAPPLET_WIDGET(capplet_widget_new());
+	RETVAL = (CappletWidget*)(capplet_widget_new());
 	OUTPUT:
 	RETVAL
 
@@ -32,7 +32,7 @@ multi_new(Class, capid)
 	SV *	Class
 	int	capid
 	CODE:
-	RETVAL = CAPPLET_WIDGET(capplet_widget_multi_new(capid));
+	RETVAL = (CappletWidget*)(capplet_widget_multi_new(capid));
 	OUTPUT:
 	RETVAL
 

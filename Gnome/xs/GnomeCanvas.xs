@@ -15,7 +15,7 @@ Gnome::Canvas_Sink
 gnome_canvas_new(Class)
 	SV*	Class
 	CODE:
-	RETVAL= GNOME_CANVAS(gnome_canvas_new());
+	RETVAL= (GnomeCanvas*)(gnome_canvas_new());
 	OUTPUT:
 	RETVAL
 
@@ -25,7 +25,7 @@ Gnome::Canvas_Sink
 gnome_canvas_new_aa(Class)
 	SV*	Class
 	CODE:
-	RETVAL= GNOME_CANVAS(gnome_canvas_new_aa());
+	RETVAL= (GnomeCanvas*)(gnome_canvas_new_aa());
 	OUTPUT:
 	RETVAL
 
@@ -233,6 +233,8 @@ gnome_canvas_set_close_enough(canvas, ce)
 	CODE:
 	canvas->close_enough = ce;
 
+#if GNOME_HVER >= 0x010209
+
 void
 gnome_canvas_set_dither (canvas, dither)
 	Gnome::Canvas	canvas
@@ -241,6 +243,8 @@ gnome_canvas_set_dither (canvas, dither)
 Gtk::Gdk::Rgb::Dither
 gnome_canvas_get_dither (canvas)
 	Gnome::Canvas	canvas
+
+#endif
 
 #endif
 

@@ -13,7 +13,7 @@ Gtk::Combo_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_COMBO(gtk_combo_new());
+	RETVAL = (GtkCombo*)(gtk_combo_new());
 	OUTPUT:
 	RETVAL
 

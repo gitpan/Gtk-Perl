@@ -17,7 +17,7 @@ Gnome::PaperSelector_Sink
 new (Class)
 	SV *	Class
 	CODE:
-	RETVAL = GNOME_PAPER_SELECTOR(gnome_paper_selector_new());
+	RETVAL = (GnomePaperSelector*)(gnome_paper_selector_new());
 	OUTPUT:
 	RETVAL
 

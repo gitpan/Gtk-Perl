@@ -23,7 +23,7 @@ new(Class, title, ...)
 		for (i=2; i < items; ++i)
 			interfs[i-2] = SvPV(ST(i), PL_na);
 		interfs[i] = NULL;
-		RETVAL = GNOME_BONOBO_SELECTOR(gnome_bonobo_selector_new(title, interfs));
+		RETVAL = (GnomeBonoboSelector*)(gnome_bonobo_selector_new(title, interfs));
 	}
 	OUTPUT:
 	RETVAL

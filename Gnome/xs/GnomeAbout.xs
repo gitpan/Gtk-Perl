@@ -36,7 +36,7 @@ new(Class, title=0, version=0, copyright=0, authors=0, comments=0, logo=0)
 				a[1] = 0;
 			}
 		}
-		RETVAL = GNOME_ABOUT(gnome_about_new(title, version, copyright, a, comments, logo));
+		RETVAL = (GnomeAbout*)(gnome_about_new(title, version, copyright, a, comments, logo));
 		if (a)
 			free(a);
 	}

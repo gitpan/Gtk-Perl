@@ -18,9 +18,9 @@ new(Class, label=0)
 		Gtk::CheckMenuItem::new_with_label = 1
 	CODE:
 	if (!label)
-		RETVAL = GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new());
+		RETVAL = (GtkCheckMenuItem*)(gtk_check_menu_item_new());
 	else
-		RETVAL = GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new_with_label(label));
+		RETVAL = (GtkCheckMenuItem*)(gtk_check_menu_item_new_with_label(label));
 	OUTPUT:
 	RETVAL
 

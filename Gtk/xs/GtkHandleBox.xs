@@ -13,7 +13,7 @@ Gtk::HandleBox_Sink
 new(Class)
 	SV *	Class
 	CODE:
-	RETVAL = GTK_HANDLE_BOX(gtk_handle_box_new());
+	RETVAL = (GtkHandleBox*)(gtk_handle_box_new());
 	OUTPUT:
 	RETVAL
 

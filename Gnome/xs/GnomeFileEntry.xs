@@ -17,7 +17,7 @@ new(Class, history_id, browse_dialog_title)
 	char *	history_id
 	char *	browse_dialog_title
 	CODE:
-	RETVAL = GNOME_FILE_ENTRY(gnome_file_entry_new(history_id, browse_dialog_title));
+	RETVAL = (GnomeFileEntry*)(gnome_file_entry_new(history_id, browse_dialog_title));
 	OUTPUT:
 	RETVAL
 

@@ -20,7 +20,7 @@ new (Class, history_id, browse_dialog_title, do_preview)
 	char *	browse_dialog_title
 	int	do_preview
 	CODE:
-	RETVAL = GNOME_PIXMAP_ENTRY(gnome_pixmap_entry_new(history_id, browse_dialog_title, do_preview));
+	RETVAL = (GnomePixmapEntry*)(gnome_pixmap_entry_new(history_id, browse_dialog_title, do_preview));
 	OUTPUT:
 	RETVAL
 

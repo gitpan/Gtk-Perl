@@ -17,7 +17,7 @@ new(Class, xalign=0.5, yalign=0.5, xscale=1.0, yscale=1.0)
 	double	xscale
 	double	yscale
 	CODE:
-	RETVAL = GTK_ALIGNMENT(gtk_alignment_new(xalign, yalign, xscale, yscale));
+	RETVAL = (GtkAlignment*)(gtk_alignment_new(xalign, yalign, xscale, yscale));
 	OUTPUT:
 	RETVAL
 

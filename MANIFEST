@@ -206,7 +206,9 @@ Gtk/samples/testlog.pl
 Gtk/samples/testmf.pl
 Gtk/samples/testpacker.pl
 Gtk/samples/testpdl.pl
+Gtk/samples/testrgb.pl
 Gtk/samples/testselection.pl
+Gtk/samples/thread.pl
 Gtk/samples/widget.pl
 Gtk/samples/xpm/3DRings.xpm
 Gtk/samples/xpm/FilesQueue.xpm

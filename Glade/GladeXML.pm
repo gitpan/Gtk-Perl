@@ -10,7 +10,7 @@ require AutoLoader;
 use Carp;
 use strict;
 
-$Gtk::GladeXML::VERSION = '0.7007';
+$Gtk::GladeXML::VERSION = '0.7008';
 
 @Gtk::GladeXML::ISA = qw(Exporter DynaLoader);
 # Items to export into callers namespace by default. Note: do not export
@@ -93,15 +93,18 @@ sub signal_autoconnect_from_package {
 }
 
 sub _init_handler {
-	my ($lib, $symbol) = @_;
+	my ($symbol, @libs) = @_;
 	my ($libref, $handle, $error);
 	$handle = DynaLoader::dl_find_symbol_anywhere ($symbol);
 	unless ($handle) {
-		my $fullpath = DynaLoader::dl_findfile($lib);
-		$libref = DynaLoader::dl_load_file($fullpath, 0) if $fullpath;
-		#warn "Cannot load: $lib\n" unless $libref;
-		$handle = DynaLoader::dl_find_symbol($libref, $symbol) if $libref;
-		#warn "Found symbol in $lib: $symbol\n" if $handle;
+		@libs = DynaLoader::dl_findfile(@libs);
+		foreach my $lib (@libs) {
+			$libref = DynaLoader::dl_load_file($lib, 0);
+			#warn "Cannot load: $lib\n" unless $libref;
+			$handle = DynaLoader::dl_find_symbol($libref, $symbol) if $libref;
+			#warn "Found symbol in $lib: $symbol\n" if $handle;
+			last if $handle;
+		}
 	} else {
 		#warn "Found symbol: $symbol\n";
 	}
@@ -114,15 +117,16 @@ sub _init_handler {
 }
 
 sub gnome_init {
-	Gtk::GladeXML::_init_handler("glade-gnome", "glade_gnome_init");
+	# platform specific, but should do for now
+	Gtk::GladeXML::_init_handler("glade_gnome_init", "glade-gnome", "libglade-gnome.so.0");
 }
 
 sub bonobo_init {
-	Gtk::GladeXML::_init_handler("glade-bonobo", "glade_bonobo_init");
+	Gtk::GladeXML::_init_handler("glade_bonobo_init", "glade-bonobo");
 }
 
 sub gnomedb_init {
-	Gtk::GladeXML::_init_handler("glade-gnomedb", "glade_gnome_db_init");
+	Gtk::GladeXML::_init_handler("glade_gnome_db_init", "glade-gnomedb");
 }
 
 Gtk->mod_init_add('Gtk', sub {

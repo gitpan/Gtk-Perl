@@ -16,13 +16,13 @@ call_line_handler(SV *handler, GnomePrintContext *context, int line, SV *data) {
 	SAVETMPS;
 	PUSHMARK(SP);
 
-	XPUSHs(sv_2mortal(newSVGtkObjectRef(context, NULL)));
+	XPUSHs(sv_2mortal(newSVGtkObjectRef(GTK_OBJECT(context), NULL)));
 	XPUSHs(sv_2mortal(newSViv(line)));
 	XPUSHs(sv_2mortal(newSVsv(data)));
 
 	PUTBACK;
 
-	Perl_call_sv(handler, G_DISCARD);
+	call_sv(handler, G_DISCARD);
 	
 	FREETMPS;
 	LEAVE;
@@ -37,7 +37,7 @@ new (Class, printer)
 	SV*	Class
 	Gnome::Printer	printer
 	CODE:
-	RETVAL = GNOME_PRINT_CONTEXT(gnome_print_context_new(printer));
+	RETVAL = (GnomePrintContext*)(gnome_print_context_new(printer));
 	OUTPUT:
 	RETVAL
 
@@ -47,7 +47,7 @@ gnome_print_context_new_with_paper_size (Class, printer, paper)
 	Gnome::Printer	printer
 	char*	paper
 	CODE:
-	RETVAL = GNOME_PRINT_CONTEXT(gnome_print_context_new_with_paper_size(printer, paper));
+	RETVAL = (GnomePrintContext*)(gnome_print_context_new_with_paper_size(printer, paper));
 	OUTPUT:
 	RETVAL
 
