@@ -6,7 +6,7 @@ require Exporter;
 require DynaLoader;
 require Gtk::Gdk::Pixbuf::Types;
 
-$VERSION = "0.7009";
+$VERSION = "0.7010";
 
 @ISA = qw(Exporter DynaLoader);
 @EXPORT = qw();

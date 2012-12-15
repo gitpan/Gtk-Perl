@@ -1191,8 +1191,7 @@ watch_add(Class, sv, priority, handler, ...)
 		/* code basically stolen from perl-tk */
 		if (SvTHINKFIRST(sv) && SvREADONLY(sv))
 			croak("Cannot trace readonly variable");
-		if (!SvUPGRADE(sv, SVt_PVMG))
-			croak("Cannot upgrade variable");
+		SvUPGRADE(sv, SVt_PVMG);
 		mg_list = SvMAGIC(sv);
 		SvMAGIC(sv) = NULL;
 		sv_magic(sv, 0, 'U', 0, 0);

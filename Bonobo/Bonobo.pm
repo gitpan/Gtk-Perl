@@ -13,7 +13,7 @@ use CORBA::ORBit
 
 require Carp;
 
-$VERSION = '0.7009';
+$VERSION = "0.7010";
 
 my $orb =  CORBA::ORB_init("orbit-local-orb");
 my $poa = $orb->resolve_initial_references("RootPOA");

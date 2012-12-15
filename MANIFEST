@@ -449,3 +449,5 @@ Mozilla/samples/test.pl
 Mozilla/xs/GtkMozArea.xs
 Mozilla/xs/GtkMozBox.xs
 Mozilla/xs/GtkMozEmbed.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
